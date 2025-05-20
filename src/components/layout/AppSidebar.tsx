@@ -110,7 +110,7 @@ export const AppSidebar = () => {
 
       <Sidebar
         defaultCollapsed={false}
-        collapsible
+        collapsible="icon"
         collapsed={collapsed}
         onCollapsedChange={setCollapsed}
         className={cn(
