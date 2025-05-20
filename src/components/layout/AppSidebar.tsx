@@ -1,7 +1,15 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { cn } from "@/lib/utils";
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarContent,
+  SidebarFooter as SidebarFooterWrapper,
+  SidebarHeader as SidebarHeaderWrapper,
+  SidebarGroup,
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   Home,
   Users,
@@ -12,27 +20,19 @@ import {
   X,
   Shield
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  SidebarContent,
-  SidebarFooter as SidebarFooterWrapper,
-  SidebarHeader as SidebarHeaderWrapper,
-  SidebarGroup,
-} from "@/components/ui/sidebar";
-import { Sidebar } from "@/components/ui/sidebar-wrapper";
 import { Role } from "@/types";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { iconClasses, sidebarMobileClasses } from "@/lib/tailwind-utils";
+import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
 
 export const AppSidebar = () => {
   const { authState, signOut } = useAuth();
   const location = useLocation();
-  const { collapsed, setCollapsed } = useSidebarCollapse(false);
+  const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
-  // Itens de navegação com controle de acesso por role
+  // Navigation items with role-based access control
   const navItems: NavItem[] = [
     {
       title: "Dashboard",
@@ -72,12 +72,12 @@ export const AppSidebar = () => {
     },
   ];
 
-  // Filtrar itens baseado na role do usuário atual
+  // Filter items based on the current user's role
   const filteredItems = navItems.filter(
     (item) => authState.user && item.roles.includes(authState.user.role)
   );
 
-  // Verifica se o item atual é o ativo
+  // Check if the current item is active
   const isActive = (href: string) => location.pathname === href;
 
   return (
@@ -87,7 +87,7 @@ export const AppSidebar = () => {
         variant="ghost"
         size="icon"
         className="fixed top-4 right-4 z-50 md:hidden"
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggleCollapsed}
       >
         {collapsed ? (
           <Menu className={iconClasses} />
@@ -96,35 +96,37 @@ export const AppSidebar = () => {
         )}
       </Button>
 
-      <Sidebar
-        defaultCollapsed={false}
-        collapsible="icon"
-        collapsed={collapsed}
-        onCollapsedChange={setCollapsed}
-        className={sidebarMobileClasses(collapsed)}
-      >
-        <SidebarHeaderWrapper className="py-4 px-4">
-          <SidebarHeader collapsed={collapsed} />
-        </SidebarHeaderWrapper>
-        
-        <SidebarContent className="px-2">
-          <SidebarGroup>
-            <SidebarNavigation 
-              navItems={filteredItems} 
-              isActive={isActive} 
+      <SidebarProvider>
+        <Sidebar
+          defaultCollapsed={false}
+          collapsible="icon"
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          className={sidebarElementClasses.container}
+        >
+          <SidebarHeaderWrapper className={sidebarElementClasses.header}>
+            <SidebarHeader collapsed={collapsed} />
+          </SidebarHeaderWrapper>
+          
+          <SidebarContent className={sidebarElementClasses.content}>
+            <SidebarGroup>
+              <SidebarNavigation 
+                navItems={filteredItems} 
+                isActive={isActive} 
+                collapsed={collapsed} 
+              />
+            </SidebarGroup>
+          </SidebarContent>
+          
+          <SidebarFooterWrapper className={sidebarElementClasses.footer}>
+            <SidebarFooter 
+              user={authState.user} 
               collapsed={collapsed} 
+              onSignOut={signOut}
             />
-          </SidebarGroup>
-        </SidebarContent>
-        
-        <SidebarFooterWrapper className="mt-auto">
-          <SidebarFooter 
-            user={authState.user} 
-            collapsed={collapsed} 
-            onSignOut={signOut}
-          />
-        </SidebarFooterWrapper>
-      </Sidebar>
+          </SidebarFooterWrapper>
+        </Sidebar>
+      </SidebarProvider>
     </>
   );
 };

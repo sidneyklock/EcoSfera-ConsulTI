@@ -34,3 +34,11 @@ export const sidebarMobileClasses = (collapsed: boolean) => cn(
   "border-r h-screen fixed left-0 top-0 z-40 transition-all duration-300",
   collapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "w-64"
 );
+
+// Sidebar element classes
+export const sidebarElementClasses = {
+  container: "border-r h-screen fixed left-0 top-0 z-40 transition-all duration-300",
+  header: "py-4 px-4",
+  footer: "mt-auto",
+  content: "px-2"
+};

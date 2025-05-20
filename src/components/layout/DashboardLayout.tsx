@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Role } from "@/types";
+import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -17,8 +18,9 @@ export const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const { authState } = useAuth();
   const { user, isLoading } = authState;
+  const { collapsed } = useSidebarCollapse(false);
 
-  // Se estiver carregando, exibe um indicador de carregamento
+  // If loading, display a loading indicator
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -27,12 +29,12 @@ export const DashboardLayout = ({
     );
   }
 
-  // Se não estiver autenticado, redireciona para o login
+  // If not authenticated, redirect to login
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  // Verifica permissões se requiredRoles for especificado
+  // Check permissions if requiredRoles is specified
   if (requiredRoles && !requiredRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" />;
   }
@@ -41,7 +43,8 @@ export const DashboardLayout = ({
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
       <div className={cn(
-        "flex-1 ml-0 md:ml-64 transition-all duration-300",
+        "flex-1 transition-all duration-300",
+        collapsed ? "ml-0 md:ml-20" : "ml-0 md:ml-64"
       )}>
         <main className="flex-1 p-4 md:p-8">
           {children}
