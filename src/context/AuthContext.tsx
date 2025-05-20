@@ -28,6 +28,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser) as User;
+        // Quando integrado com Supabase, a role virá de:
+        // 1. user.user_metadata.role OU
+        // 2. Consulta à tabela profiles vinculada ao user.id
         setAuthState({ user, isLoading: false, error: null });
       } catch (error) {
         console.error("Erro ao analisar usuário armazenado:", error);
@@ -45,11 +48,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simular um login (será substituído pela integração com Supabase)
       // Em produção, use: const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
+      // Quando integrado com Supabase, obtenha a role de:
+      // 1. data.user.user_metadata.role OU
+      // 2. Consulta à tabela profiles vinculada ao data.user.id
+      // const role = data.user.user_metadata.role || await getProfileRole(data.user.id) || "user";
+      
+      // Para demonstração, vamos usar um valor padrão "user"
+      const defaultRole = "user";
+      
       // Para demonstração, vamos simular um usuário
       const mockUser: User = {
         id: "1",
         email,
-        role: email.includes("admin") ? "admin" : "user",
+        role: defaultRole, // Valor padrão, será substituído pela role do Supabase
         name: email.split("@")[0],
       };
       
@@ -71,11 +82,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simular um registro (será substituído pela integração com Supabase)
       // Em produção, use: const { data, error } = await supabase.auth.signUp({ email, password });
       
-      // Para demonstração, vamos simular um usuário
+      // Quando integrado com Supabase, defina a role padrão como "user" e crie um perfil
+      // const defaultRole = "user";
+      // await supabase.from('profiles').insert({ id: data.user.id, role: defaultRole, name: name || email.split("@")[0] });
+      
+      // Para demonstração, vamos simular um usuário com role padrão "user"
       const mockUser: User = {
         id: "1",
         email,
-        role: "user",
+        role: "user", // Role padrão para novos usuários
         name: name || email.split("@")[0],
       };
       
@@ -95,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
       // Em produção, use: const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      // Quando o usuário for autenticado, obtenha a role de forma similar ao signIn
       
       alert("Função será implementada quando integrada com Supabase");
       setAuthState((prev) => ({ ...prev, isLoading: false }));
