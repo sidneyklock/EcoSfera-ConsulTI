@@ -4,6 +4,12 @@ import { cn } from "@/lib/utils";
 import { Role } from "@/types";
 import { SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { LucideIcon } from "lucide-react";
+import { 
+  iconClasses, 
+  sidebarItemClasses, 
+  sidebarItemActiveClasses, 
+  sidebarItemInactiveClasses 
+} from "@/lib/tailwind-utils";
 
 export type NavItem = {
   title: string;
@@ -29,13 +35,13 @@ export const SidebarNavigation = ({ navItems, isActive, collapsed }: SidebarNavi
               <Link
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                  sidebarItemClasses,
                   isActive(item.href)
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? sidebarItemActiveClasses
+                    : sidebarItemInactiveClasses
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className={iconClasses} />
                 {!collapsed && <span>{item.title}</span>}
               </Link>
             </SidebarMenuButton>

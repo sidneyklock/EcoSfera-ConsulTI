@@ -25,6 +25,7 @@ import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
+import { iconClasses, sidebarMobileClasses } from "@/lib/tailwind-utils";
 
 export const AppSidebar = () => {
   const { authState, signOut } = useAuth();
@@ -89,9 +90,9 @@ export const AppSidebar = () => {
         onClick={() => setCollapsed(!collapsed)}
       >
         {collapsed ? (
-          <Menu className="h-5 w-5" />
+          <Menu className={iconClasses} />
         ) : (
-          <X className="h-5 w-5" />
+          <X className={iconClasses} />
         )}
       </Button>
 
@@ -100,10 +101,7 @@ export const AppSidebar = () => {
         collapsible="icon"
         collapsed={collapsed}
         onCollapsedChange={setCollapsed}
-        className={cn(
-          "border-r h-screen fixed left-0 top-0 z-40 transition-all duration-300",
-          collapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "w-64"
-        )}
+        className={sidebarMobileClasses(collapsed)}
       >
         <SidebarHeaderWrapper className="py-4 px-4">
           <SidebarHeader collapsed={collapsed} />

@@ -4,6 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { LogOut } from "lucide-react";
 import { User } from "@/types";
+import { 
+  iconClasses, 
+  flexCenterGapClasses, 
+  textBaseClasses,
+  textSecondaryClasses,
+  avatarSizeClasses
+} from "@/lib/tailwind-utils";
 
 interface SidebarFooterProps {
   user: User | null;
@@ -26,8 +33,8 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
     <div className="px-2 pb-4">
       {user && (
         <>
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-md">
-            <Avatar className="h-8 w-8">
+          <div className={cn(flexCenterGapClasses, "px-3 py-2.5 rounded-md")}>
+            <Avatar className={avatarSizeClasses}>
               <AvatarImage src={user.avatar_url} />
               <AvatarFallback>
                 {getInitials(user.name)}
@@ -35,10 +42,10 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
+                <p className={textBaseClasses + " truncate"}>
                   {user.name || 'Usuário'}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">
+                <p className={cn(textSecondaryClasses, "truncate")}>
                   {user.email}
                 </p>
               </div>
@@ -49,7 +56,7 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
             className={cn("w-full mt-2 justify-start", collapsed && "justify-center")}
             onClick={onSignOut}
           >
-            <LogOut className="h-5 w-5 mr-2" />
+            <LogOut className={cn(iconClasses, "mr-2")} />
             {!collapsed && "Sair"}
           </Button>
         </>
