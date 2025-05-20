@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/unauthorized" element={<NotFound />} /> {/* Temporariamente usando NotFound para página de acesso não autorizado */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
