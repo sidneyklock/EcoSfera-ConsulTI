@@ -34,7 +34,7 @@ export const DashboardLayout = ({
 
   // Verifica permissões se requiredRoles for especificado
   if (requiredRoles && !requiredRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/unauthorized" />;
   }
 
   return (

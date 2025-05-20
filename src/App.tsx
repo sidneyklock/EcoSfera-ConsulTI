@@ -15,6 +15,8 @@ import ChatPage from "./pages/ChatPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import UsersPage from "./pages/UsersPage";
 import SettingsPage from "./pages/SettingsPage";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +36,8 @@ const App = () => (
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/unauthorized" element={<NotFound />} /> {/* Temporariamente usando NotFound para página de acesso não autorizado */}
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

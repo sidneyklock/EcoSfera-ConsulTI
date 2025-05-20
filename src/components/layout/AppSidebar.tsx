@@ -10,7 +10,8 @@ import {
   MessageSquare,
   LogOut,
   Menu,
-  X
+  X,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -47,6 +48,12 @@ export const AppSidebar = () => {
       href: "/dashboard",
       icon: Home,
       roles: ["user", "admin"],
+    },
+    {
+      title: "Admin",
+      href: "/admin",
+      icon: Shield,
+      roles: ["admin"],
     },
     {
       title: "Usuários",
