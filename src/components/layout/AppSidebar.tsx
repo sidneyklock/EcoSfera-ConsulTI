@@ -13,7 +13,6 @@ import {
   Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import {
   SidebarContent,
   SidebarFooter as SidebarFooterWrapper,
@@ -25,11 +24,12 @@ import { Role } from "@/types";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
+import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 
 export const AppSidebar = () => {
   const { authState, signOut } = useAuth();
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, setCollapsed } = useSidebarCollapse(false);
 
   // Itens de navegação com controle de acesso por role
   const navItems: NavItem[] = [
