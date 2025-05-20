@@ -15,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
@@ -25,6 +24,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
+import { Sidebar } from "@/components/ui/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Role } from "@/types";
 
