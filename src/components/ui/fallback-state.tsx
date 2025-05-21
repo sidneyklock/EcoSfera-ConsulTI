@@ -2,19 +2,25 @@
 import React from 'react';
 import { Loader, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from './button';
 
 export interface FallbackStateProps {
   type: 'loading' | 'error' | 'empty';
   title?: string;
   message?: string;
   className?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 export const FallbackState = ({ 
   type, 
   title, 
   message, 
-  className 
+  className,
+  action
 }: FallbackStateProps) => {
   // Default messages based on type
   const defaults = {
@@ -60,7 +66,18 @@ export const FallbackState = ({
         {currentState.icon}
       </div>
       <h3 className="text-lg font-medium mb-2">{displayTitle}</h3>
-      <p className="text-sm text-muted-foreground max-w-md">{displayMessage}</p>
+      <p className="text-sm text-muted-foreground max-w-md mb-4">{displayMessage}</p>
+      
+      {action && (
+        <Button 
+          onClick={action.onClick}
+          variant="outline"
+          size="sm"
+          className="mt-2"
+        >
+          {action.label}
+        </Button>
+      )}
     </div>
   );
 };

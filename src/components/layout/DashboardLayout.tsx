@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User as UserIcon } from "lucide-react";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 
@@ -17,7 +17,7 @@ const DashboardHeader = memo(({ userName, onSignOut }: { userName?: string, onSi
     </div>
     <div className="flex items-center gap-2">
       <div className="flex items-center mr-2">
-        <User className="h-4 w-4 mr-1 text-muted-foreground" />
+        <UserIcon className="h-4 w-4 mr-1 text-muted-foreground" />
         <span className="text-sm font-medium hidden md:inline">{userName || 'Usuário'}</span>
       </div>
       <Button variant="ghost" size="sm" onClick={onSignOut} className="text-sm">

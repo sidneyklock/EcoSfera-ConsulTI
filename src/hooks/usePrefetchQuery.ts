@@ -6,7 +6,7 @@ import { dispatchUserActionSubmit, dispatchUserActionError } from "@/utils";
 interface PrefetchOptions {
   enabled?: boolean;
   staleTime?: number;
-  cacheTime?: number;
+  gcTime?: number;
 }
 
 /**
@@ -19,7 +19,7 @@ export function usePrefetchQuery<TData>(
   user?: any
 ) {
   const queryClient = useQueryClient();
-  const { enabled = true, staleTime = 1000 * 60 * 5, cacheTime = 1000 * 60 * 10 } = options;
+  const { enabled = true, staleTime = 1000 * 60 * 5, gcTime = 1000 * 60 * 10 } = options;
   
   // Define the prefetch function
   const prefetch = useCallback(async () => {
@@ -29,7 +29,7 @@ export function usePrefetchQuery<TData>(
         queryKey,
         queryFn,
         staleTime,
-        cacheTime
+        gcTime
       });
     } catch (error) {
       console.error(`Error prefetching query ${queryKey}:`, error);
@@ -41,7 +41,7 @@ export function usePrefetchQuery<TData>(
         user
       );
     }
-  }, [queryClient, queryKey, queryFn, staleTime, cacheTime, user]);
+  }, [queryClient, queryKey, queryFn, staleTime, gcTime, user]);
 
   // Prefetch on mount if enabled
   useEffect(() => {
@@ -56,6 +56,7 @@ export function usePrefetchQuery<TData>(
     queryKey,
     queryFn,
     staleTime,
+    gcTime,
     enabled
   });
 

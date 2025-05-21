@@ -93,10 +93,7 @@ export function useSecureContext() {
         type="error"
         title="Erro ao carregar perfil"
         message={`Não foi possível carregar seus dados: ${error}`}
-        action={{
-          label: "Tentar novamente",
-          onClick: () => window.location.reload()
-        }}
+        action={{ label: "Tentar novamente", onClick: () => window.location.reload() }}
       />
     ) : null
   }), [user, solutionId, role, loading, error]);

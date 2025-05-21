@@ -1,8 +1,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { Role } from '@/types';
+import { Role, User } from '@/types';
 import { useSecureContextStore } from '@/stores/secureContextStore';
 
 export type AuthState = {
@@ -32,6 +32,18 @@ export function useAuth() {
     fetchUserContext,
     createUserRecord
   } = useSecureContextStore();
+
+  // Convert Supabase user to our User type
+  const mapSupabaseUser = (supabaseUser: SupabaseUser | null): User | null => {
+    if (!supabaseUser) return null;
+    
+    return {
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
+      avatar_url: supabaseUser.user_metadata?.avatar_url,
+    };
+  };
 
   const signOut = useCallback(async () => {
     try {

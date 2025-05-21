@@ -4,7 +4,7 @@ export type Role = "anon" | "user" | "admin" | "system" | "member" | "owner";
 export interface User {
   id: string;
   email: string;
-  role: Role;
+  role?: Role;
   name?: string;
   avatar_url?: string;
 }
