@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, cardClasses, iconClasses, transitions } from "@/lib/utils";
+import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, a11yClasses } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
@@ -29,11 +29,12 @@ export const StatsCard = ({
     <Card 
       className={cn(
         cardClasses({ variant: "interactive" }),
+        transitions.all,
         className
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardTitle className={textClasses.base}>{title}</CardTitle>
         <div 
           className={cn(iconClasses.container, "h-9 w-9")}
           aria-hidden="true"
@@ -42,14 +43,20 @@ export const StatsCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className={cn(textClasses.heading.h2, "mb-1")}>
+          {isLoading ? (
+            <span className={cn("bg-muted h-7 w-20 block rounded-md", animations.pulse)} />
+          ) : (
+            value
+          )}
+        </div>
         {(trend || description) && (
-          <div className="flex items-center mt-1.5">
+          <div className={cn(layoutClasses.flexCenterGap, "mt-1.5")}>
             {trend && (
               <span
                 className={cn(
-                  "text-xs font-medium mr-2 flex items-center gap-0.5",
-                  trend.isPositive ? "text-green-500" : "text-red-500"
+                  "text-xs font-medium flex items-center gap-0.5",
+                  trend.isPositive ? "text-success" : "text-destructive"
                 )}
                 aria-label={`${trend.isPositive ? 'Aumento' : 'Redução'} de ${Math.abs(trend.value)}%`}
               >
@@ -58,7 +65,9 @@ export const StatsCard = ({
               </span>
             )}
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className={textClasses.secondary}>
+                {description}
+              </p>
             )}
           </div>
         )}

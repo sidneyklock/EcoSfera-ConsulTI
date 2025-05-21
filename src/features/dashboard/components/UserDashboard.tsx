@@ -3,6 +3,7 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { MessageSquare, Clock, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { responsive, spacing, cardClasses, transitions, layoutClasses, textClasses, buttonStateClasses, iconClasses, a11yClasses } from "@/lib/utils";
 
 export const UserDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -14,10 +15,10 @@ export const UserDashboard = () => {
   };
 
   return (
-    <div>
+    <div className={spacing.section}>
       <WelcomeHeader />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className={responsive.grid.cols4}>
         <StatsCard
           title="Mensagens"
           value={stats.messages}
@@ -46,58 +47,90 @@ export const UserDashboard = () => {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border bg-card shadow p-6">
-          <h3 className="font-medium text-lg mb-4">Atividade Recente</h3>
+      <div className={cn(responsive.grid.cols2, "mt-8")}>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Atividade Recente</h3>
           <div className="space-y-4">
-            <div className="flex gap-4 items-start">
-              <div className="bg-primary/10 rounded-full p-2">
-                <MessageSquare className="h-4 w-4 text-primary" />
+            <div className={layoutClasses.flexCenterGap}>
+              <div className={cn(iconClasses.container, "p-2")}>
+                <MessageSquare className={cn(iconClasses.base, "h-4 w-4")} />
               </div>
               <div>
-                <p className="text-sm font-medium">Nova mensagem no projeto Alpha</p>
-                <p className="text-xs text-muted-foreground">Há 10 minutos</p>
+                <p className={textClasses.base}>Nova mensagem no projeto Alpha</p>
+                <p className={textClasses.secondary}>Há 10 minutos</p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <div className="bg-primary/10 rounded-full p-2">
-                <Star className="h-4 w-4 text-primary" />
+            <div className={layoutClasses.flexCenterGap}>
+              <div className={cn(iconClasses.container, "p-2")}>
+                <Star className={cn(iconClasses.base, "h-4 w-4")} />
               </div>
               <div>
-                <p className="text-sm font-medium">Projeto Beta concluído</p>
-                <p className="text-xs text-muted-foreground">Há 2 horas</p>
+                <p className={textClasses.base}>Projeto Beta concluído</p>
+                <p className={textClasses.secondary}>Há 2 horas</p>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <div className="bg-primary/10 rounded-full p-2">
-                <Calendar className="h-4 w-4 text-primary" />
+            <div className={layoutClasses.flexCenterGap}>
+              <div className={cn(iconClasses.container, "p-2")}>
+                <Calendar className={cn(iconClasses.base, "h-4 w-4")} />
               </div>
               <div>
-                <p className="text-sm font-medium">Reunião agendada</p>
-                <p className="text-xs text-muted-foreground">Hoje, 15:00</p>
+                <p className={textClasses.base}>Reunião agendada</p>
+                <p className={textClasses.secondary}>Hoje, 15:00</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card shadow p-6">
-          <h3 className="font-medium text-lg mb-4">Ações Rápidas</h3>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Ações Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <MessageSquare className="h-5 w-5 mb-1 mx-auto" />
-              <span className="text-sm block">Iniciar Chat IA</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active,
+              a11yClasses.focusVisible
+            )}
+              aria-label="Iniciar Chat IA">
+              <MessageSquare className={cn(iconClasses.base, "mb-1")} />
+              <span className={textClasses.base}>Iniciar Chat IA</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Calendar className="h-5 w-5 mb-1 mx-auto" />
-              <span className="text-sm block">Agendar Reunião</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active,
+              a11yClasses.focusVisible
+            )}
+              aria-label="Agendar Reunião">
+              <Calendar className={cn(iconClasses.base, "mb-1")} />
+              <span className={textClasses.base}>Agendar Reunião</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Star className="h-5 w-5 mb-1 mx-auto" />
-              <span className="text-sm block">Novo Projeto</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active,
+              a11yClasses.focusVisible
+            )}
+              aria-label="Novo Projeto">
+              <Star className={cn(iconClasses.base, "mb-1")} />
+              <span className={textClasses.base}>Novo Projeto</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Clock className="h-5 w-5 mb-1 mx-auto" />
-              <span className="text-sm block">Ver Tarefas</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active,
+              a11yClasses.focusVisible
+            )}
+              aria-label="Ver Tarefas">
+              <Clock className={cn(iconClasses.base, "mb-1")} />
+              <span className={textClasses.base}>Ver Tarefas</span>
             </button>
           </div>
         </div>

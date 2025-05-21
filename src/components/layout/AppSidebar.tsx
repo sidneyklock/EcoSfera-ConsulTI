@@ -28,12 +28,14 @@ import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { 
   iconClasses,
   sidebarElementClasses,
-  buttonStateClasses
-} from "@/lib/tailwind-utils";
+  buttonStateClasses,
+  transitions,
+  animations,
+  a11yClasses
+} from "@/lib/utils";
 import { useEffect, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
-import { animations, transitions } from "@/lib/utils";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -146,6 +148,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
           transitions.all,
           buttonStateClasses.active,
           buttonStateClasses.hover,
+          a11yClasses.focusVisible,
           animations.fadeIn
         )}
         onClick={toggleCollapsed}
@@ -153,9 +156,9 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
         aria-expanded={!collapsed}
       >
         {collapsed ? (
-          <Menu className={cn(iconClasses, transitions.transform)} />
+          <Menu className={cn(iconClasses.base, transitions.transform)} />
         ) : (
-          <X className={cn(iconClasses, transitions.transform)} />
+          <X className={cn(iconClasses.base, transitions.transform)} />
         )}
       </Button>
 
@@ -170,7 +173,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
             sidebarElementClasses.container, 
             "border-r border-border bg-background shadow-sm",
             transitions.all,
-            "focus-visible:outline-none"
+            a11yClasses.focusVisible
           )}
           aria-label="Navegação principal"
         >

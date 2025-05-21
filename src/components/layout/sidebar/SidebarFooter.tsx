@@ -6,11 +6,13 @@ import { LogOut } from "lucide-react";
 import { User } from "@/types";
 import { 
   iconClasses, 
-  flexCenterGapClasses, 
-  textBaseClasses,
-  textSecondaryClasses,
-  avatarSizeClasses
-} from "@/lib/tailwind-utils";
+  layoutClasses, 
+  textClasses,
+  avatarSizeClasses,
+  buttonStateClasses,
+  transitions,
+  a11yClasses
+} from "@/lib/utils";
 
 interface SidebarFooterProps {
   user: User | null;
@@ -33,19 +35,19 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
     <div className="px-2 pb-4">
       {user && (
         <>
-          <div className={cn(flexCenterGapClasses, "px-3 py-2.5 rounded-md")}>
+          <div className={cn(layoutClasses.flexCenterGap, "px-3 py-2.5 rounded-md", "hover:bg-accent/50", transitions.colors)}>
             <Avatar className={avatarSizeClasses}>
-              <AvatarImage src={user.avatar_url} />
+              <AvatarImage src={user.avatar_url} alt={user.name || 'Avatar do usuário'} />
               <AvatarFallback>
                 {getInitials(user.name)}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className={cn(textBaseClasses, "truncate")}>
+                <p className={cn(textClasses.base, "truncate")}>
                   {user.name || 'Usuário'}
                 </p>
-                <p className={cn(textSecondaryClasses, "truncate")}>
+                <p className={cn(textClasses.secondary, "truncate")}>
                   {user.email}
                 </p>
               </div>
@@ -53,10 +55,18 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
           </div>
           <Button
             variant="ghost"
-            className={cn("w-full mt-2 justify-start", collapsed && "justify-center")}
+            className={cn(
+              "w-full mt-2 justify-start",
+              collapsed && "justify-center",
+              transitions.colors,
+              buttonStateClasses.active,
+              buttonStateClasses.hover,
+              a11yClasses.focusVisible
+            )}
             onClick={onSignOut}
+            aria-label="Sair da aplicação"
           >
-            <LogOut className={cn(iconClasses, "mr-2")} />
+            <LogOut className={cn(iconClasses.base, "mr-2")} />
             {!collapsed && "Sair"}
           </Button>
         </>

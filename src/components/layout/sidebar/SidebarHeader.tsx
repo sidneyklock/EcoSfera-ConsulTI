@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { flexCenterClasses } from "@/lib/tailwind-utils";
+import { layoutClasses } from "@/lib/utils";
 import { SolutionSelector } from "../SolutionSelector";
 
 interface SidebarHeaderProps {
@@ -12,7 +12,7 @@ interface SidebarHeaderProps {
 export const SidebarHeader = ({ collapsed, solutionId }: SidebarHeaderProps) => {
   return (
     <div className="py-4 px-4">
-      <div className={flexCenterClasses}>
+      <div className={layoutClasses.flexCenter}>
         <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold mr-2">
           S
         </div>

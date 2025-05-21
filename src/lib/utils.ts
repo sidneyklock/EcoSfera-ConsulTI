@@ -20,7 +20,9 @@ export const animations = {
   slideOutRight: "animate-slide-out-right",
   pulse: "animate-pulse",
   spin: "animate-spin",
-  bounce: "animate-bounce"
+  bounce: "animate-bounce",
+  enter: "animate-enter",
+  exit: "animate-exit"
 }
 
 /**
@@ -98,10 +100,10 @@ export const textClasses = {
 }
 
 /**
- * Layout related classes
+ * Layout helper classes
  */
 export const layoutClasses = {
-  flexCenter: "flex items-center",
+  flexCenter: "flex items-center justify-center",
   flexCenterGap: "flex items-center gap-3",
   itemPadding: "px-3 py-2.5 rounded-md",
   cardPadding: "p-6"
@@ -115,6 +117,28 @@ export const buttonStateClasses = {
   hover: "hover:bg-accent hover:text-accent-foreground transition-colors duration-200",
   focus: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 }
+
+/**
+ * Sidebar element classes
+ */
+export const sidebarElementClasses = {
+  container: "w-64 h-screen flex flex-col overflow-y-auto",
+  header: "flex items-center justify-between",
+  content: "flex-1 overflow-y-auto",
+  footer: "flex flex-col"
+};
+
+/**
+ * Sidebar item classes
+ */
+export const sidebarItemClasses = "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors";
+export const sidebarItemActiveClasses = "bg-primary/10 text-primary hover:bg-primary/15";
+export const sidebarItemInactiveClasses = "text-muted-foreground hover:bg-accent hover:text-accent-foreground";
+
+/**
+ * Avatar size classes
+ */
+export const avatarSizeClasses = "h-8 w-8";
 
 /**
  * Card state classes - for consistent card styling
@@ -143,6 +167,37 @@ export const cardClasses = cva(
 )
 
 export type CardVariantsProps = VariantProps<typeof cardClasses>
+
+/**
+ * Button variants with consistent styling
+ */
+export const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline"
+      },
+      size: {
+        default: "h-10 px-4 py-2 text-sm",
+        sm: "h-9 px-3 text-xs",
+        lg: "h-11 px-8 text-base",
+        icon: "h-10 w-10"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+)
+
+export type ButtonVariantsProps = VariantProps<typeof buttonVariants>
 
 /**
  * Skeleton loader variants

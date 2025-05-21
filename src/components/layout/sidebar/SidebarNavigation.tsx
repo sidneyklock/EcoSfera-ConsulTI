@@ -8,8 +8,10 @@ import {
   iconClasses, 
   sidebarItemClasses, 
   sidebarItemActiveClasses, 
-  sidebarItemInactiveClasses 
-} from "@/lib/tailwind-utils";
+  sidebarItemInactiveClasses,
+  transitions,
+  a11yClasses
+} from "@/lib/utils";
 
 export type NavItem = {
   title: string;
@@ -36,12 +38,15 @@ export const SidebarNavigation = ({ navItems, isActive, collapsed }: SidebarNavi
                 to={item.href}
                 className={cn(
                   sidebarItemClasses,
+                  transitions.colors,
+                  a11yClasses.focusVisible,
                   isActive(item.href)
                     ? sidebarItemActiveClasses
                     : sidebarItemInactiveClasses
                 )}
+                aria-current={isActive(item.href) ? "page" : undefined}
               >
-                <item.icon className={iconClasses} />
+                <item.icon className={iconClasses.base} />
                 {!collapsed && <span>{item.title}</span>}
               </Link>
             </SidebarMenuButton>

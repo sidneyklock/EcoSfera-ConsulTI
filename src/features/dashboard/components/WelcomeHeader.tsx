@@ -1,6 +1,6 @@
 
 import { useAuthStore } from "@/stores/authStore";
-import { textClasses } from "@/lib/utils";
+import { textClasses, spacing } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 export const WelcomeHeader = () => {
@@ -18,7 +18,7 @@ export const WelcomeHeader = () => {
   const displayName = user?.name || user?.email?.split("@")[0] || "Usuário";
 
   return (
-    <div className="mb-8">
+    <div className={spacing.cardHeader}>
       <h1 className={cn(textClasses.heading.h1)}>
         {getGreeting()}, {displayName}!
       </h1>
