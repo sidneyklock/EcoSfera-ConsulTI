@@ -4,7 +4,7 @@ import { cn, skeletonClasses, animations } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
-  variant?: "card" | "table" | "text" | "avatar" | "button" | "stats";
+  variant?: "card" | "table" | "text" | "avatar" | "button" | "stats" | "page";
   count?: number;
   height?: string;
 };
@@ -18,6 +18,19 @@ export function LoadingSkeleton({
 }: SkeletonProps) {
   const renderSkeleton = () => {
     switch (variant) {
+      case "page":
+        return (
+          <div className="space-y-4 w-full">
+            <Skeleton className="h-8 w-1/3 mb-6" />
+            <Skeleton className="h-32 w-full mb-4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+            <div className="mt-8">
+              <Skeleton className="h-10 w-1/4 rounded-md" />
+            </div>
+          </div>
+        );
       case "stats":
         return (
           <div className="space-y-3 w-full h-full">
