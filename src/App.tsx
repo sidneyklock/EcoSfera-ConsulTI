@@ -1,7 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./features/core/pages/NotFound";
@@ -9,6 +8,7 @@ import DashboardLayout from "./features/layout/components/DashboardLayout";
 import DashboardPage from "./features/dashboard/pages/DashboardPage";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { Navigate } from "react-router-dom";
 
 const App = () => {
   return (
@@ -16,7 +16,7 @@ const App = () => {
       <AuthProvider>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
