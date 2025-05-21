@@ -2,15 +2,23 @@
 import { useAuthActions } from './useAuthActions';
 import { useAuthContext } from './useAuthContext';
 import { useAuthSession } from './useAuthSession';
+import { logger } from "@/utils/logger";
 
 /**
- * Hook principal de autenticação que combina todas as funcionalidades
- * Este hook substitui useAuthentication e useAuthService
+ * Hook principal de autenticação que consolida toda funcionalidade
+ * Substitui todos os hooks legados (useAuthentication, useAuthService, etc)
  */
 export function useAuth() {
   const actions = useAuthActions();
   const context = useAuthContext();
   const { session } = useAuthSession();
+  
+  // Logging para rastrear uso
+  logger.debug({
+    action: "hook_used",
+    message: "useAuth hook called",
+    data: { isAuthenticated: !!context.user }
+  });
   
   return {
     // Dados do usuário e contexto
