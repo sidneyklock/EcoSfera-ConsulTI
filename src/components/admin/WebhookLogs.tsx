@@ -28,12 +28,16 @@ interface WebhookLog {
   execution_timestamp: string;
 }
 
+interface TokenDetail {
+  name: string;
+}
+
 export const WebhookLogs = () => {
   const [logs, setLogs] = useState<WebhookLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedLog, setSelectedLog] = useState<WebhookLog | null>(null);
-  const [tokenDetails, setTokenDetails] = useState<Record<string, { name: string }>>({});
+  const [tokenDetails, setTokenDetails] = useState<Record<string, TokenDetail>>({});
 
   // Carregar logs de webhook
   const fetchLogs = async () => {
@@ -61,7 +65,7 @@ export const WebhookLogs = () => {
           .in("id", tokenIds);
 
         if (!tokenError && tokenData) {
-          const tokenMap: Record<string, { name: string }> = {};
+          const tokenMap: Record<string, TokenDetail> = {};
           tokenData.forEach(token => {
             tokenMap[token.id] = { name: token.name };
           });

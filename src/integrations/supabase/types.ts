@@ -240,6 +240,86 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_logs: {
+        Row: {
+          execution_id: string
+          execution_timestamp: string | null
+          id: string
+          ip_address: string | null
+          request_data: Json | null
+          response_data: Json | null
+          status: string
+          user_id: string | null
+          webhook_token_id: string | null
+        }
+        Insert: {
+          execution_id: string
+          execution_timestamp?: string | null
+          id?: string
+          ip_address?: string | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status: string
+          user_id?: string | null
+          webhook_token_id?: string | null
+        }
+        Update: {
+          execution_id?: string
+          execution_timestamp?: string | null
+          id?: string
+          ip_address?: string | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
+          user_id?: string | null
+          webhook_token_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_webhook_token_id_fkey"
+            columns: ["webhook_token_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_tokens: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -258,6 +338,10 @@ export type Database = {
         Returns: boolean
       }
       is_system: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_valid_webhook_token: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
