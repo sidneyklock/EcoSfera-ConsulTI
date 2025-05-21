@@ -1,8 +1,9 @@
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSecureContextStore } from '@/stores/secureContextStore';
 import { FallbackState } from '@/components/ui/fallback-state';
 import { supabase } from '@/integrations/supabase/client';
+import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 
 /**
  * Hook que fornece o contexto seguro do usuário atual
@@ -66,19 +67,25 @@ export function useSecureContext() {
     };
   }, [fetchUserContext, createUserRecord]);
 
-  return { 
+  // Memoize the returned object to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
     user, 
     solutionId, 
     role, 
     loading, 
     error,
-    // Accessible loading component for consumers
+    // Accessible loading component for consumers with skeleton
     LoadingSpinner: () => loading ? (
-      <FallbackState 
-        type="loading" 
-        title="Carregando perfil" 
-        message="Obtendo dados do seu perfil..." 
-      />
+      <div className="space-y-4 w-full">
+        <FallbackState 
+          type="loading" 
+          title="Carregando perfil" 
+          message="Obtendo dados do seu perfil..." 
+        />
+        <div className="max-w-md mx-auto">
+          <LoadingSkeleton variant="text" count={3} />
+        </div>
+      </div>
     ) : null,
     // Error display component
     ErrorDisplay: () => error ? (
@@ -86,7 +93,13 @@ export function useSecureContext() {
         type="error"
         title="Erro ao carregar perfil"
         message={`Não foi possível carregar seus dados: ${error}`}
+        action={{
+          label: "Tentar novamente",
+          onClick: () => window.location.reload()
+        }}
       />
     ) : null
-  };
+  }), [user, solutionId, role, loading, error]);
+
+  return contextValue;
 }

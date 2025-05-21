@@ -1,7 +1,7 @@
 
-import { useEffect } from "react";
-import { useSecureContextStore } from "@/stores/secureContextStore";
+import { useMemo } from "react";
 import { User, Role } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UserContextData {
   user: User | null;
@@ -9,27 +9,23 @@ interface UserContextData {
   solutionId: string | null;
 }
 
+/**
+ * Hook to provide user context data with optimized re-renders
+ */
 export function useUserContext() {
-  const { 
-    user, 
-    role, 
-    solutionId,
-    loading: isLoading, 
-    error, 
-    fetchUserContext: refetch 
-  } = useSecureContextStore();
-
-  useEffect(() => {
-    if (!user) {
-      refetch();
-    }
-  }, [user, refetch]);
-
-  const data: UserContextData = {
+  const { user, role, solutionId, isLoading, error, refreshContext } = useAuth();
+  
+  // Memoize data object to prevent unnecessary re-renders
+  const data = useMemo<UserContextData>(() => ({
     user,
     role,
     solutionId
-  };
+  }), [user, role, solutionId]);
 
-  return { data, isLoading, error, refetch };
+  return { 
+    data, 
+    isLoading, 
+    error, 
+    refetch: refreshContext 
+  };
 }

@@ -1,13 +1,18 @@
 
+import { memo, useEffect } from "react";
 import { AdminDashboard, UserDashboard } from "@/features/dashboard/components";
 import { useUserContext } from "@/features/auth/hooks";
-import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
 import { logger, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 
-const DashboardPage = () => {
+/**
+ * Dashboard page component with standardized fallbacks
+ * Uses memo to prevent unnecessary re-renders
+ */
+const DashboardPage = memo(() => {
   const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
   const { user, role } = userData || {};
   
@@ -33,11 +38,23 @@ const DashboardPage = () => {
       action: "dashboard_loading",
       message: "Dashboard em carregamento"
     });
-    return <FallbackState 
-      type="loading" 
-      title="Carregando dashboard" 
-      message="Preparando seu painel personalizado..."
-    />;
+    
+    // Use skeleton loader instead of spinner for better UX
+    return (
+      <div className="space-y-6">
+        <LoadingSkeleton variant="text" className="h-8 w-1/3" />
+        <LoadingSkeleton variant="text" className="h-4 w-1/2" />
+        
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <LoadingSkeleton variant="card" />
+          <LoadingSkeleton variant="card" />
+          <LoadingSkeleton variant="card" />
+          <LoadingSkeleton variant="card" />
+        </div>
+        
+        <LoadingSkeleton variant="table" />
+      </div>
+    );
   }
   
   if (userError) {
@@ -47,11 +64,18 @@ const DashboardPage = () => {
       message: "Erro ao carregar dashboard",
       data: { errorMessage: userError }
     });
-    return <FallbackState 
-      type="error" 
-      title="Erro ao carregar o dashboard" 
-      message={`Não foi possível carregar seus dados: ${userError}. Tente novamente mais tarde.`} 
-    />;
+    
+    return (
+      <FallbackState 
+        type="error" 
+        title="Erro ao carregar o dashboard" 
+        message={`Não foi possível carregar seus dados: ${userError}. Tente novamente mais tarde.`}
+        action={{
+          label: "Tentar novamente",
+          onClick: () => window.location.reload()
+        }}
+      />
+    );
   }
   
   if (!user) {
@@ -76,6 +100,8 @@ const DashboardPage = () => {
       {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
     </PageLayout>
   );
-};
+});
+
+DashboardPage.displayName = 'DashboardPage';
 
 export default DashboardPage;
