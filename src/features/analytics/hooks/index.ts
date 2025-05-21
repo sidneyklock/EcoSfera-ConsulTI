@@ -1,0 +1,2 @@
+
+export { useAnalyticsData } from './useAnalyticsData';

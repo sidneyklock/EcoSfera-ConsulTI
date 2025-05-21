@@ -1,23 +1,13 @@
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
-
-const data = [
-  { name: "Jan", value: 5, users: 10 },
-  { name: "Feb", value: 8, users: 15 },
-  { name: "Mar", value: 12, users: 18 },
-  { name: "Apr", value: 19, users: 25 },
-  { name: "May", value: 15, users: 30 },
-  { name: "Jun", value: 24, users: 32 },
-  { name: "Jul", value: 35, users: 45 },
-  { name: "Aug", value: 30, users: 50 },
-  { name: "Sep", value: 42, users: 55 },
-  { name: "Oct", value: 38, users: 48 },
-  { name: "Nov", value: 45, users: 60 },
-  { name: "Dec", value: 55, users: 70 },
-];
+import { useAnalyticsData } from "../hooks/useAnalyticsData";
+import { AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AnalyticsPage = () => {
   // Redirect if user doesn't have admin role
@@ -27,11 +17,32 @@ const AnalyticsPage = () => {
   }
   
   const [activeTab, setActiveTab] = useState("overview");
+  const { data, isLoading, error } = useAnalyticsData();
   
-  useEffect(() => {
-    // Simulated analytics data fetch
-    console.log("Fetching analytics data...");
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="space-y-4 p-4">
+        <Skeleton className="h-12 w-3/4" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <Alert variant="destructive" className="m-4">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Erro ao carregar os dados de análise</AlertTitle>
+        <AlertDescription>{String(error)}</AlertDescription>
+      </Alert>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -117,7 +128,7 @@ const AnalyticsPage = () => {
             </CardHeader>
             <CardContent className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data}>
+                <LineChart data={data?.monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -141,7 +152,7 @@ const AnalyticsPage = () => {
             </CardHeader>
             <CardContent className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
+                <BarChart data={data?.monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -164,7 +175,7 @@ const AnalyticsPage = () => {
             </CardHeader>
             <CardContent className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
+                <BarChart data={data?.monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />

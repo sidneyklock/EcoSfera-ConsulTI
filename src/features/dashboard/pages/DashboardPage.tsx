@@ -1,3 +1,4 @@
+
 import { AdminDashboard, UserDashboard } from "@/features/dashboard/components";
 import { useSecureContext } from "@/hooks/useSecureContext";
 import { useEffect } from "react";
@@ -5,15 +6,17 @@ import { Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useUserContext } from "@/features/auth/hooks/useUserContext";
 
 const DashboardPage = () => {
-  const { user, role, loading, error } = useSecureContext();
+  const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
+  const { user, role } = userData || {};
   
   useEffect(() => {
     console.log("DashboardPage: Initial render with user:", user, "role:", role);
   }, [user, role]);
   
-  if (loading) {
+  if (userLoading) {
     console.log("DashboardPage: Loading state");
     return (
       <div className="space-y-4 p-4">
@@ -28,13 +31,13 @@ const DashboardPage = () => {
     );
   }
   
-  if (error) {
-    console.log("DashboardPage: Error state:", error);
+  if (userError) {
+    console.log("DashboardPage: Error state:", userError);
     return (
       <Alert variant="destructive" className="m-4">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Erro ao carregar o dashboard</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>{userError}</AlertDescription>
       </Alert>
     );
   }
