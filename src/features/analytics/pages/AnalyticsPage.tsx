@@ -9,22 +9,40 @@ import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageLayout } from "@/layouts";
+import { useUserContext } from "@/features/auth/hooks";
+import { useLogger } from "@/utils/logger";
 
 const AnalyticsPage = () => {
+  // Obter dados do usuário para logging
+  const { data: userData } = useUserContext();
+  const { user } = userData || {};
+  
+  // Inicializar logger com nome do componente e usuário atual
+  const log = useLogger("AnalyticsPage", user);
+  
   // Redirect if user doesn't have admin role
   const redirectComponent = useRoleGuard("admin");
   if (redirectComponent) {
+    log.warn("access_denied", "Tentativa de acesso à página de analytics sem permissão");
     return redirectComponent;
   }
   
   const [activeTab, setActiveTab] = useState("overview");
   const { data, isLoading, error } = useAnalyticsData();
   
+  // Log quando a tab mudar
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    log.info("tab_change", `Tab alterada para ${value}`);
+  };
+  
   if (isLoading) {
+    log.debug("loading", "Carregando dados de analytics");
     return <FallbackState type="loading" title="Carregando análises" />;
   }
   
   if (error) {
+    log.error("data_load_error", `Erro ao carregar dados: ${String(error)}`, error instanceof Error ? error : undefined);
     return (
       <FallbackState 
         type="error" 
@@ -36,6 +54,7 @@ const AnalyticsPage = () => {
   
   // Check if data is empty
   if (!data || !data.monthlyData || data.monthlyData.length === 0) {
+    log.warn("empty_data", "Nenhum dado de análise disponível");
     return (
       <FallbackState 
         type="empty" 
@@ -45,12 +64,14 @@ const AnalyticsPage = () => {
     );
   }
   
+  log.info("render", "Renderizando página de analytics com dados", { tabsCount: data.monthlyData.length });
+  
   return (
     <PageLayout
       title="Analytics"
       description="Visualize dados e métricas da plataforma."
     >
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="users">Usuários</TabsTrigger>

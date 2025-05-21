@@ -5,22 +5,35 @@ import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
+import { logger } from "@/utils/logger";
 
 const DashboardPage = () => {
   const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
   const { user, role } = userData || {};
   
   useEffect(() => {
-    console.log("DashboardPage: Initial render with user:", user, "role:", role);
+    logger.info({
+      userId: user?.id,
+      action: "dashboard_load",
+      message: `Dashboard inicializado para usuário com papel: ${role || 'desconhecido'}`
+    });
   }, [user, role]);
   
   if (userLoading) {
-    console.log("DashboardPage: Loading state");
+    logger.debug({
+      action: "dashboard_loading",
+      message: "Dashboard em carregamento"
+    });
     return <FallbackState type="loading" />;
   }
   
   if (userError) {
-    console.log("DashboardPage: Error state:", userError);
+    logger.error({
+      userId: user?.id,
+      action: "dashboard_error",
+      message: "Erro ao carregar dashboard",
+      data: { errorMessage: userError }
+    });
     return <FallbackState 
       type="error" 
       title="Erro ao carregar o dashboard" 
@@ -29,11 +42,18 @@ const DashboardPage = () => {
   }
   
   if (!user) {
-    console.log("DashboardPage: No user, redirecting to login");
+    logger.warn({
+      action: "dashboard_unauthorized",
+      message: "Tentativa de acesso ao dashboard sem autenticação"
+    });
     return <Navigate to="/login" />;
   }
 
-  console.log("DashboardPage: Rendering dashboard for user role:", role);
+  logger.info({
+    userId: user.id,
+    action: "dashboard_render",
+    message: `Renderizando dashboard para papel: ${role}`
+  });
   
   return (
     <PageLayout 
