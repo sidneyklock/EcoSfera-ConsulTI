@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { transitions } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
@@ -24,10 +25,21 @@ export const StatsCard = ({
   className,
 }: StatsCardProps) => {
   return (
-    <Card className={cn("overflow-hidden hover:shadow-md transition-all", className)}>
+    <Card 
+      className={cn(
+        "overflow-hidden", 
+        transitions.all,
+        transitions.hover.elevate,
+        "border-border/60 h-full",
+        className
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className="h-9 w-9 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+        <div 
+          className="h-9 w-9 rounded-md bg-primary/10 text-primary flex items-center justify-center"
+          aria-hidden="true"
+        >
           {icon}
         </div>
       </CardHeader>
@@ -41,6 +53,7 @@ export const StatsCard = ({
                   "text-xs font-medium mr-2 flex items-center gap-0.5",
                   trend.isPositive ? "text-green-500" : "text-red-500"
                 )}
+                aria-label={`${trend.isPositive ? 'Aumento' : 'Redução'} de ${Math.abs(trend.value)}%`}
               >
                 {trend.isPositive ? "+" : "-"}
                 {Math.abs(trend.value)}%

@@ -18,7 +18,7 @@ export function LoadingSkeleton({
     switch (variant) {
       case 'card':
         return (
-          <div className="space-y-3">
+          <div className="space-y-3 w-full h-full">
             <div className="flex justify-between items-center">
               <Skeleton className="h-5 w-1/2" />
               <Skeleton className="h-9 w-9 rounded-md" />
@@ -32,7 +32,7 @@ export function LoadingSkeleton({
         );
       case 'table':
         return (
-          <div className="space-y-2">
+          <div className="space-y-2 w-full">
             <div className="flex justify-between">
               <Skeleton className="h-6 w-1/4" />
               <Skeleton className="h-6 w-1/4" />
@@ -55,11 +55,11 @@ export function LoadingSkeleton({
   };
 
   return (
-    <div className={cn("animate-pulse", className)} {...props} aria-busy="true" aria-live="polite">
+    <div className={cn("animate-pulse", className)} {...props} aria-busy="true" aria-live="polite" role="status">
       {Array(count)
         .fill(0)
         .map((_, index) => (
-          <div key={index} className="mb-2">
+          <div key={index} className={cn("mb-2", variant === 'card' && "h-full")}>
             {renderSkeleton()}
           </div>
         ))}

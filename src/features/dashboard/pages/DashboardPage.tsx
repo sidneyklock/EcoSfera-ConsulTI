@@ -7,6 +7,7 @@ import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
 import { logger, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { animations, transitions } from "@/lib/utils";
 
 /**
  * Dashboard page component with standardized fallbacks
@@ -40,11 +41,11 @@ const DashboardPage = memo(() => {
     
     // Use skeleton loader instead of spinner for better UX
     return (
-      <div className="container mx-auto py-6 animate-fade-in">
-        <LoadingSkeleton variant="text" className="h-8 w-1/3 mb-4" />
+      <div className={cn("container mx-auto p-6", animations.fadeIn)}>
+        <LoadingSkeleton variant="text" className="h-8 w-1/3 mb-6" />
         <LoadingSkeleton variant="text" className="h-4 w-1/2 mb-8" />
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <LoadingSkeleton variant="card" />
           <LoadingSkeleton variant="card" />
           <LoadingSkeleton variant="card" />
@@ -99,7 +100,7 @@ const DashboardPage = memo(() => {
       title="Dashboard" 
       description="Bem-vindo ao painel de controle da EcoSfera ConsulTI"
     >
-      <div className="container mx-auto py-6 animate-fade-in">
+      <div className={cn("container mx-auto py-6", animations.fadeIn)}>
         {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
       </div>
     </PageLayout>
@@ -109,3 +110,6 @@ const DashboardPage = memo(() => {
 DashboardPage.displayName = 'DashboardPage';
 
 export default DashboardPage;
+
+// Precisamos importar o cn para usar no componente
+import { cn } from "@/lib/utils";

@@ -3,6 +3,7 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
+import { cn, responsive, spacing, transitions } from "@/lib/utils";
 
 export const AdminDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -14,10 +15,10 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className={spacing.section}>
       <WelcomeHeader />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className={responsive.grid.cols4}>
         <StatsCard
           title="Total de Usuários"
           value={stats.totalUsers}
@@ -48,8 +49,12 @@ export const AdminDashboard = () => {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
+      <div className={cn(responsive.grid.cols2, "mt-8")}>
+        <div className={cn(
+          "rounded-lg border bg-card shadow-sm p-6", 
+          transitions.all,
+          transitions.hover.elevate
+        )}>
           <h3 className="font-medium text-lg mb-4">Visão Geral do Sistema</h3>
           <p className="text-muted-foreground mb-6">
             Bem-vindo ao painel administrativo. Como administrador, você tem acesso a todas as funcionalidades do sistema, incluindo gerenciamento de usuários, análise de dados e configurações gerais.
@@ -60,36 +65,67 @@ export const AdminDashboard = () => {
               <span className="text-sm font-medium">85%</span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2.5">
-              <div className="bg-primary h-2.5 rounded-full transition-all" style={{ width: "85%" }}></div>
+              <div 
+                className="bg-primary h-2.5 rounded-full transition-all duration-500" 
+                style={{ width: "85%" }}
+                role="progressbar" 
+                aria-valuenow={85} 
+                aria-valuemin={0} 
+                aria-valuemax={100}
+              ></div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
+        <div className={cn(
+          "rounded-lg border bg-card shadow-sm p-6", 
+          transitions.all,
+          transitions.hover.elevate
+        )}>
           <h3 className="font-medium text-lg mb-4">Ações Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
-              <Briefcase className="h-5 w-5 mb-2 mx-auto" />
-              <span className="text-sm block">Novo Projeto</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            )}>
+              <Briefcase className="h-5 w-5 mb-2" />
+              <span className="text-sm">Novo Projeto</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
-              <Users className="h-5 w-5 mb-2 mx-auto" />
-              <span className="text-sm block">Gerenciar Usuários</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            )}>
+              <Users className="h-5 w-5 mb-2" />
+              <span className="text-sm">Gerenciar Usuários</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
-              <BarChart2 className="h-5 w-5 mb-2 mx-auto" />
-              <span className="text-sm block">Ver Relatórios</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            )}>
+              <BarChart2 className="h-5 w-5 mb-2" />
+              <span className="text-sm">Ver Relatórios</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
-              <Activity className="h-5 w-5 mb-2 mx-auto" />
-              <span className="text-sm block">Atividade</span>
+            <button className={cn(
+              "p-3 border rounded-lg flex flex-col items-center justify-center",
+              transitions.colors,
+              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            )}>
+              <Activity className="h-5 w-5 mb-2" />
+              <span className="text-sm">Atividade</span>
             </button>
           </div>
         </div>
       </div>
       
       <div className="mt-8">
-        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
+        <div className={cn(
+          "rounded-lg border bg-card shadow-sm p-6",
+          transitions.all, 
+          transitions.hover.elevate
+        )}>
           <UserRoleAssignment />
         </div>
       </div>

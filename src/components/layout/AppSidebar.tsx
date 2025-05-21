@@ -25,9 +25,10 @@ import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
-import { useEffect } from "react";
+import { iconClasses, sidebarElementClasses, transitions } from "@/lib/tailwind-utils";
+import { useEffect, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
+import { cn, animations } from "@/lib/utils";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -39,23 +40,31 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
   const { signOut } = useAuthStore();
 
+  // Detectar tamanho da tela e ajustar sidebar para melhor experiência mobile
+  const handleScreenResize = useCallback(() => {
+    if (window.innerWidth < 768) {
+      setCollapsed(true);
+    } else if (window.innerWidth >= 1280) {
+      setCollapsed(false);
+    }
+  }, [setCollapsed]);
+
   useEffect(() => {
-    // Close sidebar on mobile when location changes
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setCollapsed(true);
-      }
+    // Configurar estado inicial baseado no tamanho da tela
+    handleScreenResize();
+    
+    // Adicionar evento para detectar mudanças de tamanho de tela
+    window.addEventListener('resize', handleScreenResize);
+    
+    // Fechar sidebar em dispositivos móveis quando a rota mudar
+    if (window.innerWidth < 768) {
+      setCollapsed(true);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleScreenResize);
     };
-
-    // Set initial state based on screen size
-    handleResize();
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-
-    // Clean up
-    return () => window.removeEventListener('resize', handleResize);
-  }, [location.pathname, setCollapsed]);
+  }, [location.pathname, setCollapsed, handleScreenResize]);
 
   // Handle sign out
   const handleSignOut = async () => {
@@ -123,18 +132,24 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile toggle with improved accessibility and visual feedback */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 right-4 z-50 md:hidden shadow-sm hover:bg-accent/80 transition-colors"
+        className={cn(
+          "fixed top-4 right-4 z-50 md:hidden shadow-sm",
+          transitions.all,
+          "hover:bg-accent/80 active:scale-95",
+          animations.fadeIn
+        )}
         onClick={toggleCollapsed}
         aria-label={collapsed ? "Abrir menu" : "Fechar menu"}
+        aria-expanded={!collapsed}
       >
         {collapsed ? (
-          <Menu className={iconClasses} />
+          <Menu className={cn(iconClasses, transitions.transform)} />
         ) : (
-          <X className={iconClasses} />
+          <X className={cn(iconClasses, transitions.transform)} />
         )}
       </Button>
 
@@ -145,17 +160,22 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
       >
         <Sidebar
           collapsible="icon"
-          className={`${sidebarElementClasses.container} border-r border-border bg-background shadow-sm transition-all duration-300`}
+          className={cn(
+            sidebarElementClasses.container, 
+            "border-r border-border bg-background shadow-sm",
+            transitions.all,
+            "focus-visible:outline-none"
+          )}
           aria-label="Navegação principal"
         >
-          <SidebarHeaderWrapper className={`${sidebarElementClasses.header} px-4 py-4 border-b`}>
+          <SidebarHeaderWrapper className={cn(sidebarElementClasses.header, "px-4 py-4 border-b")}>
             <SidebarHeader 
               collapsed={collapsed} 
               solutionId={solutionId}
             />
           </SidebarHeaderWrapper>
           
-          <SidebarContent className={`${sidebarElementClasses.content} py-4 px-2`}>
+          <SidebarContent className={cn(sidebarElementClasses.content, "py-4 px-2")}>
             <SidebarGroup>
               <SidebarNavigation 
                 navItems={filteredItems} 
@@ -165,7 +185,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
             </SidebarGroup>
           </SidebarContent>
           
-          <SidebarFooterWrapper className={`${sidebarElementClasses.footer} mt-auto p-4 border-t`}>
+          <SidebarFooterWrapper className={cn(sidebarElementClasses.footer, "mt-auto p-4 border-t")}>
             <SidebarFooter 
               user={userRole ? { name: '', email: '', id: '', role: userRole } : null} 
               collapsed={collapsed} 
