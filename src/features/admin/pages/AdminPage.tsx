@@ -1,3 +1,4 @@
+
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { Role } from "@/types";
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import {
   WebhookLogs, 
   AuditLogViewer 
 } from "@/features/admin/components";
+import { PageLayout } from "@/layouts";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
@@ -50,12 +52,10 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Área de Administração</h1>
-      <p className="text-muted-foreground">
-        Esta página só pode ser acessada por administradores.
-      </p>
-      
+    <PageLayout
+      title="Área de Administração"
+      description="Esta página só pode ser acessada por administradores."
+    >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-7 mb-8">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
@@ -130,7 +130,7 @@ const AdminPage = () => {
           <AdminLogViewer />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageLayout>
   );
 };
 

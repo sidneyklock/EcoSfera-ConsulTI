@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
@@ -8,6 +7,7 @@ import { useAnalyticsData } from "../hooks/useAnalyticsData";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageLayout } from "@/layouts";
 
 const AnalyticsPage = () => {
   // Redirect if user doesn't have admin role
@@ -45,14 +45,10 @@ const AnalyticsPage = () => {
   }
   
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground mt-2">
-          Visualize dados e métricas da plataforma.
-        </p>
-      </div>
-      
+    <PageLayout
+      title="Analytics"
+      description="Visualize dados e métricas da plataforma."
+    >
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
@@ -188,7 +184,7 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </PageLayout>
   );
 };
 

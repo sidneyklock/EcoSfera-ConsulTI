@@ -1,12 +1,12 @@
 
 import { AdminDashboard, UserDashboard } from "@/features/dashboard/components";
-import { useSecureContext } from "@/hooks/useSecureContext";
+import { useUserContext } from "@/features/auth/hooks";
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useUserContext } from "@/features/auth/hooks/useUserContext";
+import { PageLayout } from "@/layouts";
 
 const DashboardPage = () => {
   const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
@@ -50,9 +50,12 @@ const DashboardPage = () => {
   console.log("DashboardPage: Rendering dashboard for user role:", role);
   
   return (
-    <div className="p-4">
+    <PageLayout 
+      title="Dashboard" 
+      description="Bem-vindo ao painel de controle da EcoSfera ConsulTI"
+    >
       {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
-    </div>
+    </PageLayout>
   );
 };
 
