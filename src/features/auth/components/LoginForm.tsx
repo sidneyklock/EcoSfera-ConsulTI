@@ -28,12 +28,13 @@ const loginFormSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginFormSchema>;
 
 /**
- * Componente de formulário de login
+ * Componente de formulário de login otimizado
  * Permite autenticação por email/senha e por Google
  */
 export function LoginForm() {
   const { signIn, signInWithGoogle, error, isLoading } = useAuth();
   const [isDemoAuthLoading, setIsDemoAuthLoading] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const navigate = useNavigate();
   
   const isProcessing = isLoading || isDemoAuthLoading;
@@ -44,35 +45,57 @@ export function LoginForm() {
       email: "",
       password: "",
     },
+    mode: "onBlur", // Validar ao perder o foco para melhor UX
   });
 
   /**
-   * Manipulador de submissão do formulário
+   * Manipulador de submissão do formulário com feedback visual aprimorado
    */
   const onSubmit = async (data: LoginFormInputs) => {
-    await signIn(data.email, data.password);
+    try {
+      setFormSubmitted(true);
+      await signIn(data.email, data.password);
+    } catch (err) {
+      // Error será tratado pelo hook de auth
+      console.error("Erro no processo de login:", err);
+    } finally {
+      setFormSubmitted(false);
+    }
   };
 
   /**
-   * Login rápido para ambiente de desenvolvimento
+   * Login rápido para ambiente de desenvolvimento com melhor feedback
    */
   const handleDevLogin = async () => {
     try {
       setIsDemoAuthLoading(true);
+      toast.loading("Efetuando login de desenvolvimento...", { id: "dev-login" });
       // Usuário e senha temporários para desenvolvimento
       await signIn("dev@example.com", "senha123");
+      toast.success("Login de desenvolvimento concluído", { id: "dev-login" });
+    } catch (err) {
+      toast.error("Falha no login de desenvolvimento", { id: "dev-login" });
     } finally {
       setIsDemoAuthLoading(false);
     }
   };
 
   /**
-   * Login com Google
+   * Login com Google com melhor feedback
    */
-  const handleGoogleSignIn = () => {
-    signInWithGoogle().catch(error => {
-      toast.error("Erro ao iniciar login com Google");
-    });
+  const handleGoogleSignIn = async () => {
+    try {
+      toast.loading("Preparando autenticação Google...", { id: "google-login" });
+      const result = await signInWithGoogle();
+      
+      if (!result.success) {
+        toast.error("Falha ao iniciar login com Google", { id: "google-login" });
+      } else {
+        toast.success("Redirecionando para Google...", { id: "google-login" });
+      }
+    } catch (error) {
+      toast.error("Erro ao iniciar login com Google", { id: "google-login" });
+    }
   };
 
   /**
@@ -93,7 +116,7 @@ export function LoginForm() {
       />
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de login">
+        <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de login" noValidate>
           <CardContent className="space-y-4">
             {/* Alerta de erro */}
             {error && (
@@ -103,7 +126,7 @@ export function LoginForm() {
             )}
             
             {/* Campo de email */}
-            <EmailField control={form.control} name="email" />
+            <EmailField control={form.control} name="email" disabled={isProcessing} />
             
             {/* Campo de senha */}
             <PasswordField 
@@ -111,6 +134,7 @@ export function LoginForm() {
               name="password"
               forgotPasswordLink
               onForgotPasswordClick={navigateToForgotPassword}
+              disabled={isProcessing}
             />
             
             {/* Botões de ação */}
@@ -126,7 +150,8 @@ export function LoginForm() {
             {/* Botão de login com Google */}
             <GoogleLoginButton 
               onClick={handleGoogleSignIn} 
-              disabled={isProcessing} 
+              disabled={isProcessing}
+              aria-label="Entrar com o Google"
             />
           </CardContent>
         </form>

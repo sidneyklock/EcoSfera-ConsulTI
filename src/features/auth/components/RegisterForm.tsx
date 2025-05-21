@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,12 +32,13 @@ const registerFormSchema = z.object({
 type RegisterFormInputs = z.infer<typeof registerFormSchema>;
 
 /**
- * Componente de formulário de registro
+ * Componente de formulário de registro otimizado
  * Permite criação de conta por email/senha e por Google
  */
 export function RegisterForm() {
   const { signUp, signInWithGoogle, error, isLoading } = useAuth();
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const navigate = useNavigate();
   
   const form = useForm<RegisterFormInputs>({
@@ -47,32 +48,61 @@ export function RegisterForm() {
       email: "",
       password: "",
     },
+    mode: "onBlur", // Validar ao perder o foco para melhor UX
   });
 
   const password = form.watch("password", "");
+  
+  // Observar mudanças nos campos para feedback em tempo real
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      // Este callback é chamado sempre que qualquer campo muda
+      // Podemos adicionar lógica de validação em tempo real aqui
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   /**
-   * Manipulador de submissão do formulário
+   * Manipulador de submissão do formulário com feedback visual aprimorado
    */
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
-    // Prevenir submissão se senha não for válida
-    if (!isPasswordValid) {
-      toast.error("A senha não atende aos requisitos de segurança");
-      return;
+    try {
+      // Prevenir submissão se senha não for válida
+      if (!isPasswordValid) {
+        toast.error("A senha não atende aos requisitos de segurança");
+        return;
+      }
+      
+      setFormSubmitted(true);
+      toast.loading("Criando sua conta...", { id: "register" });
+      
+      const { email, password, name } = data;
+      await signUp(email, password, name);
+      
+      toast.success("Conta criada com sucesso! Verifique seu email.", { id: "register" });
+    } catch (err) {
+      // Error será tratado pelo hook de auth
+      toast.error("Erro ao criar conta", { id: "register" });
+    } finally {
+      setFormSubmitted(false);
     }
-    
-    const { email, password, name } = data;
-    await signUp(email, password, name);
   };
 
   /**
-   * Login com Google
+   * Login com Google com melhor feedback
    */
   const handleGoogleLogin = async () => {
-    const { success } = await signInWithGoogle();
-    
-    if (!success) {
-      toast.error("Falha ao iniciar login com Google");
+    try {
+      toast.loading("Preparando autenticação Google...", { id: "google-register" });
+      const { success } = await signInWithGoogle();
+      
+      if (!success) {
+        toast.error("Falha ao iniciar registro com Google", { id: "google-register" });
+      } else {
+        toast.success("Redirecionando para Google...", { id: "google-register" });
+      }
+    } catch (error) {
+      toast.error("Erro ao iniciar registro com Google", { id: "google-register" });
     }
   };
 
@@ -89,7 +119,7 @@ export function RegisterForm() {
       />
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de registro">
+        <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de registro" noValidate>
           <CardContent className="space-y-4">
             {/* Alerta de erro */}
             {error && (
@@ -112,6 +142,8 @@ export function RegisterForm() {
                         placeholder="Seu nome"
                         className="pl-10"
                         {...field}
+                        disabled={isLoading || formSubmitted}
+                        aria-required="true"
                       />
                     </FormControl>
                   </div>
@@ -121,12 +153,17 @@ export function RegisterForm() {
             />
             
             {/* Campo de email */}
-            <EmailField control={form.control} name="email" />
+            <EmailField 
+              control={form.control} 
+              name="email" 
+              disabled={isLoading || formSubmitted}
+            />
             
             {/* Campo de senha */}
             <PasswordField 
               control={form.control} 
               name="password"
+              disabled={isLoading || formSubmitted}
             />
             
             {/* Validador de senha */}
@@ -137,7 +174,7 @@ export function RegisterForm() {
             
             {/* Botões de ação */}
             <FormActions 
-              isLoading={isLoading}
+              isLoading={isLoading || formSubmitted}
               submitLabel="Registrar"
               disabled={!isPasswordValid}
             />
@@ -147,7 +184,8 @@ export function RegisterForm() {
             {/* Botão de login com Google */}
             <GoogleLoginButton 
               onClick={handleGoogleLogin} 
-              disabled={isLoading} 
+              disabled={isLoading || formSubmitted}
+              aria-label="Registrar com o Google" 
             />
           </CardContent>
         </form>

@@ -42,3 +42,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   refreshContext: async () => 
     authOperations.refreshContext(set)
 }));
+
+// Seletores para evitar re-renderizações desnecessárias
+export const useAuthUser = () => useAuthStore(state => state.user);
+export const useAuthRole = () => useAuthStore(state => state.role);
+export const useAuthSolutionId = () => useAuthStore(state => state.solutionId);
+export const useAuthLoading = () => useAuthStore(state => state.isLoading);
+export const useAuthError = () => useAuthStore(state => state.error);
+export const useAuthStatus = () => useAuthStore(state => ({
+  isLoading: state.isLoading,
+  error: state.error,
+  isAuthenticated: !!state.user
+}));

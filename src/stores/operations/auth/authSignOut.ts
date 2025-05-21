@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 import { toast } from '@/components/ui/sonner';
+import { fetchLogger } from '@/utils/fetchLogger';
 
 /**
  * Logout
@@ -10,6 +11,7 @@ export const signOut = async (set: Function, get: Function) => {
   const methodStart = performance.now();
   const state = get();
   const user = state.user;
+  
   try {
     set({ isLoading: true, error: null });
     
@@ -19,7 +21,16 @@ export const signOut = async (set: Function, get: Function) => {
       message: "Iniciando processo de logout"
     });
     
-    await supabase.auth.signOut();
+    // Usar fetchLogger para melhor rastreamento de desempenho
+    await fetchLogger.withLogs(
+      "auth_signout",
+      async () => await supabase.auth.signOut(),
+      user,
+      "Iniciando logout no Supabase",
+      () => "Logout processado com sucesso no Supabase",
+      "Erro ao processar logout no Supabase"
+    );
+    
     set({ user: null, role: null, solutionId: null });
     toast.success("Logout realizado com sucesso");
     
@@ -28,6 +39,8 @@ export const signOut = async (set: Function, get: Function) => {
       action: "auth_signout_success",
       message: "Logout realizado com sucesso"
     });
+    
+    return { success: true };
   } catch (error: any) {
     const errorMessage = error.message || "Erro ao realizar logout";
     logger.error({
@@ -39,6 +52,7 @@ export const signOut = async (set: Function, get: Function) => {
     
     set({ error: errorMessage });
     toast.error(errorMessage);
+    return { success: false };
   } finally {
     const duration = performance.now() - methodStart;
     
