@@ -3,7 +3,6 @@ import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { Role } from "@/types";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   WebhookKeyManager, 
@@ -14,6 +13,7 @@ import {
   AuditLogViewer 
 } from "@/features/admin/components";
 import { PageLayout } from "@/layouts";
+import { adminService } from "../services/adminService";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
@@ -28,15 +28,15 @@ const AdminPage = () => {
       description: "Bem-vindo(a) à área administrativa. Você tem permissões de administrador.",
     });
     
-    // Registrar o acesso na tabela de logs administrativos
+    // Registrar o acesso na tabela de logs administrativos usando o adminService
     const logAdminAccess = async () => {
       try {
-        await supabase.rpc('log_admin_action', {
-          action: 'access_admin_page',
-          entity_table: 'admin_page',
-          entity_id: null,
-          details: { page: 'admin', timestamp: new Date().toISOString() }
-        });
+        await adminService.logAdminAction(
+          'access_admin_page',
+          'admin_page',
+          null,
+          { page: 'admin', timestamp: new Date().toISOString() }
+        );
         console.log('Acesso administrativo registrado com sucesso');
       } catch (error) {
         console.error('Erro ao registrar acesso administrativo:', error);
