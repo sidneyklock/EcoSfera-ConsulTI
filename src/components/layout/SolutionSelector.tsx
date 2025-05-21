@@ -44,7 +44,8 @@ export const SolutionSelector = () => {
         const { data, error } = await supabase
           .from('user_solutions')
           .select('solution_id, solutions(id, name)')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .returns<UserSolutionResponse[]>();
 
         if (error) {
           console.error('Erro ao buscar soluções:', error);
@@ -55,8 +56,8 @@ export const SolutionSelector = () => {
         const formattedSolutions = data
           .filter(item => item.solutions != null) // Garantir que solutions existe
           .map((item) => ({
-            id: item.solutions?.id,
-            name: item.solutions?.name
+            id: item.solutions.id,
+            name: item.solutions.name
           }));
 
         setSolutions(formattedSolutions);
