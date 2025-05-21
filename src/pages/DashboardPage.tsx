@@ -1,5 +1,4 @@
 
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { useSecureContext } from "@/hooks/useSecureContext";

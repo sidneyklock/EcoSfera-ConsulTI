@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             
-            {/* Dashboard routes com layout compartilhado */}
+            {/* Dashboard routes with shared layout */}
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/chat" element={<ChatPage />} />
