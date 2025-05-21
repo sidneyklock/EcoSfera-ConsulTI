@@ -4,8 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ProtectedRoute } from '@/features/auth/components';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { FallbackState } from '@/components/ui/fallback-state';
+import { DashboardLayout } from '@/features/layout/components';
 
-// Importando páginas de features (estrutura centralizada)
+// Importando páginas das features
 const Index = lazy(() => import('@/features/core/pages/Index'));
 const NotFound = lazy(() => import('@/features/core/pages/NotFound'));
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
@@ -38,42 +39,44 @@ const App = () => {
           <Route path="/auth/verify-email" element={<EmailVerificationPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           
-          {/* Rotas protegidas */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin" element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/analytics" element={
-            <ProtectedRoute requiredRole="admin">
-              <AnalyticsPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/users" element={
-            <ProtectedRoute>
-              <UsersPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/chat" element={
-            <ProtectedRoute>
-              <ChatPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/sustainability" element={
-            <ProtectedRoute>
-              <SustainabilityPage />
-            </ProtectedRoute>
-          } />
+          {/* Rotas protegidas - usando o layout do dashboard */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute requiredRole="admin">
+                <AnalyticsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/users" element={
+              <ProtectedRoute>
+                <UsersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/sustainability" element={
+              <ProtectedRoute>
+                <SustainabilityPage />
+              </ProtectedRoute>
+            } />
+          </Route>
           
           {/* Redirecionamentos */}
           <Route path="/home" element={<Navigate to="/dashboard" replace />} />

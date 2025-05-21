@@ -1,55 +1,40 @@
 
-import { useCallback, useEffect } from "react";
-import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { useLocation } from "react-router-dom";
-import { logger } from "@/utils/logger";
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useCallback, useEffect, useState } from 'react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface SidebarConfig {
   collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
+  setCollapsed: (value: boolean) => void;
   toggleCollapsed: () => void;
 }
 
 /**
- * Hook para gerenciar a configuração e comportamento da sidebar
- * Controla estados de colapso e ajustes responsivos
+ * Hook para gerenciar a configuração da barra lateral
+ * Suporta armazenamento local para persistência e adaptação para dispositivos móveis
  */
 export function useSidebarConfig(): SidebarConfig {
-  const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
-  const location = useLocation();
-
-  // Detectar tamanho da tela e ajustar sidebar para melhor experiência mobile
-  const handleScreenResize = useCallback(() => {
-    if (window.innerWidth < 768) {
-      setCollapsed(true);
-    } else if (window.innerWidth >= 1280) {
-      setCollapsed(false);
-    }
-  }, [setCollapsed]);
-
+  const [storedCollapsed, setStoredCollapsed] = useLocalStorage('sidebar-collapsed', false);
+  const [collapsed, setCollapsed] = useState(storedCollapsed);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
+  // Colapsar automaticamente em dispositivos móveis
   useEffect(() => {
-    // Configurar estado inicial baseado no tamanho da tela
-    handleScreenResize();
-    
-    // Adicionar evento para detectar mudanças de tamanho de tela
-    window.addEventListener('resize', handleScreenResize);
-    
-    logger.debug({
-      action: "sidebar_config",
-      message: "Configurando sidebar responsiva",
-      data: { initialCollapsed: collapsed }
-    });
-    
-    // Fechar sidebar em dispositivos móveis quando a rota mudar
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       setCollapsed(true);
     }
-
-    return () => {
-      window.removeEventListener('resize', handleScreenResize);
-    };
-  }, [location.pathname, setCollapsed, handleScreenResize, collapsed]);
-
+  }, [isMobile]);
+  
+  // Atualizar o armazenamento local quando o estado mudar
+  useEffect(() => {
+    setStoredCollapsed(collapsed);
+  }, [collapsed, setStoredCollapsed]);
+  
+  // Alternar o estado de colapso
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed(prev => !prev);
+  }, []);
+  
   return {
     collapsed,
     setCollapsed,

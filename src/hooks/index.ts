@@ -1,13 +1,16 @@
 
+// Core hooks
+export * from './useLocalStorage';
+export * from './useMediaQuery';
+export * from './useSidebarCollapse';
+export * from './usePrefetchQuery';
+export * from './useRoleGuard';
+export * from './useAuth';
+export * from './useAuthentication';
+export * from './useSecureContext';
+export * from './useUserActionEvents';
+export * from './useSupabaseSession';
 
-export { useAuthentication } from './useAuthentication';
-export { useSecureContext } from './useSecureContext';
-export { useAuth } from './useAuth'; // Mantido para compatibilidade
-export { useIsMobile as useMobile } from './use-mobile'; // Aliasing useIsMobile to useMobile for compatibility
-export { useToast } from './use-toast';
-export { useRoleGuard } from './useRoleGuard';
-export { useSidebarCollapse } from './useSidebarCollapse';
-export { useUserActionEvents } from './useUserActionEvents';
-export { usePrefetchQuery } from './usePrefetchQuery';
-export { useSupabaseSession } from './useSupabaseSession';
-
+// Toast hooks
+export * from './use-toast';
+export * from './use-mobile';

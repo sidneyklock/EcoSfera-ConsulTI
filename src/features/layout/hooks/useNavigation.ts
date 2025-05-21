@@ -1,99 +1,85 @@
 
-import { useMemo, useCallback } from "react";
-import { useLocation } from "react-router-dom";
-import type { Role } from "@/types";
-import type { LucideIcon } from "lucide-react";
-import { 
-  Home, 
-  Users, 
-  BarChart, 
-  Settings, 
-  MessageSquare, 
-  Shield, 
-  Leaf 
-} from "lucide-react";
-
-export interface NavItem {
-  title: string;
-  href: string;
-  icon: LucideIcon;
-  roles: Role[];
-}
-
-interface NavigationHookResult {
-  navItems: NavItem[];
-  filteredItems: NavItem[];
-  isActive: (href: string) => boolean;
-}
+import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Home, Users, MessageSquare, Settings, Shield, Activity, Leaf } from 'lucide-react';
+import type { NavItem } from '@/types/navigation';
+import type { Role } from '@/types/auth';
 
 /**
- * Hook para gerenciar itens de navegação e seu estado ativo
- * Filtra itens com base no papel do usuário
+ * Hook para gerenciar a navegação da aplicação
+ * Filtra itens baseado no papel do usuário e identifica a rota ativa
  */
-export function useNavigation(userRole: Role | null): NavigationHookResult {
+export function useNavigation(userRole: Role | null) {
   const location = useLocation();
-
-  // Definição de todos os itens de navegação com controle de acesso baseado em papel
+  
+  // Lista completa de itens de navegação
   const navItems: NavItem[] = useMemo(() => [
     {
-      title: "Dashboard",
-      href: "/dashboard",
+      title: 'Dashboard',
+      href: '/dashboard',
       icon: Home,
-      roles: ["user", "admin"],
+      roles: ['admin', 'user'],
     },
     {
-      title: "Admin",
-      href: "/admin",
+      title: 'Administração',
+      href: '/admin',
       icon: Shield,
-      roles: ["admin"],
+      roles: ['admin'],
     },
     {
-      title: "Usuários",
-      href: "/users",
+      title: 'Analytics',
+      href: '/analytics',
+      icon: Activity,
+      roles: ['admin'],
+    },
+    {
+      title: 'Usuários',
+      href: '/users',
       icon: Users,
-      roles: ["admin"],
+      roles: ['admin', 'user'],
     },
     {
-      title: "Analytics",
-      href: "/analytics",
-      icon: BarChart,
-      roles: ["admin"],
-    },
-    {
-      title: "Consultoria",
-      href: "/chat",
+      title: 'Chat IA',
+      href: '/chat',
       icon: MessageSquare,
-      roles: ["user", "admin"],
+      roles: ['admin', 'user'],
+      badge: {
+        text: 'Novo',
+        variant: 'default'
+      }
     },
     {
-      title: "Sustentabilidade",
-      href: "/sustainability",
+      title: 'Sustentabilidade',
+      href: '/sustainability',
       icon: Leaf,
-      roles: ["user", "admin"],
+      roles: ['admin', 'user'],
     },
     {
-      title: "Configurações",
-      href: "/settings",
+      title: 'Configurações',
+      href: '/settings',
       icon: Settings,
-      roles: ["user", "admin"],
+      roles: ['admin', 'user'],
     },
   ], []);
 
-  // Filtrar itens com base no papel do usuário
-  const filteredItems = useMemo(() => 
-    navItems.filter(item => userRole && item.roles.includes(userRole)), 
-    [navItems, userRole]
-  );
+  // Filtrar itens baseado no papel do usuário
+  const filteredItems = useMemo(() => {
+    if (!userRole) return [];
+    return navItems.filter(item => item.roles.includes(userRole));
+  }, [navItems, userRole]);
 
-  // Verificar se um item está ativo com base na URL atual
-  const isActive = useCallback(
-    (href: string) => location.pathname === href,
-    [location.pathname]
-  );
-
-  return {
-    navItems,
-    filteredItems,
-    isActive
+  // Verificar se uma rota está ativa
+  const isActive = (href: string) => {
+    if (href === '/dashboard' && location.pathname === '/') {
+      return true; // Considera dashboard ativo na raiz
+    }
+    
+    if (href === '/dashboard') {
+      return location.pathname === href;
+    }
+    
+    return location.pathname.startsWith(href);
   };
+
+  return { filteredItems, isActive };
 }
