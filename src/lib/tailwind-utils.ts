@@ -31,6 +31,19 @@ export const transitionClasses = "transition-all duration-300";
 export const hoverStateClasses = "hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 export const activeStateClasses = "bg-accent text-accent-foreground";
 
+// Add transitions object to match the format in utils.ts
+export const transitions = {
+  all: "transition-all duration-300",
+  colors: "transition-colors duration-200",
+  transform: "transition-transform duration-200",
+  opacity: "transition-opacity duration-200",
+  hover: {
+    scale: "hover:scale-105 transition-transform duration-200",
+    elevate: "hover:shadow-md transition-shadow duration-200",
+    highlight: "hover:bg-accent/80 hover:text-accent-foreground transition-colors duration-200"
+  }
+};
+
 // Card state classes - for consistent card styling
 export const cardStateClasses = {
   default: "border bg-card shadow-sm",
