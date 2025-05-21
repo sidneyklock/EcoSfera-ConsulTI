@@ -1,12 +1,18 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { cva, type VariantProps } from "class-variance-authority"
 
+/**
+ * Helper to merge Tailwind CSS classes conditionally
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Common animation classes
+/**
+ * Core animation tokens - centralized for consistent usage
+ */
 export const animations = {
   fadeIn: "animate-fade-in",
   fadeOut: "animate-fade-out",
@@ -17,7 +23,9 @@ export const animations = {
   bounce: "animate-bounce"
 }
 
-// Common spacing classes
+/**
+ * Common spacing tokens - consistent across components
+ */
 export const spacing = {
   section: "space-y-8",
   container: "mx-auto px-4 sm:px-6 lg:px-8",
@@ -29,7 +37,9 @@ export const spacing = {
   stackGap: "space-y-4"
 }
 
-// Common transition classes
+/**
+ * Consistent transition effects
+ */
 export const transitions = {
   all: "transition-all duration-300",
   colors: "transition-colors duration-200",
@@ -39,10 +49,14 @@ export const transitions = {
     scale: "hover:scale-105 transition-transform duration-200",
     elevate: "hover:shadow-md hover:-translate-y-0.5 transition-all duration-200",
     highlight: "hover:bg-accent/80 hover:text-accent-foreground transition-colors duration-200"
-  }
+  },
+  focus: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  active: "active:scale-[0.98] active:transition-transform active:duration-100"
 }
 
-// Responsive helpers
+/**
+ * Responsive layout helpers
+ */
 export const responsive = {
   hidden: {
     mobile: "hidden md:block",
@@ -58,4 +72,106 @@ export const responsive = {
     horizontal: "flex flex-row items-center gap-4",
     vertical: "flex flex-col gap-4"
   }
+}
+
+/**
+ * Icon related classes
+ */
+export const iconClasses = {
+  base: "h-5 w-5 transition-transform duration-200",
+  button: "h-10 w-10 p-2.5 transition-all duration-200",
+  container: "bg-primary/10 text-primary rounded-md flex items-center justify-center"
+}
+
+/**
+ * Text related classes
+ */
+export const textClasses = {
+  base: "text-sm font-medium",
+  secondary: "text-xs text-muted-foreground",
+  heading: {
+    h1: "text-3xl font-bold tracking-tight",
+    h2: "text-2xl font-semibold tracking-tight",
+    h3: "text-xl font-semibold",
+    h4: "text-lg font-medium"
+  }
+}
+
+/**
+ * Layout related classes
+ */
+export const layoutClasses = {
+  flexCenter: "flex items-center",
+  flexCenterGap: "flex items-center gap-3",
+  itemPadding: "px-3 py-2.5 rounded-md",
+  cardPadding: "p-6"
+}
+
+/**
+ * Button state classes for consistent styling
+ */
+export const buttonStateClasses = {
+  active: "active:scale-95 transition-transform duration-100",
+  hover: "hover:bg-accent hover:text-accent-foreground transition-colors duration-200",
+  focus: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+}
+
+/**
+ * Card state classes - for consistent card styling
+ */
+export const cardClasses = cva(
+  "rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default: "border-border/60",
+        interactive: "border-border/60 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5",
+        selected: "border-primary/50 shadow-md",
+        disabled: "bg-muted/50 opacity-70"
+      },
+      size: {
+        default: "p-6",
+        sm: "p-4",
+        lg: "p-8"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  }
+)
+
+export type CardVariantsProps = VariantProps<typeof cardClasses>
+
+/**
+ * Skeleton loader variants
+ */
+export const skeletonClasses = cva(
+  "animate-pulse rounded-md bg-muted",
+  {
+    variants: {
+      variant: {
+        text: "h-4 w-full",
+        card: "w-full h-full",
+        avatar: "h-12 w-12 rounded-full",
+        button: "h-10 w-20 rounded-md",
+        stats: "h-full w-full"
+      }
+    },
+    defaultVariants: {
+      variant: "text"
+    }
+  }
+)
+
+export type SkeletonVariantsProps = VariantProps<typeof skeletonClasses>
+
+/**
+ * Accessibility classes
+ */
+export const a11yClasses = {
+  focusVisible: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  focusWithin: "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1",
+  srOnly: "sr-only"
 }

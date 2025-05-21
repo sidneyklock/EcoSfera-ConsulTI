@@ -7,7 +7,7 @@ import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
 import { logger, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { animations, responsive, spacing } from "@/lib/utils";
+import { animations, responsive, spacing, textClasses } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 /**

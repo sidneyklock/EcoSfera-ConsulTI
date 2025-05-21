@@ -3,9 +3,7 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
-import { cn } from "@/lib/utils";
-import { responsive, spacing, transitions } from "@/lib/utils";
-import { buttonStateClasses } from "@/lib/tailwind-utils";
+import { cn, responsive, spacing, transitions, cardClasses, buttonStateClasses, textClasses } from "@/lib/utils";
 
 export const AdminDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -52,19 +50,15 @@ export const AdminDashboard = () => {
       </div>
 
       <div className={cn(responsive.grid.cols2, "mt-8")}>
-        <div className={cn(
-          "rounded-lg border bg-card shadow-sm p-6", 
-          transitions.all,
-          transitions.hover.elevate
-        )}>
-          <h3 className="font-medium text-lg mb-4">Visão Geral do Sistema</h3>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Visão Geral do Sistema</h3>
           <p className="text-muted-foreground mb-6">
             Bem-vindo ao painel administrativo. Como administrador, você tem acesso a todas as funcionalidades do sistema, incluindo gerenciamento de usuários, análise de dados e configurações gerais.
           </p>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="font-medium">Uso do Sistema</span>
-              <span className="text-sm font-medium">85%</span>
+              <span className={textClasses.base}>Uso do Sistema</span>
+              <span className={textClasses.base}>85%</span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2.5">
               <div 
@@ -79,12 +73,8 @@ export const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className={cn(
-          "rounded-lg border bg-card shadow-sm p-6", 
-          transitions.all,
-          transitions.hover.elevate
-        )}>
-          <h3 className="font-medium text-lg mb-4">Ações Rápidas</h3>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Ações Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center",
@@ -131,11 +121,7 @@ export const AdminDashboard = () => {
       </div>
       
       <div className="mt-8">
-        <div className={cn(
-          "rounded-lg border bg-card shadow-sm p-6",
-          transitions.all, 
-          transitions.hover.elevate
-        )}>
+        <div className={cn(cardClasses({ variant: "default" }), spacing.card)}>
           <UserRoleAssignment />
         </div>
       </div>

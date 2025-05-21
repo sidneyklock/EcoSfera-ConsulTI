@@ -1,8 +1,7 @@
 
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { transitions, iconContainerClasses } from "@/lib/tailwind-utils";
+import { cn, cardClasses, iconClasses, transitions } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
@@ -14,6 +13,7 @@ interface StatsCardProps {
     isPositive: boolean;
   };
   className?: string;
+  isLoading?: boolean;
 }
 
 export const StatsCard = ({
@@ -23,21 +23,19 @@ export const StatsCard = ({
   icon,
   trend,
   className,
+  isLoading = false,
 }: StatsCardProps) => {
   return (
     <Card 
       className={cn(
-        "overflow-hidden", 
-        transitions.all,
-        transitions.hover.elevate,
-        "border-border/60 h-full",
+        cardClasses({ variant: "interactive" }),
         className
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div 
-          className={cn(iconContainerClasses, "h-9 w-9")}
+          className={cn(iconClasses.container, "h-9 w-9")}
           aria-hidden="true"
         >
           {icon}

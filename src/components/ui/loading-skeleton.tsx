@@ -1,25 +1,24 @@
 
-import React from 'react';
-import { cn } from "@/lib/utils";
+import React from "react";
+import { cn, skeletonClasses, animations } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { animations } from "@/lib/utils";
 
 type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
-  variant?: 'card' | 'table' | 'text' | 'avatar' | 'button' | 'stats';
+  variant?: "card" | "table" | "text" | "avatar" | "button" | "stats";
   count?: number;
   height?: string;
 };
 
 export function LoadingSkeleton({
   className,
-  variant = 'text',
+  variant = "text",
   count = 1,
   height,
   ...props
 }: SkeletonProps) {
   const renderSkeleton = () => {
     switch (variant) {
-      case 'stats':
+      case "stats":
         return (
           <div className="space-y-3 w-full h-full">
             <div className="flex justify-between items-center">
@@ -33,7 +32,7 @@ export function LoadingSkeleton({
             </div>
           </div>
         );
-      case 'card':
+      case "card":
         return (
           <div className="space-y-3 w-full h-full">
             <div className="flex justify-between items-center">
@@ -47,7 +46,7 @@ export function LoadingSkeleton({
             </div>
           </div>
         );
-      case 'table':
+      case "table":
         return (
           <div className="space-y-2 w-full">
             <div className="flex justify-between">
@@ -61,11 +60,11 @@ export function LoadingSkeleton({
             <Skeleton className="h-12 w-full" />
           </div>
         );
-      case 'avatar':
+      case "avatar":
         return <Skeleton className="h-12 w-12 rounded-full" />;
-      case 'button':
+      case "button":
         return <Skeleton className="h-10 w-20 rounded-md" />;
-      case 'text':
+      case "text":
       default:
         return <Skeleton className={cn("h-4 w-full", height && `h-${height}`)} />;
     }
@@ -82,7 +81,7 @@ export function LoadingSkeleton({
       {Array(count)
         .fill(0)
         .map((_, index) => (
-          <div key={index} className={cn("mb-2", variant === 'card' && "h-full")}>
+          <div key={index} className={cn("mb-2", variant === "card" && "h-full")}>
             {renderSkeleton()}
           </div>
         ))}

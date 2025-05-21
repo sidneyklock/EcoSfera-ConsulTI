@@ -2,9 +2,7 @@
 import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { MessageSquare, Clock, Star, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { responsive, spacing, transitions } from "@/lib/utils";
-import { buttonStateClasses, cardStateClasses } from "@/lib/tailwind-utils";
+import { cn, responsive, spacing, transitions, cardClasses, buttonStateClasses } from "@/lib/utils";
 
 export const UserDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -49,20 +47,16 @@ export const UserDashboard = () => {
       </div>
 
       <div className={cn(responsive.grid.cols2, "mt-8")}>
-        <div className={cn(
-          "rounded-lg border bg-card shadow-sm p-6", 
-          transitions.all,
-          transitions.hover.elevate
-        )}>
-          <h3 className="font-medium text-lg mb-4">Atividade Recente</h3>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Atividade Recente</h3>
           <div className="space-y-4">
             <div className="flex gap-4 items-start">
               <div className="bg-primary/10 rounded-full p-2">
                 <MessageSquare className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium">Nova mensagem no projeto Alpha</p>
-                <p className="text-xs text-muted-foreground">Há 10 minutos</p>
+                <p className={textClasses.base}>Nova mensagem no projeto Alpha</p>
+                <p className={textClasses.secondary}>Há 10 minutos</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">
@@ -70,8 +64,8 @@ export const UserDashboard = () => {
                 <Star className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium">Projeto Beta concluído</p>
-                <p className="text-xs text-muted-foreground">Há 2 horas</p>
+                <p className={textClasses.base}>Projeto Beta concluído</p>
+                <p className={textClasses.secondary}>Há 2 horas</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">
@@ -79,19 +73,15 @@ export const UserDashboard = () => {
                 <Calendar className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium">Reunião agendada</p>
-                <p className="text-xs text-muted-foreground">Hoje, 15:00</p>
+                <p className={textClasses.base}>Reunião agendada</p>
+                <p className={textClasses.secondary}>Hoje, 15:00</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className={cn(
-          "rounded-lg border bg-card shadow-sm p-6",
-          transitions.all, 
-          transitions.hover.elevate
-        )}>
-          <h3 className="font-medium text-lg mb-4">Ações Rápidas</h3>
+        <div className={cn(cardClasses({ variant: "interactive" }), spacing.card)}>
+          <h3 className={cn(textClasses.heading.h3, spacing.cardHeader)}>Ações Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center", 
