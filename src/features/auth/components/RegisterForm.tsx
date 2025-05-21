@@ -6,10 +6,9 @@ import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { EmailField } from "./EmailField";
@@ -18,6 +17,8 @@ import { GoogleLoginButton } from "./GoogleLoginButton";
 import { AuthDivider } from "./AuthDivider";
 import { FormActions } from "./FormActions";
 import { PasswordValidator } from "./PasswordValidator";
+import { AuthHeader } from "./AuthHeader";
+import { AuthFooter } from "./AuthFooter";
 import { useAuthService } from "../hooks/useAuthService";
 import { toast } from "@/components/ui/sonner";
 
@@ -82,12 +83,10 @@ export function RegisterForm() {
 
   return (
     <Card className="auth-card animate-in">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Registrar</CardTitle>
-        <CardDescription>
-          Crie uma nova conta para acessar o dashboard
-        </CardDescription>
-      </CardHeader>
+      <AuthHeader
+        title="Registrar"
+        description="Crie uma nova conta para acessar o dashboard"
+      />
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de registro">
@@ -154,17 +153,12 @@ export function RegisterForm() {
         </form>
       </Form>
       
-      <CardFooter className="flex flex-col space-y-4">
-        <div className="text-center text-sm">
-          Já possui uma conta?{" "}
-          <Button 
-            variant="link" 
-            className="p-0 h-auto"
-            onClick={navigateToLogin}
-          >
-            Entrar
-          </Button>
-        </div>
+      <CardFooter>
+        <AuthFooter 
+          questionText="Já possui uma conta?"
+          actionText="Entrar"
+          onAction={navigateToLogin}
+        />
       </CardFooter>
     </Card>
   );

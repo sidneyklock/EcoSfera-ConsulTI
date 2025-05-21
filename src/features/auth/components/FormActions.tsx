@@ -9,6 +9,7 @@ interface FormActionsProps {
   devLoginEnabled?: boolean;
   onDevLogin?: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function FormActions({ 
@@ -16,7 +17,8 @@ export function FormActions({
   submitLabel, 
   devLoginEnabled = false,
   onDevLogin,
-  className = "space-y-4"
+  className = "space-y-4",
+  disabled = false
 }: FormActionsProps) {
   return (
     <div className={className}>
@@ -24,7 +26,7 @@ export function FormActions({
       <Button 
         type="submit" 
         className="w-full" 
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         aria-busy={isLoading}
       >
         {isLoading ? (

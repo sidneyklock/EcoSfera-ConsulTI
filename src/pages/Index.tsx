@@ -1,14 +1,13 @@
 
-import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
 
 const Index = () => {
-  const { authState } = useAuth();
+  const { user } = useAuthStore();
   
   // Redirecionar para o dashboard se estiver autenticado
   // ou para a página de login se não estiver
-  if (authState.user) {
+  if (user) {
     return <Navigate to="/dashboard" />;
   } else {
     return <Navigate to="/login" />;

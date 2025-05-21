@@ -5,15 +5,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 
 import { EmailField } from "./EmailField";
 import { PasswordField } from "./PasswordField";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { AuthDivider } from "./AuthDivider";
 import { FormActions } from "./FormActions";
+import { AuthHeader } from "./AuthHeader";
+import { AuthFooter } from "./AuthFooter";
 import { useAuthService } from "../hooks/useAuthService";
 import { toast } from "@/components/ui/sonner";
 
@@ -85,12 +88,10 @@ export function LoginForm() {
 
   return (
     <Card className="auth-card animate-in">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Entrar</CardTitle>
-        <CardDescription>
-          Faça login em sua conta para acessar o dashboard
-        </CardDescription>
-      </CardHeader>
+      <AuthHeader 
+        title="Entrar" 
+        description="Faça login em sua conta para acessar o dashboard" 
+      />
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} aria-label="Formulário de login">
@@ -132,17 +133,12 @@ export function LoginForm() {
         </form>
       </Form>
       
-      <CardFooter className="flex flex-col space-y-4">
-        <div className="text-center text-sm">
-          Não possui uma conta?{" "}
-          <Button 
-            variant="link" 
-            className="p-0 h-auto"
-            onClick={navigateToRegister}
-          >
-            Registrar
-          </Button>
-        </div>
+      <CardFooter>
+        <AuthFooter 
+          questionText="Não possui uma conta?"
+          actionText="Registrar"
+          onAction={navigateToRegister}
+        />
       </CardFooter>
     </Card>
   );

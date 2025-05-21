@@ -5,11 +5,23 @@
  * @deprecated Use useAuthService from @/features/auth/hooks instead
  */
 
-import { useAuthService } from "@/features/auth/hooks/useAuthService";
+import { useMemo } from 'react';
+import { useAuthStore } from "@/stores/authStore";
 import { logger } from "@/utils/logger";
 
 export function useAuth() {
-  const auth = useAuthService();
+  const {
+    user,
+    role,
+    solutionId, 
+    isLoading,
+    error,
+    signIn,
+    signUp,
+    signOut,
+    signInWithGoogle,
+    refreshContext
+  } = useAuthStore();
   
   // Log hook usage to help identify where deprecated hook is still being used
   if (process.env.NODE_ENV !== 'production') {
@@ -22,7 +34,23 @@ export function useAuth() {
     });
   }
   
-  return auth;
+  // Mapeando para a estrutura antiga do hook para compatibilidade retroativa
+  const authState = useMemo(() => ({
+    user,
+    role,
+    solutionId,
+    isLoading,
+    error
+  }), [user, role, solutionId, isLoading, error]);
+  
+  return { 
+    authState,
+    signIn,
+    signUp,
+    signOut,
+    signInWithGoogle,
+    refreshContext
+  };
 }
 
 export default useAuth;
