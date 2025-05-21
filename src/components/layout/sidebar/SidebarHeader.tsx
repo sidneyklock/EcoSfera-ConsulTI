@@ -6,9 +6,10 @@ import { SolutionSelector } from "../SolutionSelector";
 
 interface SidebarHeaderProps {
   collapsed: boolean;
+  solutionId?: string | null;
 }
 
-export const SidebarHeader = ({ collapsed }: SidebarHeaderProps) => {
+export const SidebarHeader = ({ collapsed, solutionId }: SidebarHeaderProps) => {
   return (
     <div className="py-4 px-4">
       <div className={flexCenterClasses}>
@@ -18,7 +19,7 @@ export const SidebarHeader = ({ collapsed }: SidebarHeaderProps) => {
         {!collapsed && (
           <div className="flex flex-col">
             <div className="font-semibold text-xl">SaaS Platform</div>
-            <SolutionSelector />
+            {solutionId && <SolutionSelector />}
           </div>
         )}
       </div>

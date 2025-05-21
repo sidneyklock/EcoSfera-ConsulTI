@@ -26,9 +26,16 @@ import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
+import { useSecureContextStore } from "@/stores/secureContextStore";
 
-export const AppSidebar = () => {
-  const { authState, signOut } = useAuth();
+interface AppSidebarProps {
+  solutionId: string | null;
+  userRole: Role | null;
+}
+
+export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
+  const { signOut } = useAuth();
+  const { user } = useSecureContextStore();
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
@@ -74,7 +81,7 @@ export const AppSidebar = () => {
 
   // Filter items based on the current user's role
   const filteredItems = navItems.filter(
-    (item) => authState.user && item.roles.includes(authState.user.role)
+    (item) => userRole && item.roles.includes(userRole)
   );
 
   // Check if the current item is active
@@ -88,6 +95,7 @@ export const AppSidebar = () => {
         size="icon"
         className="fixed top-4 right-4 z-50 md:hidden"
         onClick={toggleCollapsed}
+        aria-label={collapsed ? "Abrir menu" : "Fechar menu"}
       >
         {collapsed ? (
           <Menu className={iconClasses} />
@@ -104,9 +112,13 @@ export const AppSidebar = () => {
         <Sidebar
           collapsible="icon"
           className={sidebarElementClasses.container}
+          aria-label="Navegação principal"
         >
           <SidebarHeaderWrapper className={sidebarElementClasses.header}>
-            <SidebarHeader collapsed={collapsed} />
+            <SidebarHeader 
+              collapsed={collapsed} 
+              solutionId={solutionId}
+            />
           </SidebarHeaderWrapper>
           
           <SidebarContent className={sidebarElementClasses.content}>
@@ -121,7 +133,7 @@ export const AppSidebar = () => {
           
           <SidebarFooterWrapper className={sidebarElementClasses.footer}>
             <SidebarFooter 
-              user={authState.user} 
+              user={user} 
               collapsed={collapsed} 
               onSignOut={signOut}
             />
