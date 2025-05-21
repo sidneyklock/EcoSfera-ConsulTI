@@ -20,6 +20,11 @@ export const LoginForm = () => {
     await signIn(email, password);
   };
 
+  const handleDevLogin = async () => {
+    // Usuário e senha temporários para desenvolvimento
+    await signIn("dev@example.com", "senha123");
+  };
+
   return (
     <Card className="auth-card animate-in">
       <CardHeader>
@@ -89,6 +94,18 @@ export const LoginForm = () => {
               "Entrar"
             )}
           </Button>
+          
+          {/* Botão de login para desenvolvimento */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-dashed border-muted-foreground/50"
+            onClick={handleDevLogin}
+            disabled={authState.isLoading}
+          >
+            Login Rápido (Desenvolvimento)
+          </Button>
+
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
