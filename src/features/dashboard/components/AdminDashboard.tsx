@@ -1,7 +1,8 @@
+
 import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
-import { UserRoleAssignment } from "@/features/admin/components";
+import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
 
 export const AdminDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -13,10 +14,10 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-6">
       <WelcomeHeader />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total de Usuários"
           value={stats.totalUsers}
@@ -47,7 +48,7 @@ export const AdminDashboard = () => {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 mt-6">
         <div className="rounded-lg border bg-card shadow p-6">
           <h3 className="font-medium text-lg mb-4">Visão Geral do Sistema</h3>
           <p className="text-muted-foreground mb-4">
@@ -87,7 +88,7 @@ export const AdminDashboard = () => {
         </div>
       </div>
       
-      <div className="mt-8">
+      <div className="mt-6">
         <UserRoleAssignment />
       </div>
     </div>

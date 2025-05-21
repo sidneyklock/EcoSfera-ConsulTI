@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { AuthStore, AuthState } from './types/auth.types';
 import { authOperations } from './operations/auth';
+import { useSecureContextStore } from './secureContextStore';
 
 // Estado inicial
 const initialState: AuthState = {
@@ -41,7 +42,23 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   // Atualizar contexto do usuário
   refreshContext: async () => 
-    authOperations.refreshContext(set)
+    authOperations.refreshContext(set),
+    
+  // Atribuição de papel a um usuário
+  assignUserRole: async (userEmail, roleName, solutionId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const secureContextStore = useSecureContextStore.getState();
+      await secureContextStore.assignUserRole(userEmail, roleName, solutionId);
+      await authOperations.refreshContext(set);
+      return { success: true };
+    } catch (error: any) {
+      set({ error: error.message });
+      return { success: false, error: error.message };
+    } finally {
+      set({ isLoading: false });
+    }
+  }
 }));
 
 // Seletores para evitar re-renderizações desnecessárias

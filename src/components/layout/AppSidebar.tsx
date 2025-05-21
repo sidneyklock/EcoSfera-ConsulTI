@@ -28,6 +28,7 @@ import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/stores/authStore";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -37,6 +38,7 @@ interface AppSidebarProps {
 export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
+  const { signOut } = useAuthStore();
 
   useEffect(() => {
     console.log("AppSidebar: Rendering with userRole:", userRole);
@@ -45,7 +47,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   // Handle sign out
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
       window.location.href = "/login";
     } catch (error) {
       console.error("Error signing out:", error);
@@ -130,17 +132,17 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
       >
         <Sidebar
           collapsible="icon"
-          className={sidebarElementClasses.container}
+          className={`${sidebarElementClasses.container} border-r border-border bg-background`}
           aria-label="Navegação principal"
         >
-          <SidebarHeaderWrapper className={sidebarElementClasses.header}>
+          <SidebarHeaderWrapper className={`${sidebarElementClasses.header} px-4 py-3`}>
             <SidebarHeader 
               collapsed={collapsed} 
               solutionId={solutionId}
             />
           </SidebarHeaderWrapper>
           
-          <SidebarContent className={sidebarElementClasses.content}>
+          <SidebarContent className={`${sidebarElementClasses.content} py-2 px-1`}>
             <SidebarGroup>
               <SidebarNavigation 
                 navItems={filteredItems} 
@@ -150,7 +152,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
             </SidebarGroup>
           </SidebarContent>
           
-          <SidebarFooterWrapper className={sidebarElementClasses.footer}>
+          <SidebarFooterWrapper className={`${sidebarElementClasses.footer} mt-auto p-4`}>
             <SidebarFooter 
               user={userRole ? { name: '', email: '', id: '', role: userRole } : null} 
               collapsed={collapsed} 

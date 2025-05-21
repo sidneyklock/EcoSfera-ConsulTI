@@ -1,7 +1,7 @@
 
 import { memo, useEffect } from "react";
 import { AdminDashboard, UserDashboard } from "@/features/dashboard/components";
-import { useUserContext } from "@/features/auth/hooks";
+import { useAuthStore } from "@/stores/authStore";
 import { Navigate } from "react-router-dom";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
@@ -13,8 +13,7 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
  * Uses memo to prevent unnecessary re-renders
  */
 const DashboardPage = memo(() => {
-  const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
-  const { user, role } = userData || {};
+  const { user, role, isLoading, error } = useAuthStore();
   
   useEffect(() => {
     // Registrar início do carregamento da página
@@ -33,7 +32,7 @@ const DashboardPage = memo(() => {
     };
   }, [user, role]);
   
-  if (userLoading) {
+  if (isLoading) {
     logger.debug({
       action: "dashboard_loading",
       message: "Dashboard em carregamento"
@@ -41,7 +40,7 @@ const DashboardPage = memo(() => {
     
     // Use skeleton loader instead of spinner for better UX
     return (
-      <div className="space-y-6">
+      <div className="container space-y-6">
         <LoadingSkeleton variant="text" className="h-8 w-1/3" />
         <LoadingSkeleton variant="text" className="h-4 w-1/2" />
         
@@ -57,19 +56,19 @@ const DashboardPage = memo(() => {
     );
   }
   
-  if (userError) {
+  if (error) {
     logger.error({
       userId: user?.id,
       action: "dashboard_error",
       message: "Erro ao carregar dashboard",
-      data: { errorMessage: userError }
+      data: { errorMessage: error }
     });
     
     return (
       <FallbackState 
         type="error" 
         title="Erro ao carregar o dashboard" 
-        message={`Não foi possível carregar seus dados: ${userError}. Tente novamente mais tarde.`}
+        message={`Não foi possível carregar seus dados: ${error}. Tente novamente mais tarde.`}
         action={{
           label: "Tentar novamente",
           onClick: () => window.location.reload()
@@ -97,7 +96,9 @@ const DashboardPage = memo(() => {
       title="Dashboard" 
       description="Bem-vindo ao painel de controle da EcoSfera ConsulTI"
     >
-      {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
+      <div className="container py-6">
+        {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
+      </div>
     </PageLayout>
   );
 });
