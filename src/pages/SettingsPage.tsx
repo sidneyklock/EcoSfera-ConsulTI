@@ -21,6 +21,12 @@ const SettingsPage = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [apiKey, setApiKey] = useState("sk-•••••••••••••••••••••••••••");
 
+  // Re-added the handleProfileUpdate function
+  const handleProfileUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Perfil atualizado com sucesso!");
+  };
+
   // Obter iniciais do nome do usuário
   const getInitials = (name: string = "Usuário") => {
     return name
