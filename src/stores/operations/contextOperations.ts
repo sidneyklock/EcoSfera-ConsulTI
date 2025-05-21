@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Role, User } from '@/types';
 import { createUserRecord } from './userOperations';
+import { logger, fetchLogger } from '@/utils';
 
 /**
  * Fetches the current user context from Supabase
@@ -17,18 +18,20 @@ export async function fetchUserContext(
   setErrorState(null);
   
   try {
-    console.log("fetchUserContext: Fetching user context");
+    fetchLogger.start("fetch_user_context", "Buscando contexto do usuário");
     
     // Verificar se o usuário está autenticado
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      console.log("fetchUserContext: No active session found");
+      fetchLogger.success("fetch_user_context", "Nenhuma sessão ativa encontrada", { authenticated: false });
       setUserState(null, null, null);
       return;
     }
     
-    console.log("fetchUserContext: Session found, user is authenticated", session.user.email);
+    fetchLogger.success("fetch_user_context", "Sessão encontrada, usuário autenticado", { 
+      email: session.user.email 
+    });
     
     // Automaticamente criar um registro de usuário se não existir
     const authUser = session.user;
@@ -50,13 +53,21 @@ export async function fetchUserContext(
         .maybeSingle();
       
       if (userError) {
-        console.error("fetchUserContext: Error fetching user data", userError);
+        fetchLogger.error("fetch_user_context", "Erro ao buscar dados do usuário", userError, {
+          userId: session.user.id
+        });
         setErrorState(`Erro ao carregar dados do usuário: ${userError.message}`);
         return;
       }
       
       if (!userData) {
-        console.log("fetchUserContext: No user record found, creating one");
+        fetchLogger.info({
+          userId: session.user.id,
+          action: "fetch_user_context",
+          message: "Nenhum registro de usuário encontrado, criando um",
+          status: 'success'
+        });
+        
         // Criar o usuário se não existir
         try {
           await createRecord(authUser);
@@ -70,14 +81,27 @@ export async function fetchUserContext(
           };
           
           setUserState(defaultUser, 'user', null);
+          
+          fetchLogger.success("fetch_user_context", "Registro de usuário criado com sucesso", {
+            userId: defaultUser.id,
+            email: defaultUser.email
+          });
         } catch (err) {
-          console.error("Error creating user record:", err);
+          fetchLogger.error("fetch_user_context", "Erro ao criar registro de usuário", err, {
+            userId: session.user.id
+          });
           setErrorState(`Failed to create user record: ${err}`);
         }
         return;
       }
       
-      console.log("fetchUserContext: User record found", userData);
+      fetchLogger.info({
+        userId: userData.id,
+        action: "fetch_user_context",
+        message: "Registro de usuário encontrado",
+        data: userData,
+        status: 'success'
+      });
       
       // Extrair o papel (role) do usuário e ID da solução (se existirem)
       const userRoles = userData.user_roles || [];
@@ -85,7 +109,13 @@ export async function fetchUserContext(
       
       // Verificar se o usuário tem um papel e uma solução associada
       if (!firstUserRole) {
-        console.log("fetchUserContext: No user role found, setting default role");
+        fetchLogger.info({
+          userId: userData.id,
+          action: "fetch_user_context",
+          message: "Nenhum papel de usuário encontrado, definindo papel padrão",
+          status: 'success'
+        });
+        
         const defaultUser = {
           id: userData.id,
           email: userData.email,
@@ -97,7 +127,13 @@ export async function fetchUserContext(
         return;
       }
       
-      console.log("fetchUserContext: User role found", firstUserRole);
+      fetchLogger.info({
+        userId: userData.id,
+        action: "fetch_user_context",
+        message: "Papel de usuário encontrado",
+        data: firstUserRole,
+        status: 'success'
+      });
       
       // Extrair o ID da solução do primeiro papel do usuário (considerar preferência do usuário)
       let solutionId = currentSolutionId;
@@ -114,7 +150,11 @@ export async function fetchUserContext(
         .maybeSingle();
         
       if (roleError) {
-        console.error("fetchUserContext: Error fetching role data", roleError);
+        fetchLogger.error("fetch_user_context", "Erro ao buscar dados do papel", roleError, {
+          userId: userData.id,
+          roleId: firstUserRole.role_id
+        });
+        
         setErrorState(`Erro ao carregar papel do usuário: ${roleError.message}`);
         return;
       }
@@ -131,15 +171,20 @@ export async function fetchUserContext(
       
       setUserState(user, userRole, solutionId);
       
-      console.log('SecureContext loaded:', { user, role: userRole, solutionId });
+      fetchLogger.success("fetch_user_context", "Contexto de segurança carregado", {
+        userId: user.id,
+        email: user.email,
+        role: userRole,
+        solutionId
+      });
     
     } catch (fetchError: any) {
-      console.error("Error in fetchUserContext data fetching:", fetchError);
+      fetchLogger.error("fetch_user_context", "Erro na busca de dados de contexto do usuário", fetchError);
       setErrorState(`Error fetching user data: ${fetchError.message}`);
     }
     
   } catch (error: any) {
-    console.error('Erro ao buscar contexto do usuário:', error);
+    fetchLogger.error("fetch_user_context", "Erro ao buscar contexto do usuário", error);
     setErrorState(`Falha ao carregar dados do usuário: ${error.message || 'Erro desconhecido'}`);
   } finally {
     setLoadingState(false);

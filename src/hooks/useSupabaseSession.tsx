@@ -4,6 +4,7 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { getErrorMessage } from "@/services/authService";
+import { logger, fetchLogger } from "@/utils";
 
 /**
  * Hook para gerenciar a sessão do Supabase de forma eficiente
@@ -42,17 +43,31 @@ export const useSupabaseSession = () => {
     const checkSession = async () => {
       try {
         setLoading(true);
+        
+        fetchLogger.start("auth_session", "Verificando sessão do usuário");
+        
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
+          fetchLogger.error("auth_session", "Erro ao verificar sessão", error);
           throw error;
         }
 
         setSession(data.session);
-        setUser(data.session?.user ? mapUserData(data.session.user) : null);
+        
+        const mappedUser = data.session?.user ? mapUserData(data.session.user) : null;
+        setUser(mappedUser);
+        
+        fetchLogger.success("auth_session", "Sessão verificada com sucesso", { 
+          authenticated: !!data.session,
+          user: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null
+        });
       } catch (err) {
         console.error("Erro ao verificar sessão:", err);
-        setError(getErrorMessage(err as any));
+        const errorMessage = getErrorMessage(err as any);
+        setError(errorMessage);
+        
+        fetchLogger.error("auth_session", "Erro ao verificar sessão", err, { errorMessage });
       } finally {
         setLoading(false);
       }
