@@ -1,5 +1,4 @@
 
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, BarChart, LineChart, PieChart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +19,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
 
 // Dados simulados
 const monthlyData = [
@@ -57,8 +57,16 @@ const userActivity = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const AnalyticsPage = () => {
+  // Use the role guard hook to protect this page
+  const redirectComponent = useRoleGuard(["admin"]);
+  
+  // If the hook returns a redirect component, render it
+  if (redirectComponent) {
+    return redirectComponent;
+  }
+
   return (
-    <DashboardLayout requiredRoles={["admin"]}>
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground mt-2">
@@ -289,7 +297,7 @@ const AnalyticsPage = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </DashboardLayout>
+    </>
   );
 };
 

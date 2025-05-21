@@ -1,4 +1,3 @@
-
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,11 +21,6 @@ const SettingsPage = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [apiKey, setApiKey] = useState("sk-•••••••••••••••••••••••••••");
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Perfil atualizado com sucesso!");
-  };
-
   // Obter iniciais do nome do usuário
   const getInitials = (name: string = "Usuário") => {
     return name
@@ -38,7 +32,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
         <p className="text-muted-foreground mt-2">
@@ -285,7 +279,7 @@ const SettingsPage = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -1,5 +1,15 @@
 
+import { useRoleGuard } from "@/hooks/useRoleGuard";
+
 const AdminPage = () => {
+  // Use the role guard hook to protect this page
+  const redirectComponent = useRoleGuard(["admin"]);
+  
+  // If the hook returns a redirect component, render it
+  if (redirectComponent) {
+    return redirectComponent;
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Área de Administração</h1>
