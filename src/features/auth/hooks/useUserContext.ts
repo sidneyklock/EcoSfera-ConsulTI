@@ -15,12 +15,15 @@ interface UserContextData {
 export function useUserContext() {
   const { user, role, solutionId, isLoading, error, refreshContext } = useAuth();
   
+  // Ensure role is of type Role or null by validating it
+  const validatedRole = role as Role | null;
+  
   // Memoize data object to prevent unnecessary re-renders
   const data = useMemo<UserContextData>(() => ({
     user,
-    role,
+    role: validatedRole,
     solutionId
-  }), [user, role, solutionId]);
+  }), [user, validatedRole, solutionId]);
 
   return { 
     data, 

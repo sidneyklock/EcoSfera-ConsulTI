@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { Role } from "@/types";
 
 const DashboardHeader = memo(({ userName, onSignOut }: { userName?: string, onSignOut: () => void }) => (
   <header className="border-b h-16 px-4 flex items-center justify-between sticky top-0 bg-background z-10 shadow-sm">
@@ -52,9 +53,12 @@ const DashboardLayout = () => {
   const { collapsed } = useSidebarCollapse(false);
   const navigate = useNavigate();
 
+  // Ensure role is properly typed as Role or null
+  const userRole = role as Role | null;
+
   useEffect(() => {
-    console.log("DashboardLayout: Initial render with user:", user, "role:", role);
-  }, [user, role]);
+    console.log("DashboardLayout: Initial render with user:", user, "role:", userRole);
+  }, [user, userRole]);
 
   // Memoize the handle sign out function to prevent unnecessary re-renders
   const handleSignOut = useMemo(() => async () => {
@@ -103,7 +107,7 @@ const DashboardLayout = () => {
     return <Navigate to="/login" />;
   }
 
-  console.log("DashboardLayout: Rendering dashboard with user", user, "role", role);
+  console.log("DashboardLayout: Rendering dashboard with user", user, "role", userRole);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -115,7 +119,7 @@ const DashboardLayout = () => {
       <div className="flex flex-1">
         <AppSidebar 
           solutionId={solutionId} 
-          userRole={role}
+          userRole={userRole}
         />
         <DashboardContent collapsed={collapsed}>
           <Outlet />
