@@ -11,15 +11,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, User, AlertTriangle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-interface DashboardLayoutProps {
-  children?: ReactNode;
-  requiredRoles?: Role[];
-}
-
-const DashboardLayout = ({ 
-  children,
-  requiredRoles = ["user", "admin"] 
-}: DashboardLayoutProps) => {
+const DashboardLayout = () => {
   const { 
     user, 
     solutionId,
@@ -112,7 +104,7 @@ const DashboardLayout = ({
             aria-live="polite"
             aria-relevant="additions removals"
           >
-            {children || <Outlet />}
+            <Outlet />
           </main>
         </div>
       </div>

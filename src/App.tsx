@@ -38,14 +38,14 @@ const App = () => (
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             
-            {/* Dashboard routes com DashboardLayout como wrapper */}
-            <Route path="/" element={<DashboardLayout />}>
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="chat" element={<ChatPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="users" element={<UsersPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="admin" element={<AdminPage />} />
+            {/* Dashboard routes with DashboardLayout as parent */}
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />

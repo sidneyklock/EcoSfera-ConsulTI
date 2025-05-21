@@ -24,45 +24,41 @@ export function useSecureContext() {
 
   useEffect(() => {
     console.log("useSecureContext: Initializing secure context");
-    fetchUserContext();
+    
+    // Fetch user context immediately
+    fetchUserContext().catch(err => {
+      console.error("Error in initial fetchUserContext:", err);
+    });
     
     // Inscrever-se para mudanças na autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("useSecureContext: Auth state changed", event, "session exists:", !!session);
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Verificar e garantir que o usuário existe na tabela users quando fizer login
-        if (session?.user) {
-          const authUser = session.user;
-          console.log("useSecureContext: User signed in, ensuring user record exists", authUser.email);
-          
-          try {
-            // Realizar upsert na tabela de users para garantir que o usuário existe
-            const { error: upsertError } = await supabase
-              .from('users')
-              .upsert({
-                id: authUser.id,
-                email: authUser.email,
-                full_name: authUser.user_metadata?.name || authUser.email.split('@')[0] || '',
-                created_at: new Date().toISOString()
-              }, {
-                onConflict: 'id'
-              });
-              
-            if (upsertError) {
-              console.error('Erro ao atualizar registro de usuário:', upsertError);
-            } else {
-              console.log("useSecureContext: User record created/updated successfully");
-            }
-          } catch (err) {
-            console.error('Exception during user record creation:', err);
+        // Schedule async operations to avoid blocking
+        setTimeout(() => {
+          if (session?.user) {
+            const authUser = session.user;
+            console.log("useSecureContext: User signed in, ensuring user record exists", authUser.email);
+            
+            // Create/update user record
+            createUserRecord(authUser).catch(err => {
+              console.error("Error creating user record:", err);
+            });
           }
-        }
-        
-        fetchUserContext();
+          
+          // Fetch updated user context
+          fetchUserContext().catch(err => {
+            console.error("Error fetching user context after auth change:", err);
+          });
+        }, 0);
       } else if (event === 'SIGNED_OUT') {
         console.log("useSecureContext: User signed out");
-        fetchUserContext();
+        setTimeout(() => {
+          fetchUserContext().catch(err => {
+            console.error("Error fetching user context after sign out:", err);
+          });
+        }, 0);
       }
     });
 
