@@ -1,7 +1,7 @@
 
 import { useMemo } from "react";
 import { User, Role } from "@/types";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthService } from "./useAuthService";
 
 interface UserContextData {
   user: User | null;
@@ -13,9 +13,9 @@ interface UserContextData {
  * Hook to provide user context data with optimized re-renders
  */
 export function useUserContext() {
-  const auth = useAuth();
-  const { user, role, solutionId, isLoading, error } = auth.authState;
-  const refreshContext = auth.signOut; // Using signOut as the refreshContext function
+  const auth = useAuthService();
+  const { user, role, solutionId, isLoading, error } = auth;
+  const refreshContext = auth.refreshContext;
   
   // Validate role type safety early to avoid re-renders
   // Only re-validate when role changes

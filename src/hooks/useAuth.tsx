@@ -5,11 +5,11 @@
  * @deprecated Use useAuthService from @/features/auth/hooks instead
  */
 
-import { useAuth as useAuthContext } from "@/context/AuthContext";
+import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { logger } from "@/utils/logger";
 
 export function useAuth() {
-  const auth = useAuthContext();
+  const auth = useAuthService();
   
   // Log hook usage to help identify where deprecated hook is still being used
   if (process.env.NODE_ENV !== 'production') {

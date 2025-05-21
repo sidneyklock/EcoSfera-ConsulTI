@@ -4,9 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form } from "@/components/ui/form";
@@ -15,7 +13,9 @@ import { EmailField } from "./EmailField";
 import { PasswordField } from "./PasswordField";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { AuthDivider } from "./AuthDivider";
+import { FormActions } from "./FormActions";
 import { useAuthService } from "../hooks/useAuthService";
+import { toast } from "@/components/ui/sonner";
 
 // Schema para validação do formulário
 const loginFormSchema = z.object({
@@ -64,6 +64,25 @@ export function LoginForm() {
     }
   };
 
+  /**
+   * Login com Google
+   */
+  const handleGoogleSignIn = () => {
+    signInWithGoogle().catch(error => {
+      toast.error("Erro ao iniciar login com Google");
+    });
+  };
+
+  /**
+   * Navegação para registro
+   */
+  const navigateToRegister = () => navigate("/register");
+
+  /**
+   * Navegação para recuperação de senha
+   */
+  const navigateToForgotPassword = () => navigate("/forgot-password");
+
   return (
     <Card className="auth-card animate-in">
       <CardHeader>
@@ -91,42 +110,22 @@ export function LoginForm() {
               control={form.control} 
               name="password"
               forgotPasswordLink
-              onForgotPasswordClick={() => navigate("/forgot-password")}
+              onForgotPasswordClick={navigateToForgotPassword}
             />
             
-            {/* Botão de login */}
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isProcessing}
-              aria-busy={isProcessing}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                  <span>Aguarde</span>
-                </>
-              ) : (
-                <span>Entrar</span>
-              )}
-            </Button>
-            
-            {/* Botão de login para desenvolvimento */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-dashed border-muted-foreground/50"
-              onClick={handleDevLogin}
-              disabled={isProcessing}
-            >
-              Login Rápido (Desenvolvimento)
-            </Button>
+            {/* Botões de ação */}
+            <FormActions 
+              isLoading={isProcessing}
+              submitLabel="Entrar"
+              devLoginEnabled
+              onDevLogin={handleDevLogin}
+            />
 
             <AuthDivider />
             
             {/* Botão de login com Google */}
             <GoogleLoginButton 
-              onClick={signInWithGoogle} 
+              onClick={handleGoogleSignIn} 
               disabled={isProcessing} 
             />
           </CardContent>
@@ -139,7 +138,7 @@ export function LoginForm() {
           <Button 
             variant="link" 
             className="p-0 h-auto"
-            onClick={() => navigate("/register")}
+            onClick={navigateToRegister}
           >
             Registrar
           </Button>

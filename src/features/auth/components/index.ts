@@ -7,3 +7,6 @@ export { EmailField } from './EmailField';
 export { PasswordField } from './PasswordField';
 export { GoogleLoginButton } from './GoogleLoginButton';
 export { AuthDivider } from './AuthDivider';
+export { FormActions } from './FormActions';
+export { AuthHeader } from './AuthHeader';
+export { AuthFooter } from './AuthFooter';

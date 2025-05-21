@@ -1,14 +1,14 @@
 
 import { useEffect } from "react";
-import { LoginForm } from "../components/auth/LoginForm";
-import { useAuth } from "../context/AuthContext";
+import { LoginForm } from "../features/auth/components/LoginForm";
+import { useAuthService } from "../features/auth/hooks/useAuthService";
 import { Navigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const { authState } = useAuth();
+  const { user } = useAuthService();
   
   // Se já estiver autenticado, redireciona para o dashboard
-  if (authState.user) {
+  if (user) {
     return <Navigate to="/dashboard" />;
   }
 

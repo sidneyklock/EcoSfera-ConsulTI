@@ -1,10 +1,9 @@
-
 import { useEffect, memo, useMemo } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { Button } from "@/components/ui/button";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { FallbackState } from "@/components/ui/fallback-state";
@@ -50,9 +49,7 @@ const DashboardContent = memo(({ collapsed, children }: { collapsed: boolean, ch
 DashboardContent.displayName = 'DashboardContent';
 
 const DashboardLayout = () => {
-  const auth = useAuth();
-  const { user, role, solutionId, isLoading, error } = auth.authState;
-  const signOut = auth.signOut;
+  const { user, role, solutionId, isLoading, error, signOut } = useAuthService();
   const { collapsed } = useSidebarCollapse(false);
   const navigate = useNavigate();
 
