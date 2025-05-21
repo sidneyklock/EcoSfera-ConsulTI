@@ -96,12 +96,13 @@ export const AppSidebar = () => {
         )}
       </Button>
 
-      <SidebarProvider>
+      <SidebarProvider
+        defaultOpen={!collapsed}
+        open={!collapsed}
+        onOpenChange={(open) => setCollapsed(!open)}
+      >
         <Sidebar
-          defaultCollapsed={false}
           collapsible="icon"
-          collapsed={collapsed}
-          onCollapsedChange={setCollapsed}
           className={sidebarElementClasses.container}
         >
           <SidebarHeaderWrapper className={sidebarElementClasses.header}>
