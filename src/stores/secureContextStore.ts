@@ -50,7 +50,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
           )
         `)
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle() to handle case where user might not be found
       
       if (userError) {
         set({ error: `Erro ao carregar dados do usuário: ${userError.message}`, loading: false });
@@ -95,7 +95,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         .from('roles')
         .select('name')
         .eq('id', firstUserRole.role_id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle() to handle case where role might not be found
         
       if (roleError) {
         set({ error: `Erro ao carregar papel do usuário: ${roleError.message}`, loading: false });
