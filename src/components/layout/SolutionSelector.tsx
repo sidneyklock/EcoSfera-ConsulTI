@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -14,6 +14,15 @@ import { supabase } from '@/lib/supabase';
 interface Solution {
   id: string;
   name: string;
+}
+
+// Tipagem correta para o formato de resposta do Supabase
+interface UserSolutionResponse {
+  solution_id: string;
+  solutions: {
+    id: string;
+    name: string;
+  };
 }
 
 export const SolutionSelector = () => {
@@ -42,11 +51,12 @@ export const SolutionSelector = () => {
           return;
         }
 
+        // Correção do mapeamento para acessar corretamente os dados
         const formattedSolutions = data
-          .filter(item => item.solutions) // Garantir que solutions existe
-          .map(item => ({
-            id: item.solutions.id,
-            name: item.solutions.name
+          .filter(item => item.solutions != null) // Garantir que solutions existe
+          .map((item: UserSolutionResponse) => ({
+            id: item.solutions?.id,
+            name: item.solutions?.name
           }));
 
         setSolutions(formattedSolutions);
