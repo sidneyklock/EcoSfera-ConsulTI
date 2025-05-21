@@ -4,9 +4,10 @@ import { User } from '@/types';
 import { logger } from '@/utils/logger';
 import { toast } from '@/components/ui/sonner';
 import { createUserRecord } from '../userOperations';
+import { mapUserFromAuth } from './mappers';
 
 /**
- * Login com email e senha
+ * Login with email and password
  */
 export const signIn = async (email: string, password: string, set: Function, get: Function) => {
   const methodStart = performance.now();
@@ -35,27 +36,39 @@ export const signIn = async (email: string, password: string, set: Function, get
       return null;
     }
     
-    const mappedUser = data.user ? {
-      id: data.user.id,
-      email: data.user.email || '',
-      name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || '',
-      avatar_url: data.user.user_metadata?.avatar_url,
-    } : null;
+    // Busca os dados do usuário na tabela 'users'
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (userError) {
+      logger.warn({
+        action: "auth_signin_user_fetch_error",
+        message: `Erro ao buscar dados do usuário: ${userError.message}`,
+        data: { userError }
+      });
+      set({ error: userError.message });
+      return null;
+    }
     
-    if (mappedUser) {
+    const user = mapUserFromAuth(data.user, userData);
+    
+    if (user) {
       logger.info({
-        userId: mappedUser.id,
+        userId: user.id,
         action: "auth_signin_success",
-        message: "Login bem-sucedido, criando registro de usuário",
-        data: { email: mappedUser.email }
+        message: "Login bem-sucedido",
+        data: { email: user.email }
       });
       
       await createUserRecord(data.user);
-      await get().refreshContext();
       toast.success("Login realizado com sucesso!");
     }
     
-    return mappedUser;
+    set({ user, error: null });
+    return user;
   } catch (error: any) {
     const errorMessage = error.message || "Erro ao realizar login";
     logger.error({

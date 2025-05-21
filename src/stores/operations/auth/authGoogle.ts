@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
-import { GoogleSignInResult } from '../../types/auth.types';
+import { GoogleSignInResult } from '@/types/auth.types';
 
 /**
  * Login com o Google

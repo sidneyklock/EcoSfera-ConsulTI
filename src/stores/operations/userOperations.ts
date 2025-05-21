@@ -1,62 +1,69 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Role } from '@/types';
+import { logger } from '@/utils/logger';
 
 /**
- * Creates or updates a user record in the database
+ * Create or update user record in the users table
+ * @param authUser User object from Supabase auth
+ * @returns Success status and any error
  */
-export async function createUserRecord(authUser: any): Promise<void> {
+export const createUserRecord = async (authUser: any) => {
+  if (!authUser || !authUser.id) {
+    return { success: false, error: 'Invalid user data' };
+  }
+
   try {
-    console.log("createUserRecord: Creating/updating user record for", authUser.email);
-    
-    // Inserir o usuário na tabela public.users se não existir
-    const { error: insertError } = await supabase
+    // Check if user already exists
+    const { data: existingUser } = await supabase
       .from('users')
-      .upsert([
-        { 
-          id: authUser.id, 
-          email: authUser.email,
-          full_name: authUser.user_metadata?.name || authUser.email.split('@')[0]
-        }
-      ], { onConflict: 'id' });
+      .select('id')
+      .eq('id', authUser.id)
+      .single();
 
-    if (insertError) {
-      console.error('Erro ao criar registro de usuário:', insertError);
-      throw insertError;
+    // If user doesn't exist, create a new record
+    if (!existingUser) {
+      const { error } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: authUser.id,
+            email: authUser.email,
+            full_name: authUser.user_metadata?.name || authUser.email?.split('@')[0],
+          },
+        ]);
+
+      if (error) {
+        logger.error({
+          userId: authUser.id,
+          action: 'create_user_record_error',
+          message: `Failed to create user record: ${error.message}`,
+          data: { error },
+        });
+        return { success: false, error: error.message };
+      }
+
+      logger.info({
+        userId: authUser.id,
+        action: 'create_user_record_success',
+        message: 'User record created successfully',
+      });
+    } else {
+      // User exists - we could update here if needed
+      logger.debug({
+        userId: authUser.id,
+        action: 'user_record_exists',
+        message: 'User record already exists',
+      });
     }
-    
-    console.log("createUserRecord: User record created/updated successfully");
 
+    return { success: true, error: null };
   } catch (error: any) {
-    console.error('Erro ao criar registro de usuário:', error);
-    throw error;
-  }
-}
-
-/**
- * Assigns a role to a user for a specific solution
- */
-export async function assignUserRole(
-  userEmail: string, 
-  roleName: Role, 
-  solutionId: string
-): Promise<void> {
-  try {
-    console.log(`assignUserRole: Assigning role ${roleName} to user ${userEmail} for solution ${solutionId}`);
-    
-    // Utilizar a função assign_user_role do PostgreSQL via supabase.rpc
-    const { error } = await supabase.rpc('assign_user_role', {
-      in_user_email: userEmail,
-      in_role_name: roleName,
-      in_solution_id: solutionId
+    logger.error({
+      userId: authUser.id,
+      action: 'create_user_record_exception',
+      message: `Exception creating user record: ${error.message}`,
+      data: { error, stack: error.stack },
     });
-    
-    if (error) {
-      throw error;
-    }
-    
-  } catch (error: any) {
-    console.error('Erro ao atribuir papel ao usuário:', error);
-    throw error;
+    return { success: false, error: error.message };
   }
-}
+};

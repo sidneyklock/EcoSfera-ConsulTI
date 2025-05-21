@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { logger } from '@/utils/logger';
 import { toast } from '@/components/ui/sonner';
+import { mapUserFromAuth } from './mappers';
 
 /**
  * Registro com email e senha
@@ -38,12 +39,24 @@ export const signUp = async (email: string, password: string, name: string | und
       return null;
     }
 
-    const user = data.user ? {
-      id: data.user.id,
-      email: data.user.email || '',
-      name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || '',
-      avatar_url: data.user.user_metadata?.avatar_url,
-    } : null;
+    // Após o cadastro, insere os dados adicionais na tabela 'users'
+    const { error: userError } = await supabase
+      .from('users')
+      .insert([
+        { id: data.user?.id, full_name: name, email: email }
+      ]);
+
+    if (userError) {
+      logger.warn({
+        action: "auth_signup_user_insert_error",
+        message: `Erro ao inserir dados do usuário: ${userError.message}`,
+        data: { userError }
+      });
+      set({ error: userError.message });
+      return null;
+    }
+    
+    const user = data.user ? mapUserFromAuth(data.user, { full_name: name }) : null;
     
     if (user) {
       logger.info({
@@ -54,6 +67,7 @@ export const signUp = async (email: string, password: string, name: string | und
       });
       
       toast.success("Registro realizado com sucesso!");
+      set({ user, error: null });
     }
     
     return user;
