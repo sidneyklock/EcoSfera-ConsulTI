@@ -1,5 +1,4 @@
-
-export type Role = "anon" | "user" | "admin";
+export type Role = "anon" | "user" | "admin" | "member" | "owner";
 
 export interface User {
   id: string;
