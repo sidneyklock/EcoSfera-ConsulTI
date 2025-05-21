@@ -1,85 +1,148 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/types";
-import { SendHorizonal } from "lucide-react";
+import { SendHorizonal, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/AuthContext";
+import { useSecureContext } from "@/hooks/useSecureContext";
 import SecureMessageBubble from "./SecureMessageBubble";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const ChatInterface = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Olá! Como posso ajudar você hoje?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { authState } = useAuth();
+  const { user, solutionId } = useSecureContext();
 
-  // Rola para o final das mensagens quando novas mensagens são adicionadas
+  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
+  // Load conversation history from Supabase
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!user) {
+        setIsInitialLoading(false);
+        return;
+      }
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      content: inputValue,
-      timestamp: new Date(),
+      try {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching messages:", error);
+          setError("Não foi possível carregar o histórico de mensagens.");
+        } else {
+          const formattedMessages = data.map(
+            (msg): ChatMessage => ({
+              id: msg.id,
+              role: msg.role as "user" | "assistant",
+              content: msg.message,
+              timestamp: new Date(msg.created_at || new Date()),
+            })
+          );
+          setMessages(formattedMessages);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching messages:", err);
+        setError("Ocorreu um erro ao carregar as mensagens.");
+      } finally {
+        setIsInitialLoading(false);
+      }
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
+    fetchMessages();
+  }, [user]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!inputValue.trim() || isLoading || !user) return;
+    
     setIsLoading(true);
+    setError(null);
+    
+    const message = inputValue.trim();
+    setInputValue("");
+    
+    // Optimistically add user message to UI
+    const userMessage: ChatMessage = {
+      id: `temp-${Date.now()}`,
+      role: "user",
+      content: message,
+      timestamp: new Date(),
+    };
+    
+    setMessages((prev) => [...prev, userMessage]);
 
-    // Simula uma resposta do assistente (será substituído pela integração real com GPT-4o)
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: getSimulatedResponse(inputValue),
-        timestamp: new Date(),
-      };
+    try {
+      // Call Edge Function for GPT-4o response
+      const response = await fetch(
+        "https://dlequbzzlavikbxgzlkc.functions.supabase.co/chat-completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message,
+            userId: user.id,
+            solutionId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao obter resposta do assistente.");
+      }
+
+      // Fetch the updated messages after the edge function has saved them
+      const { data: updatedData, error: fetchError } = await supabase
+        .from("conversations")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
+
+      if (fetchError) {
+        throw new Error("Não foi possível atualizar as mensagens.");
+      }
+
+      // Update messages with the freshly fetched data
+      const formattedMessages = updatedData.map(
+        (msg): ChatMessage => ({
+          id: msg.id,
+          role: msg.role as "user" | "assistant",
+          content: msg.message,
+          timestamp: new Date(msg.created_at || new Date()),
+        })
+      );
       
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocorreu um erro ao processar sua mensagem."
+      );
+      toast.error("Erro ao enviar mensagem. Por favor, tente novamente.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
-
-  // Função para gerar respostas simuladas com base no input do usuário
-  const getSimulatedResponse = (input: string): string => {
-    const lowerInput = input.toLowerCase();
-    
-    if (lowerInput.includes("olá") || lowerInput.includes("oi") || lowerInput.includes("bom dia") || lowerInput.includes("boa tarde") || lowerInput.includes("boa noite")) {
-      return `Olá ${authState.user?.name || ""}! Como posso ajudar você hoje?`;
     }
-    
-    if (lowerInput.includes("ajuda") || lowerInput.includes("help")) {
-      return "Posso ajudar com informações sobre projetos, tarefas, e análises de dados. O que você gostaria de saber?";
-    }
-    
-    if (lowerInput.includes("projeto") || lowerInput.includes("projetos")) {
-      return "Você tem 3 projetos ativos no momento. Gostaria de ver mais detalhes sobre algum deles?";
-    }
-    
-    if (lowerInput.includes("relatório") || lowerInput.includes("analise") || lowerInput.includes("análise")) {
-      return "Posso gerar relatórios detalhados sobre seus projetos e atividades. Que tipo de informação você está procurando?";
-    }
-    
-    if (lowerInput.includes("reunião") || lowerInput.includes("agenda")) {
-      return "Sua próxima reunião está agendada para hoje às 15:00. Deseja que eu envie um lembrete?";
-    }
-    
-    return "Entendi sua mensagem. Como posso te ajudar com isso? Para dar uma resposta mais precisa, eu precisaria estar conectado a uma API de IA como GPT-4o.";
   };
 
   return (
@@ -99,14 +162,48 @@ export const ChatInterface = () => {
         aria-live="polite"
         aria-relevant="additions"
       >
-        {messages.map((msg) => (
-          <SecureMessageBubble
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-            timestamp={msg.timestamp}
-          />
-        ))}
+        {isInitialLoading ? (
+          <>
+            <div className="flex gap-3">
+              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="h-4 w-4 text-primary" aria-hidden="true">🤖</span>
+              </div>
+              <div className="rounded-md p-3 bg-muted max-w-[80%]">
+                <Skeleton className="h-4 w-40 mb-2" />
+                <Skeleton className="h-4 w-60" />
+              </div>
+            </div>
+            <div className="flex gap-3 ml-auto">
+              <div className="rounded-md p-3 bg-primary max-w-[80%]">
+                <Skeleton className="h-4 w-32 bg-primary-foreground/20" />
+              </div>
+              <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                <Skeleton className="h-4 w-4 rounded-full" />
+              </div>
+            </div>
+          </>
+        ) : messages.length === 0 && !error ? (
+          <div className="flex items-center justify-center h-full flex-col gap-4 text-center p-4">
+            <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
+              <span className="text-4xl" aria-hidden="true">🤖</span>
+            </div>
+            <div>
+              <h3 className="text-xl font-medium mb-2">Bem-vindo(a) ao Chat com IA</h3>
+              <p className="text-muted-foreground">
+                Envie uma mensagem para iniciar uma conversa com o assistente.
+              </p>
+            </div>
+          </div>
+        ) : (
+          messages.map((msg) => (
+            <SecureMessageBubble
+              key={msg.id}
+              role={msg.role}
+              content={msg.content}
+              timestamp={msg.timestamp}
+            />
+          ))
+        )}
         
         {isLoading && (
           <div className="flex gap-3">
@@ -123,6 +220,15 @@ export const ChatInterface = () => {
           </div>
         )}
         
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
       
@@ -133,16 +239,16 @@ export const ChatInterface = () => {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Digite sua mensagem..."
             className="flex-1"
-            disabled={isLoading}
+            disabled={isLoading || !user}
             aria-label="Mensagem"
           />
           <Button 
             type="submit" 
             size="icon" 
-            disabled={isLoading || !inputValue.trim()}
+            disabled={isLoading || !inputValue.trim() || !user}
             aria-label="Enviar mensagem"
           >
-            <SendHorizonal className="h-5 w-5" />
+            <SendHorizonal className={cn("h-5 w-5", isLoading && "animate-pulse")} />
           </Button>
         </div>
       </form>
