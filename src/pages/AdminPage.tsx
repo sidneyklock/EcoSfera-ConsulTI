@@ -1,13 +1,19 @@
 
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { Role } from "@/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WebhookKeyManager } from "@/components/admin/WebhookKeyManager";
+import { AdminLogViewer } from "@/components/admin/AdminLogViewer";
+import { UserRoleAssignment } from "@/components/admin/UserRoleAssignment";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
   const redirectComponent = useRoleGuard("admin" as Role);
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
   
   useEffect(() => {
     // Exibe uma mensagem de boas-vindas para o administrador
@@ -15,6 +21,23 @@ const AdminPage = () => {
       title: "Área de Administração",
       description: "Bem-vindo(a) à área administrativa. Você tem permissões de administrador.",
     });
+    
+    // Registrar o acesso na tabela de logs administrativos
+    const logAdminAccess = async () => {
+      try {
+        await supabase.rpc('log_admin_action', {
+          action: 'access_admin_page',
+          entity_table: 'admin_page',
+          entity_id: null,
+          details: { page: 'admin', timestamp: new Date().toISOString() }
+        });
+        console.log('Acesso administrativo registrado com sucesso');
+      } catch (error) {
+        console.error('Erro ao registrar acesso administrativo:', error);
+      }
+    };
+    
+    logAdminAccess();
   }, [toast]);
   
   // If the hook returns a redirect component, render it
@@ -29,28 +52,51 @@ const AdminPage = () => {
         Esta página só pode ser acessada por administradores.
       </p>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="p-6 border rounded-lg bg-card shadow">
-          <h3 className="font-medium text-lg mb-2">Gerenciamento de Usuários</h3>
-          <p className="text-sm text-muted-foreground">
-            Gerencie contas de usuário, permissões e acesso ao sistema.
-          </p>
-        </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="users">Usuários e Roles</TabsTrigger>
+          <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs">Logs de Auditoria</TabsTrigger>
+        </TabsList>
         
-        <div className="p-6 border rounded-lg bg-card shadow">
-          <h3 className="font-medium text-lg mb-2">Configurações do Sistema</h3>
-          <p className="text-sm text-muted-foreground">
-            Configure parâmetros globais e ajuste comportamentos do sistema.
-          </p>
-        </div>
+        <TabsContent value="overview">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-6 border rounded-lg bg-card shadow">
+              <h3 className="font-medium text-lg mb-2">Gerenciamento de Usuários</h3>
+              <p className="text-sm text-muted-foreground">
+                Gerencie contas de usuário, permissões e acesso ao sistema.
+              </p>
+            </div>
+            
+            <div className="p-6 border rounded-lg bg-card shadow">
+              <h3 className="font-medium text-lg mb-2">Configurações do Sistema</h3>
+              <p className="text-sm text-muted-foreground">
+                Configure parâmetros globais e ajuste comportamentos do sistema.
+              </p>
+            </div>
+            
+            <div className="p-6 border rounded-lg bg-card shadow">
+              <h3 className="font-medium text-lg mb-2">Logs e Auditoria</h3>
+              <p className="text-sm text-muted-foreground">
+                Monitore atividades do sistema e revise logs de auditoria.
+              </p>
+            </div>
+          </div>
+        </TabsContent>
         
-        <div className="p-6 border rounded-lg bg-card shadow">
-          <h3 className="font-medium text-lg mb-2">Logs e Auditoria</h3>
-          <p className="text-sm text-muted-foreground">
-            Monitore atividades do sistema e revise logs de auditoria.
-          </p>
-        </div>
-      </div>
+        <TabsContent value="users" className="space-y-4">
+          <UserRoleAssignment />
+        </TabsContent>
+        
+        <TabsContent value="webhooks" className="space-y-4">
+          <WebhookKeyManager />
+        </TabsContent>
+        
+        <TabsContent value="logs" className="space-y-4">
+          <AdminLogViewer />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
