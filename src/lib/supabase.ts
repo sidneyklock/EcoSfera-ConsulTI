@@ -11,6 +11,10 @@ export const supabase = supabaseUrl && supabaseAnonKey
       from: () => ({
         select: () => ({
           eq: () => ({
+            limit: () => ({
+              returns: () => Promise.resolve({ data: [], error: null }),
+              single: () => Promise.resolve({ data: null, error: null }),
+            }),
             returns: () => Promise.resolve({ data: [], error: null }),
             single: () => Promise.resolve({ data: null, error: null }),
           }),
@@ -24,4 +28,3 @@ export const supabase = supabaseUrl && supabaseAnonKey
 
 // Função para verificar se o Supabase está configurado
 export const isSupabaseConfigured = () => Boolean(supabaseUrl && supabaseAnonKey);
-
