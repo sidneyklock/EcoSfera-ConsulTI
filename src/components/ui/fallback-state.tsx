@@ -13,6 +13,7 @@ export interface FallbackStateProps {
     label: string;
     onClick: () => void;
   };
+  children?: React.ReactNode;
 }
 
 export const FallbackState = ({ 
@@ -20,7 +21,8 @@ export const FallbackState = ({
   title, 
   message, 
   className,
-  action
+  action,
+  children
 }: FallbackStateProps) => {
   // Default messages based on type
   const defaults = {
@@ -61,7 +63,9 @@ export const FallbackState = ({
       currentState.bgColor,
       currentState.borderColor,
       className
-    )}>
+    )}
+    aria-live="polite"
+    role={type === 'error' ? 'alert' : 'status'}>
       <div className={cn("mb-4", currentState.iconColor)} aria-hidden="true">
         {currentState.icon}
       </div>
@@ -78,6 +82,8 @@ export const FallbackState = ({
           {action.label}
         </Button>
       )}
+
+      {children}
     </div>
   );
 };

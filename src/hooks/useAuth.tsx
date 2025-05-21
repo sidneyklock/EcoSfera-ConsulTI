@@ -15,8 +15,8 @@ export type AuthState = {
 };
 
 /**
- * Centralized hook for authentication state
- * Combines Supabase auth and secure context
+ * Hook centralizado para estado de autenticação
+ * Combina auth do Supabase e contexto seguro
  */
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -33,8 +33,8 @@ export function useAuth() {
     createUserRecord
   } = useSecureContextStore();
 
-  // Convert Supabase user to our User type
-  const mapSupabaseUser = (supabaseUser: SupabaseUser | null): User | null => {
+  // Converte usuário do Supabase para nosso tipo User
+  const mapSupabaseUser = useCallback((supabaseUser: SupabaseUser | null): User | null => {
     if (!supabaseUser) return null;
     
     return {
@@ -43,7 +43,7 @@ export function useAuth() {
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
       avatar_url: supabaseUser.user_metadata?.avatar_url,
     };
-  };
+  }, []);
 
   const signOut = useCallback(async () => {
     try {
@@ -57,13 +57,13 @@ export function useAuth() {
     }
   }, []);
 
-  // Combined loading state
+  // Estado de loading combinado
   const loading = isLoading || contextLoading;
   
-  // Combined error state (prioritize auth error over context error)
+  // Estado de erro combinado (priorizar erro de auth sobre erro de contexto)
   const combinedError = error || contextError;
 
-  // Memoize the auth state to prevent unnecessary re-renders
+  // Memorizar o estado de auth para prevenir re-renderizações desnecessárias
   const authState = useMemo<AuthState>(() => ({
     user,
     session,
@@ -75,27 +75,28 @@ export function useAuth() {
 
   useEffect(() => {
     console.log("useAuth: Initializing authentication state");
+    const startTime = performance.now();
     
-    // Set up listener for auth state changes first (to avoid missing events)
+    // Configurar listener para mudanças de estado de auth primeiro (para não perder eventos)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       console.log("useAuth: Auth state changed", event);
       
       setSession(newSession);
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Schedule async operations to avoid blocking
+        // Agendar operações assíncronas para evitar bloqueio
         setTimeout(() => {
           if (newSession?.user) {
             console.log("useAuth: User signed in, ensuring user record exists");
             
-            // Create/update user record
+            // Criar/atualizar registro do usuário
             createUserRecord(newSession.user).catch(err => {
               console.error("Error creating user record:", err);
               setError(`Error creating user record: ${err.message}`);
             });
           }
           
-          // Fetch updated user context
+          // Buscar contexto de usuário atualizado
           fetchUserContext().catch(err => {
             console.error("Error fetching user context after auth change:", err);
             setError(`Error fetching context: ${err.message}`);
@@ -106,7 +107,7 @@ export function useAuth() {
       }
     });
 
-    // Then check for existing session
+    // Então verificar a sessão existente
     const checkSession = async () => {
       try {
         setIsLoading(true);
@@ -119,7 +120,7 @@ export function useAuth() {
         setSession(data.session);
         
         if (data.session?.user) {
-          // Fetch user context if we have a session
+          // Buscar contexto do usuário se tivermos uma sessão
           await fetchUserContext();
         }
       } catch (err: any) {
@@ -131,6 +132,8 @@ export function useAuth() {
     };
 
     checkSession();
+    
+    console.log(`useAuth: Initialization took ${performance.now() - startTime}ms`);
 
     return () => {
       subscription.unsubscribe();

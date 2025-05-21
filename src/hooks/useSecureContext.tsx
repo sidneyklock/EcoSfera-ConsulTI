@@ -81,10 +81,11 @@ export function useSecureContext() {
           type="loading" 
           title="Carregando perfil" 
           message="Obtendo dados do seu perfil..." 
-        />
-        <div className="max-w-md mx-auto">
-          <LoadingSkeleton variant="text" count={3} />
-        </div>
+        >
+          <div className="max-w-md mx-auto mt-4">
+            <LoadingSkeleton variant="text" count={3} />
+          </div>
+        </FallbackState>
       </div>
     ) : null,
     // Error display component

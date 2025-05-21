@@ -10,7 +10,7 @@ interface PrefetchOptions {
 }
 
 /**
- * Hook for data prefetching and query management with built-in performance tracking
+ * Hook para prefetch e gerenciamento de queries com rastreamento de performance integrado
  */
 export function usePrefetchQuery<TData>(
   queryKey: QueryKey,
@@ -21,7 +21,7 @@ export function usePrefetchQuery<TData>(
   const queryClient = useQueryClient();
   const { enabled = true, staleTime = 1000 * 60 * 5, gcTime = 1000 * 60 * 10 } = options;
   
-  // Define the prefetch function
+  // Define a função de prefetch
   const prefetch = useCallback(async () => {
     try {
       dispatchUserActionSubmit("prefetch_data", "usePrefetchQuery", { queryKey }, user);
@@ -43,7 +43,7 @@ export function usePrefetchQuery<TData>(
     }
   }, [queryClient, queryKey, queryFn, staleTime, gcTime, user]);
 
-  // Prefetch on mount if enabled
+  // Prefetch na montagem se habilitado
   useEffect(() => {
     if (enabled) {
       console.log(`Prefetching data for ${queryKey.join('.')}`);
@@ -51,7 +51,7 @@ export function usePrefetchQuery<TData>(
     }
   }, [enabled, prefetch, queryKey]);
 
-  // Use the query normally
+  // Usa a query normalmente
   const query = useQuery({
     queryKey,
     queryFn,
