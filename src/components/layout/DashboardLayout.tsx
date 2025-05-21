@@ -10,6 +10,7 @@ import { LogOut, User as UserIcon } from "lucide-react";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Role } from "@/types";
+import { logger } from "@/utils/logger";
 
 const DashboardHeader = memo(({ userName, onSignOut }: { userName?: string, onSignOut: () => void }) => (
   <header className="border-b h-16 px-4 flex items-center justify-between sticky top-0 bg-background z-10 shadow-sm">
@@ -53,26 +54,66 @@ const DashboardLayout = () => {
   const { collapsed } = useSidebarCollapse(false);
   const navigate = useNavigate();
 
-  // Ensure role is properly typed as Role or null
-  const userRole = role as Role | null;
+  // Validate role early and memoize to prevent unnecessary re-renders
+  const userRole = useMemo(() => {
+    const validRoles: Role[] = ["anon", "user", "admin", "system", "member", "owner"];
+    return (role && typeof role === 'string' && validRoles.includes(role as Role)) 
+      ? (role as Role) 
+      : null;
+  }, [role]);
 
   useEffect(() => {
-    console.log("DashboardLayout: Initial render with user:", user, "role:", userRole);
-  }, [user, userRole]);
+    logger.debug({
+      action: "dashboard_mounted",
+      message: "DashboardLayout: Initial render",
+      data: { 
+        hasUser: !!user, 
+        userRole, 
+        hasSolutionId: !!solutionId 
+      }
+    });
+    
+    // Record performance timing
+    const renderStart = performance.now();
+    
+    return () => {
+      const renderTime = performance.now() - renderStart;
+      logger.debug({
+        action: "dashboard_unmounted",
+        message: `DashboardLayout render time: ${renderTime.toFixed(2)}ms`,
+        data: { renderTimeMs: renderTime }
+      });
+    };
+  }, [user, userRole, solutionId]);
 
   // Memoize the handle sign out function to prevent unnecessary re-renders
   const handleSignOut = useMemo(() => async () => {
     try {
+      logger.info({
+        userId: user?.id,
+        action: "user_signout",
+        message: "User initiated sign out"
+      });
+      
       await signOut();
       navigate("/login");
     } catch (error) {
-      console.error("Error signing out:", error);
+      logger.error({
+        userId: user?.id,
+        action: "signout_error",
+        message: "Error signing out",
+        data: { error }
+      });
     }
-  }, [signOut, navigate]);
+  }, [signOut, navigate, user?.id]);
 
   // If loading, display a skeleton loader instead of spinner
   if (isLoading) {
-    console.log("DashboardLayout: In loading state");
+    logger.debug({
+      action: "dashboard_loading",
+      message: "DashboardLayout: In loading state"
+    });
+    
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <DashboardHeader userName={undefined} onSignOut={() => {}} />
@@ -90,7 +131,13 @@ const DashboardLayout = () => {
 
   // If there's an error, display an error message with reload button
   if (error) {
-    console.log("DashboardLayout: Error state:", error);
+    logger.error({
+      userId: user?.id,
+      action: "dashboard_error",
+      message: "Error loading dashboard",
+      data: { error }
+    });
+    
     return (
       <FallbackState 
         type="error" 
@@ -103,11 +150,20 @@ const DashboardLayout = () => {
 
   // If not authenticated, redirect to login
   if (!user) {
-    console.log("DashboardLayout: No user found, redirecting to auth");
+    logger.debug({
+      action: "dashboard_redirect",
+      message: "DashboardLayout: No user found, redirecting to auth"
+    });
+    
     return <Navigate to="/login" />;
   }
 
-  console.log("DashboardLayout: Rendering dashboard with user", user, "role", userRole);
+  logger.debug({
+    userId: user.id,
+    action: "dashboard_render",
+    message: "Rendering dashboard",
+    data: { userRole }
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

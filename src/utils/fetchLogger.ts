@@ -1,7 +1,14 @@
 
 import { logger } from './logger';
 import { User } from '@/types';
-import { dispatchSupabaseQueryError } from './events';
+import { dispatchSupabaseQueryError, dispatchSlowQuery } from './events';
+
+// Thresholds for performance monitoring (in milliseconds)
+const PERFORMANCE_THRESHOLDS = {
+  SLOW_QUERY: 500,     // 500ms threshold for slow queries
+  VERY_SLOW_QUERY: 1000, // 1s threshold for very slow queries
+  TIMEOUT: 10000       // 10s timeout for operations
+};
 
 /**
  * Função auxiliar para logs em operações de fetch
@@ -18,17 +25,44 @@ export const fetchLogger = {
       data: additionalData,
       status: 'success'
     });
+    
+    // Return timestamp for performance tracking
+    return {
+      startTime: performance.now(),
+      operationId: Math.random().toString(36).substring(2, 9)
+    };
   },
   
   /**
    * Loga o sucesso de uma operação de busca
    */
-  success: (operation: string, message: string, additionalData?: any, user?: User | null) => {
+  success: (operation: string, message: string, additionalData?: any, user?: User | null, startTime?: number) => {
+    // Calculate duration if startTime was provided
+    const endTime = performance.now();
+    const duration = startTime ? endTime - startTime : undefined;
+    
+    // Check for slow operations
+    if (duration && duration > PERFORMANCE_THRESHOLDS.SLOW_QUERY) {
+      const table = additionalData?.table || additionalData?.tableName;
+      dispatchSlowQuery(operation, duration, table, PERFORMANCE_THRESHOLDS.SLOW_QUERY, user);
+      
+      // Add warning for very slow queries
+      if (duration > PERFORMANCE_THRESHOLDS.VERY_SLOW_QUERY) {
+        logger.warn({
+          userId: user?.id,
+          action: `${operation}_performance`,
+          message: `Very slow operation detected: ${operation} took ${duration.toFixed(2)}ms`,
+          data: { ...additionalData, duration, threshold: PERFORMANCE_THRESHOLDS.VERY_SLOW_QUERY },
+          status: 'fail'
+        });
+      }
+    }
+    
     logger.info({
       userId: user?.id,
       action: `${operation}_success`,
       message,
-      data: additionalData,
+      data: { ...additionalData, duration },
       status: 'success'
     });
   },
@@ -77,14 +111,46 @@ export const fetchLogger = {
     successMessage: (result: T) => string = () => `${operation} concluído com sucesso`,
     errorMessage: string = `Erro ao executar ${operation}`
   ): Promise<T> => {
-    fetchLogger.start(operation, startMessage, user);
+    const { startTime, operationId } = fetchLogger.start(operation, startMessage, user);
+    
+    // Set timeout to catch hanging operations
+    const timeoutId = setTimeout(() => {
+      logger.warn({
+        userId: user?.id,
+        action: `${operation}_timeout`,
+        message: `Operation may be hanging: ${operation} (${operationId}) has been running for over ${PERFORMANCE_THRESHOLDS.TIMEOUT / 1000}s`,
+        data: { 
+          operationId,
+          startTime,
+          threshold: PERFORMANCE_THRESHOLDS.TIMEOUT,
+          operation
+        },
+        status: 'fail'
+      });
+    }, PERFORMANCE_THRESHOLDS.TIMEOUT);
     
     try {
       const result = await fetchFn();
-      fetchLogger.success(operation, successMessage(result), { result }, user);
+      clearTimeout(timeoutId);
+      
+      fetchLogger.success(
+        operation, 
+        successMessage(result), 
+        { result, operationId }, 
+        user,
+        startTime
+      );
       return result;
     } catch (error) {
-      fetchLogger.error(operation, errorMessage, error, {}, user);
+      clearTimeout(timeoutId);
+      
+      fetchLogger.error(
+        operation, 
+        errorMessage, 
+        error, 
+        { operationId }, 
+        user
+      );
       throw error;
     }
   }

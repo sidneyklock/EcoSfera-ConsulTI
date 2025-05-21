@@ -1,8 +1,12 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "@/types";
 import { useAuthService } from "@/features/auth/hooks";
+import { logger } from "@/utils/logger";
+import { fetchLogger } from "@/utils/fetchLogger";
+import { dispatchAuthStateChange } from "@/utils/events";
+import { toast } from "@/components/ui/sonner";
 
 /**
  * Interface do contexto de autenticação
@@ -44,30 +48,85 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const navigate = useNavigate();
 
+  // Monitor auth state changes and dispatch events
+  useEffect(() => {
+    const authState = { user, role, isLoading, error };
+    
+    // Dispatch auth state change event for tracking
+    dispatchAuthStateChange(authState, user);
+    
+    // Log significant auth state changes
+    if (user && !isLoading) {
+      logger.info({
+        userId: user.id,
+        action: "auth_state_changed",
+        message: "User authenticated",
+        data: { role }
+      });
+    } else if (!user && !isLoading && error) {
+      logger.warn({
+        action: "auth_state_changed",
+        message: "Authentication error",
+        data: { error }
+      });
+    }
+  }, [user, role, isLoading, error]);
+
   /**
-   * Função de login com redirecionamento
+   * Função de login com redirecionamento e instrumentação
    */
   const signIn = async (email: string, password: string) => {
-    const user = await authenticateUser(email, password);
-    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
-    return user;
+    return await fetchLogger.withLogs(
+      "user_login",
+      async () => {
+        const user = await authenticateUser(email, password);
+        if (user) {
+          toast.success("Login realizado com sucesso!");
+        }
+        return user;
+      },
+      undefined, // user not available yet
+      "Iniciando processo de login",
+      (user) => `Login ${user ? 'bem-sucedido' : 'falhou'} para ${email}`,
+      "Erro ao processar login"
+    );
   };
 
   /**
-   * Função de registro com redirecionamento
+   * Função de registro com redirecionamento e instrumentação
    */
   const signUp = async (email: string, password: string, name?: string) => {
-    const user = await registerUser(email, password, name);
-    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
-    return user;
+    return await fetchLogger.withLogs(
+      "user_signup",
+      async () => {
+        const user = await registerUser(email, password, name);
+        if (user) {
+          toast.success("Registro realizado com sucesso!");
+        }
+        return user;
+      },
+      undefined, // user not available yet
+      "Iniciando processo de registro",
+      (user) => `Registro ${user ? 'bem-sucedido' : 'falhou'} para ${email}`,
+      "Erro ao processar registro"
+    );
   };
 
   /**
-   * Função de logout com redirecionamento
+   * Função de logout com redirecionamento e instrumentação
    */
   const signOut = async () => {
-    await logoutUser();
-    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
+    return await fetchLogger.withLogs(
+      "user_logout",
+      async () => {
+        await logoutUser();
+        toast.success("Logout realizado com sucesso");
+      },
+      user,
+      "Iniciando processo de logout",
+      () => "Logout realizado com sucesso",
+      "Erro ao processar logout"
+    );
   };
 
   // Mantendo compatibilidade com a interface existente
@@ -89,6 +148,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   if (isLoading) {
+    logger.debug({
+      action: "auth_provider_loading",
+      message: "AuthProvider in loading state"
+    });
+    
     return <div className="flex min-h-screen items-center justify-center">Carregando...</div>;
   }
 
@@ -107,7 +171,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    const error = new Error("useAuth must be used within an AuthProvider");
+    logger.error({
+      action: "context_error",
+      message: "useAuth called outside AuthProvider",
+      data: { stack: error.stack }
+    });
+    throw error;
   }
   return context;
 }

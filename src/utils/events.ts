@@ -1,4 +1,3 @@
-
 import { User } from '@/types';
 import React from 'react';
 
@@ -16,10 +15,18 @@ export enum AppEventTypes {
   
   // Eventos do Supabase
   SUPABASE_QUERY_ERROR = 'supabase_query_error',
+  SUPABASE_QUERY_SLOW = 'supabase_query_slow', // New: track slow queries
+  
+  // Eventos de autenticação
+  AUTH_STATE_CHANGE = 'auth_state_change',
+  AUTH_LOGIN_ATTEMPT = 'auth_login_attempt',
+  AUTH_LOGIN_SUCCESS = 'auth_login_success',
+  AUTH_LOGIN_ERROR = 'auth_login_error',
   
   // Outros eventos do sistema
-  AUTH_STATE_CHANGE = 'auth_state_change',
-  NAVIGATION_CHANGE = 'navigation_change'
+  NAVIGATION_CHANGE = 'navigation_change',
+  COMPONENT_ERROR = 'component_error', // New: component errors
+  PERFORMANCE_ISSUE = 'performance_issue' // New: performance issues
 }
 
 /**
@@ -38,6 +45,12 @@ export interface PageEventPayload extends BaseEventPayload {
   component: string;
   duration?: number; // usado para page_load_complete
   referrer?: string;
+  performanceMetrics?: {
+    fcp?: number; // First Contentful Paint
+    lcp?: number; // Largest Contentful Paint
+    fid?: number; // First Input Delay
+    cls?: number; // Cumulative Layout Shift
+  };
 }
 
 /**
@@ -49,6 +62,7 @@ export interface UserActionEventPayload extends BaseEventPayload {
   data?: any;
   result?: 'success' | 'error';
   errorMessage?: string;
+  duration?: number; // Tempo para completar a ação
 }
 
 /**
@@ -60,12 +74,35 @@ export interface SupabaseEventPayload extends BaseEventPayload {
   errorCode?: string;
   errorMessage?: string;
   metadata?: any;
+  duration?: number; // Tempo de execução da query
+}
+
+/**
+ * Interface para eventos de autenticação
+ */
+export interface AuthEventPayload extends BaseEventPayload {
+  status: 'success' | 'error' | 'pending' | 'change';
+  provider?: 'email' | 'google' | 'other';
+  errorMessage?: string;
+  authState?: any;
+}
+
+/**
+ * Interface para eventos de performance
+ */
+export interface PerformanceEventPayload extends BaseEventPayload {
+  component: string;
+  metricType: 'render' | 'network' | 'animation' | 'interaction';
+  metricValue: number;
+  threshold: number;
+  detail: string;
 }
 
 /**
  * Tipo de união para todos os payloads de eventos
  */
-export type AppEventPayload = PageEventPayload | UserActionEventPayload | SupabaseEventPayload;
+export type AppEventPayload = PageEventPayload | UserActionEventPayload | 
+  SupabaseEventPayload | AuthEventPayload | PerformanceEventPayload;
 
 /**
  * Função auxiliar para disparar eventos do aplicativo com payload tipado
@@ -173,8 +210,54 @@ export function dispatchSupabaseQueryError(
   }, user);
 }
 
+// New function: Dispatch authentication state change
+export function dispatchAuthStateChange(
+  authState: any,
+  user?: User | null
+): void {
+  dispatchAppEvent<AuthEventPayload>(AppEventTypes.AUTH_STATE_CHANGE, {
+    status: 'change',
+    authState
+  }, user);
+}
+
+// New function: Dispatch when a component renders too slowly (ex: >16ms)
+export function dispatchSlowRender(
+  component: string,
+  renderTimeMs: number,
+  threshold: number = 16,
+  user?: User | null
+): void {
+  dispatchAppEvent<PerformanceEventPayload>(AppEventTypes.PERFORMANCE_ISSUE, {
+    component,
+    metricType: 'render',
+    metricValue: renderTimeMs,
+    threshold,
+    detail: `Slow render detected: ${component} took ${renderTimeMs.toFixed(2)}ms (threshold: ${threshold}ms)`
+  }, user);
+}
+
+// New function: Dispatch when a Supabase query is slow
+export function dispatchSlowQuery(
+  operation: string,
+  durationMs: number,
+  table?: string,
+  threshold: number = 500,
+  user?: User | null
+): void {
+  dispatchAppEvent<SupabaseEventPayload>(AppEventTypes.SUPABASE_QUERY_SLOW, {
+    operation,
+    table,
+    duration: durationMs,
+    metadata: {
+      threshold,
+      exceededBy: durationMs - threshold
+    }
+  }, user);
+}
+
 /**
- * Hook para adicionar listener para eventos customizados
+ * Hook para adicionar listener para eventos customizados com strong typing
  */
 export function useAppEventListener<T extends AppEventPayload>(
   eventType: AppEventTypes,

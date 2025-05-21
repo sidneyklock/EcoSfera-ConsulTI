@@ -15,8 +15,15 @@ interface UserContextData {
 export function useUserContext() {
   const { user, role, solutionId, isLoading, error, refreshContext } = useAuth();
   
-  // Ensure role is of type Role or null by validating it
-  const validatedRole = role as Role | null;
+  // Validate role type safety early to avoid re-renders
+  // Only re-validate when role changes
+  const validatedRole = useMemo(() => {
+    // Only cast if role is a valid Role type or null
+    const validRoles: Role[] = ["anon", "user", "admin", "system", "member", "owner"];
+    return (role && typeof role === 'string' && validRoles.includes(role as Role)) 
+      ? role as Role 
+      : null;
+  }, [role]);
   
   // Memoize data object to prevent unnecessary re-renders
   const data = useMemo<UserContextData>(() => ({
