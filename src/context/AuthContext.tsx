@@ -2,13 +2,20 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "@/types";
-import { useAuthentication, AuthenticationState } from "@/hooks/useAuthentication";
+import { useAuthService } from "@/features/auth/hooks";
 
 /**
  * Interface do contexto de autenticação
  */
 type AuthContextType = {
-  authState: AuthenticationState;
+  authState: {
+    user: User | null;
+    isLoading: boolean;
+    error: string | null;
+    role: string | null;
+    solutionId: string | null;
+    session: any | null;
+  };
   signIn: (email: string, password: string) => Promise<User | null>;
   signUp: (email: string, password: string, name?: string) => Promise<User | null>;
   signOut: () => Promise<void>;
@@ -20,17 +27,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /**
  * Provider para o contexto de autenticação
- * Usa o hook useAuthentication para gerenciar o estado
+ * Usa o hook useAuthService para gerenciar o estado
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { 
-    authState, 
-    signIn: authenticateUser, 
-    signUp: registerUser, 
-    signOut: logoutUser, 
+  const {
+    user,
+    role,
+    solutionId,
+    isLoading,
+    error,
+    signIn: authenticateUser,
+    signUp: registerUser,
+    signOut: logoutUser,
     signInWithGoogle: googleAuth,
-    LoadingSpinner
-  } = useAuthentication();
+  } = useAuthService();
 
   const navigate = useNavigate();
 
@@ -39,10 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const signIn = async (email: string, password: string) => {
     const user = await authenticateUser(email, password);
-    if (user) {
-      // Após login bem-sucedido, redirecionar para o dashboard
-      setTimeout(() => navigate("/dashboard"), 0);
-    }
+    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
     return user;
   };
 
@@ -51,10 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const signUp = async (email: string, password: string, name?: string) => {
     const user = await registerUser(email, password, name);
-    if (user) {
-      // Após registro bem-sucedido, redirecionar para verificação de email
-      navigate("/verify-email", { state: { email } });
-    }
+    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
     return user;
   };
 
@@ -63,7 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const signOut = async () => {
     await logoutUser();
-    navigate("/login");
+    // Não é mais necessário redirecionar aqui pois isso já é feito no hook useAuthService
+  };
+
+  // Mantendo compatibilidade com a interface existente
+  const authState = {
+    user,
+    isLoading,
+    error,
+    role,
+    solutionId,
+    session: null // Mantido para compatibilidade, embora não estejamos mais usando diretamente
   };
 
   const value: AuthContextType = {
@@ -74,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signInWithGoogle: googleAuth,
   };
 
-  if (authState.isLoading) {
-    return <LoadingSpinner />;
+  if (isLoading) {
+    return <div className="flex min-h-screen items-center justify-center">Carregando...</div>;
   }
 
   return (
