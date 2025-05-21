@@ -1,17 +1,20 @@
+
 import { useState, useEffect, Suspense } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
-import AccountPage from './pages/AccountPage';
-import HomePage from './pages/HomePage';
-import PricingPage from './pages/PricingPage';
+// Imports disponíveis
 import ChatPage from './pages/ChatPage';
-import AuthPage from './pages/AuthPage';
-import SolutionsPage from './pages/SolutionsPage';
-import SolutionDetailPage from './pages/SolutionDetailPage';
-import NewSolutionPage from './pages/NewSolutionPage';
-import EditSolutionPage from './pages/EditSolutionPage';
 import TestPage from './pages/TestPage';
+// Imports que serão temporariamente comentados por não existirem
+// import AccountPage from './pages/AccountPage';
+// import HomePage from './pages/HomePage';
+// import PricingPage from './pages/PricingPage';
+// import AuthPage from './pages/AuthPage';
+// import SolutionsPage from './pages/SolutionsPage';
+// import SolutionDetailPage from './pages/SolutionDetailPage';
+// import NewSolutionPage from './pages/NewSolutionPage';
+// import EditSolutionPage from './pages/EditSolutionPage';
 
 function App() {
   const [isUserLoaded, setIsUserLoaded] = useState(false);
@@ -32,7 +35,7 @@ function App() {
       } else {
         // If there's no session, navigate to the auth page
         if (location.pathname !== '/auth') {
-          navigate('/auth');
+          navigate('/');  // Temporarily navigate to root instead of /auth
         }
       }
       setIsUserLoaded(true);
@@ -43,14 +46,16 @@ function App() {
 
   return (
     <Routes>
+      {/* Rotas temporariamente comentadas por falta dos componentes */}
       <Route
         path="/"
         element={
           <Suspense fallback={<div>Loading...</div>}>
-            <HomePage />
+            <div>Home Page (Placeholder)</div>
           </Suspense>
         }
       />
+      {/* 
       <Route
         path="/pricing"
         element={
@@ -67,6 +72,7 @@ function App() {
           </Suspense>
         }
       />
+      */}
       <Route
         path="/chat"
         element={
@@ -75,6 +81,7 @@ function App() {
           </Suspense>
         }
       />
+      {/*
       <Route
         path="/auth"
         element={
@@ -83,7 +90,7 @@ function App() {
           </Suspense>
         }
       />
-       <Route
+      <Route
         path="/solutions"
         element={
           <Suspense fallback={<div>Loading...</div>}>
@@ -115,6 +122,7 @@ function App() {
           </Suspense>
         }
       />
+      */}
       <Route
         path="/test"
         element={
