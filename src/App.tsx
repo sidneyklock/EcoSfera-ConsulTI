@@ -6,21 +6,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import DashboardPage from "./pages/DashboardPage";
-import ChatPage from "./pages/ChatPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import UsersPage from "./pages/UsersPage";
-import SettingsPage from "./pages/SettingsPage";
-import UnauthorizedPage from "./pages/UnauthorizedPage";
-import AdminPage from "./pages/AdminPage";
-import AuthCallbackPage from "./pages/AuthCallbackPage";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
-import DashboardLayout from "./components/layout/DashboardLayout";
-import SustainabilityPage from "./pages/SustainabilityPage";
+import Index from "@/features/core/pages/Index";
+import NotFound from "@/features/core/pages/NotFound";
+import LoginPage from "@/features/auth/pages/LoginPage";
+import RegisterPage from "@/features/auth/pages/RegisterPage";
+import DashboardPage from "@/features/dashboard/pages/DashboardPage";
+import ChatPage from "@/features/chat/pages/ChatPage";
+import AnalyticsPage from "@/features/analytics/pages/AnalyticsPage";
+import UsersPage from "@/features/users/pages/UsersPage";
+import SettingsPage from "@/features/settings/pages/SettingsPage";
+import UnauthorizedPage from "@/features/auth/pages/UnauthorizedPage";
+import AdminPage from "@/features/admin/pages/AdminPage";
+import AuthCallbackPage from "@/features/auth/pages/AuthCallbackPage";
+import EmailVerificationPage from "@/features/auth/pages/EmailVerificationPage";
+import DashboardLayout from "@/features/layout/components/DashboardLayout";
+import SustainabilityPage from "@/features/sustainability/pages/SustainabilityPage";
 
 const queryClient = new QueryClient();
 
