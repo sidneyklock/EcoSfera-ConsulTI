@@ -1,6 +1,6 @@
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useSecureContext } from "@/hooks/useSecureContext";
 import { Role } from "@/types";
 
 /**
@@ -13,11 +13,10 @@ export const useRoleGuard = (
   requiredRole: Role | Role[], 
   redirectTo = "/unauthorized"
 ) => {
-  const { authState } = useAuth();
-  const { user, isLoading } = authState;
+  const { user, loading, role } = useSecureContext();
 
   // Se estiver carregando, não faz nada ainda
-  if (isLoading) {
+  if (loading) {
     return null;
   }
 
@@ -30,7 +29,7 @@ export const useRoleGuard = (
   const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
   // Verifica se o usuário tem pelo menos uma das roles necessárias
-  if (!requiredRoles.includes(user.role)) {
+  if (!role || !requiredRoles.includes(role)) {
     return <Navigate to={redirectTo} />;
   }
 

@@ -1,9 +1,10 @@
 
 import { useRoleGuard } from "@/hooks/useRoleGuard";
+import { Role } from "@/types";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
-  const redirectComponent = useRoleGuard(["admin"]);
+  const redirectComponent = useRoleGuard(["admin"] as Role[]);
   
   // If the hook returns a redirect component, render it
   if (redirectComponent) {

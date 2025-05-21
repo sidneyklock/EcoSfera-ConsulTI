@@ -8,7 +8,7 @@ import { useSecureContext } from "@/hooks/useSecureContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, AlertTriangle, RefreshCw } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardLayout = () => {
   const { 
@@ -19,12 +19,21 @@ const DashboardLayout = () => {
     error,
   } = useSecureContext();
   const { collapsed } = useSidebarCollapse(false);
-  const { signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log("DashboardLayout: Initial render with user:", user, "role:", role);
   }, [user, role]);
+
+  // Handle logout directly using supabase
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   // If loading, display a loading indicator
   if (loading) {
@@ -81,7 +90,7 @@ const DashboardLayout = () => {
             <User className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="text-sm font-medium hidden md:inline">{user?.name || user?.email}</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} className="text-sm">
+          <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-sm">
             <LogOut className="h-4 w-4 mr-1" />
             <span className="hidden md:inline">Sair</span>
           </Button>

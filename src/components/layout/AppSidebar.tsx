@@ -1,6 +1,5 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import {
   Sidebar,
   SidebarProvider,
@@ -28,6 +27,7 @@ import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -35,13 +35,22 @@ interface AppSidebarProps {
 }
 
 export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
-  const { signOut } = useAuth();
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
   useEffect(() => {
     console.log("AppSidebar: Rendering with userRole:", userRole);
   }, [userRole]);
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   // Navigation items with role-based access control
   const navItems: NavItem[] = [
@@ -145,7 +154,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
             <SidebarFooter 
               user={userRole ? { name: '', email: '', id: '', role: userRole } : null} 
               collapsed={collapsed} 
-              onSignOut={signOut}
+              onSignOut={handleSignOut}
             />
           </SidebarFooterWrapper>
         </Sidebar>
