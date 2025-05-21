@@ -9,6 +9,7 @@ import DashboardPage from "./features/dashboard/pages/DashboardPage";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Navigate } from "react-router-dom";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
           
           {/* Protected routes */}
           <Route path="/dashboard" element={

@@ -17,7 +17,7 @@ import { FormActions } from "./FormActions";
 import { AuthHeader } from "./AuthHeader";
 import { AuthFooter } from "./AuthFooter";
 import { useAuth } from "../hooks";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 // Schema para validação do formulário
 const loginFormSchema = z.object({
@@ -69,12 +69,12 @@ export function LoginForm() {
   const handleDevLogin = async () => {
     try {
       setIsDemoAuthLoading(true);
-      toast.loading("Efetuando login de desenvolvimento...", { id: "dev-login" });
+      toast.loading("Efetuando login de desenvolvimento...");
       // Use o email que já existe no seu sistema Supabase
       await signIn("sidney.klock@gmail.com", "senha123");
-      toast.success("Login de desenvolvimento concluído", { id: "dev-login" });
+      toast.success("Login de desenvolvimento concluído");
     } catch (err) {
-      toast.error("Falha no login de desenvolvimento", { id: "dev-login" });
+      toast.error("Falha no login de desenvolvimento");
     } finally {
       setIsDemoAuthLoading(false);
     }
@@ -85,16 +85,17 @@ export function LoginForm() {
    */
   const handleGoogleSignIn = async () => {
     try {
-      toast.loading("Preparando autenticação Google...", { id: "google-login" });
+      toast.loading("Preparando autenticação Google...", { id: "google-auth" });
       const result = await signInWithGoogle();
       
       if (!result.success) {
-        toast.error("Falha ao iniciar login com Google", { id: "google-login" });
+        toast.error("Falha ao iniciar login com Google", { id: "google-auth" });
       } else {
-        toast.success("Redirecionando para Google...", { id: "google-login" });
+        toast.success("Redirecionando para Google...", { id: "google-auth" });
       }
     } catch (error) {
-      toast.error("Erro ao iniciar login com Google", { id: "google-login" });
+      toast.error("Erro ao iniciar login com Google", { id: "google-auth" });
+      console.error("Erro ao iniciar login com Google:", error);
     }
   };
 
