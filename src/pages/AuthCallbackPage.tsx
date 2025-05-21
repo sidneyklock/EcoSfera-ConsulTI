@@ -11,20 +11,28 @@ const AuthCallbackPage = () => {
     // Processar o callback OAuth
     const handleAuthCallback = async () => {
       try {
+        console.log("Processando callback de autenticação...");
+        
+        // Obter parâmetros da URL para debugging
+        const params = new URLSearchParams(window.location.search);
+        console.log("Parâmetros da URL:", Object.fromEntries(params.entries()));
+        
+        // Verificar a sessão do Supabase
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Erro na autenticação:", error.message);
+          console.error("Erro na autenticação:", error);
           toast.error("Erro na autenticação: " + error.message);
           navigate("/login");
           return;
         }
         
         if (data.session) {
-          console.info("Login realizado com sucesso");
+          console.info("Login realizado com sucesso:", data.session.user);
           toast.success("Login realizado com sucesso!");
           navigate("/dashboard");
         } else {
+          console.error("Nenhuma sessão encontrada no retorno do OAuth");
           toast.error("Falha ao obter sessão");
           navigate("/login");
         }

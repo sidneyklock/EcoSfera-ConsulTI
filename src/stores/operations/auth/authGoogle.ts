@@ -16,11 +16,22 @@ export const signInWithGoogle = async (set: Function): Promise<GoogleSignInResul
       action: "auth_google_signin_start",
       message: "Iniciando processo de login com Google"
     });
+    
+    // Obter URL atual para configurar corretamente o redirecionamento
+    const currentUrl = window.location.origin;
+    console.log("URL de origem para redirecionamento:", currentUrl);
+    
+    const redirectTo = `${currentUrl}/auth/callback`;
+    console.log("URL de redirecionamento completa:", redirectTo);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
       }
     });
 
