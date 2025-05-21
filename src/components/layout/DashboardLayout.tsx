@@ -38,22 +38,31 @@ export const DashboardLayout = ({
   // If loading, display a loading indicator
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div 
+        className="min-h-screen flex flex-col" 
+        aria-busy="true" 
+        aria-label="Carregando painel"
+      >
         <div className="flex h-16 items-center px-4 border-b">
           <Skeleton className="h-8 w-8 rounded-full" />
-          <Skeleton className="h-4 w-[200px] ml-4" />
+          <Skeleton className="h-4 w-[200px] ml-4 rounded-md" />
         </div>
         <div className="flex flex-1">
           <div className="w-64 border-r p-4 hidden md:block">
-            <Skeleton className="h-10 w-full mb-4" />
-            <Skeleton className="h-8 w-full mb-2" />
-            <Skeleton className="h-8 w-full mb-2" />
-            <Skeleton className="h-8 w-full mb-2" />
+            <Skeleton className="h-10 w-full mb-4 rounded-md" />
+            <Skeleton className="h-6 w-full mb-3 rounded-md" />
+            <Skeleton className="h-6 w-full mb-3 rounded-md" />
+            <Skeleton className="h-6 w-full mb-3 rounded-md" />
           </div>
           <div className="flex-1 p-4 md:p-8">
-            <Skeleton className="h-10 w-1/2 mb-6" />
-            <Skeleton className="h-24 w-full mb-4" />
-            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-8 w-1/2 mb-6 rounded-md" />
+            <Skeleton className="h-24 w-full mb-5 rounded-md" />
+            <Skeleton className="h-24 w-full rounded-md" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <Skeleton className="h-32 w-full rounded-lg" />
+              <Skeleton className="h-32 w-full rounded-lg" />
+              <Skeleton className="h-32 w-full rounded-lg" />
+            </div>
           </div>
         </div>
       </div>
