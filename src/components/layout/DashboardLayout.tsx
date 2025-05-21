@@ -1,7 +1,7 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { AppSidebar } from "./AppSidebar";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Role } from "@/types";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
@@ -30,15 +30,22 @@ export const DashboardLayout = ({
     ErrorDisplay
   } = useSecureContext();
   const { collapsed } = useSidebarCollapse(false);
-  const { signOut } = useAuth();
+  const { signOut, authState } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("DashboardLayout: Initial render with authState:", authState, "secureContext user:", user);
+  }, [authState, user]);
 
   // If loading, display a loading indicator
   if (loading) {
+    console.log("DashboardLayout: In loading state");
     return <LoadingSpinner />;
   }
 
   // If there's an error, display an error message
   if (error) {
+    console.log("DashboardLayout: Error state:", error);
     return <ErrorDisplay />;
   }
 

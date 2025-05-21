@@ -26,6 +26,7 @@ import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
+import { useEffect } from "react";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -37,7 +38,9 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
-  console.log("AppSidebar: Rendering sidebar for user role:", userRole);
+  useEffect(() => {
+    console.log("AppSidebar: Rendering with userRole:", userRole);
+  }, [userRole]);
 
   // Navigation items with role-based access control
   const navItems: NavItem[] = [
