@@ -17,6 +17,7 @@ import UsersPage from "./pages/UsersPage";
 import SettingsPage from "./pages/SettingsPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import AdminPage from "./pages/AdminPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />

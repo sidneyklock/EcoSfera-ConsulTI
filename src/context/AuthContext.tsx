@@ -1,6 +1,15 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { AuthState, User } from "../types";
+import { toast } from "@/components/ui/sonner";
+import {
+  signInWithEmailAndPassword,
+  signUpWithEmailAndPassword,
+  signInWithGoogle as signInWithGoogleService,
+  signOut as signOutService,
+  getCurrentSession,
+  setupAuthListener
+} from "@/services/authService";
 
 interface AuthContextType {
   authState: AuthState;
@@ -21,56 +30,80 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>(initialState);
 
-  // Simulando integração com Supabase (será implementado quando conectar Supabase)
+  // Verificar sessão existente e configurar listener para mudanças de autenticação
   useEffect(() => {
-    // Verificar se há um usuário em localStorage (apenas para demonstração)
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    // Primeiro, configuramos o listener para mudanças de autenticação
+    const subscription = setupAuthListener((user) => {
+      setAuthState({ 
+        user, 
+        isLoading: false, 
+        error: null 
+      });
+    });
+
+    // Depois, verificamos se já existe uma sessão ativa
+    const checkSession = async () => {
       try {
-        const user = JSON.parse(storedUser) as User;
-        // Quando integrado com Supabase, a role virá de:
-        // 1. user.user_metadata.role OU
-        // 2. Consulta à tabela profiles vinculada ao user.id
-        setAuthState({ user, isLoading: false, error: null });
+        const { user, error } = await getCurrentSession();
+        
+        if (error) {
+          console.error("Erro ao verificar sessão:", error);
+        }
+        
+        setAuthState({ 
+          user, 
+          isLoading: false, 
+          error: null 
+        });
       } catch (error) {
-        console.error("Erro ao analisar usuário armazenado:", error);
-        setAuthState({ user: null, isLoading: false, error: null });
+        console.error("Erro ao verificar sessão:", error);
+        setAuthState({ 
+          user: null, 
+          isLoading: false, 
+          error: null 
+        });
       }
-    } else {
-      setAuthState({ user: null, isLoading: false, error: null });
-    }
+    };
+    
+    checkSession();
+    
+    // Cleanup: remover o listener quando o componente for desmontado
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
-      // Simular um login (será substituído pela integração com Supabase)
-      // Em produção, use: const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { user, error } = await signInWithEmailAndPassword(email, password);
       
-      // Quando integrado com Supabase, obtenha a role de:
-      // 1. data.user.user_metadata.role OU
-      // 2. Consulta à tabela profiles vinculada ao data.user.id
-      // const role = data.user.user_metadata.role || await getProfileRole(data.user.id) || "user";
+      if (error) {
+        toast.error(error);
+        setAuthState((prev) => ({ 
+          ...prev, 
+          isLoading: false, 
+          error 
+        }));
+        return;
+      }
       
-      // Para demonstração, vamos usar um valor padrão "user"
-      const defaultRole = "user";
-      
-      // Para demonstração, vamos simular um usuário
-      const mockUser: User = {
-        id: "1",
-        email,
-        role: defaultRole, // Valor padrão, será substituído pela role do Supabase
-        name: email.split("@")[0],
-      };
-      
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      setAuthState({ user: mockUser, isLoading: false, error: null });
+      if (user) {
+        toast.success("Login realizado com sucesso!");
+        setAuthState({ 
+          user, 
+          isLoading: false, 
+          error: null 
+        });
+      }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Falha no login. Por favor, tente novamente.";
+      toast.error(errorMessage);
       setAuthState((prev) => ({ 
         ...prev, 
         isLoading: false, 
-        error: "Falha no login. Por favor, tente novamente." 
+        error: errorMessage 
       }));
     }
   };
@@ -79,28 +112,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
-      // Simular um registro (será substituído pela integração com Supabase)
-      // Em produção, use: const { data, error } = await supabase.auth.signUp({ email, password });
+      const { user, error } = await signUpWithEmailAndPassword(email, password, name);
       
-      // Quando integrado com Supabase, defina a role padrão como "user" e crie um perfil
-      // const defaultRole = "user";
-      // await supabase.from('profiles').insert({ id: data.user.id, role: defaultRole, name: name || email.split("@")[0] });
+      if (error) {
+        toast.error(error);
+        setAuthState((prev) => ({ 
+          ...prev, 
+          isLoading: false, 
+          error 
+        }));
+        return;
+      }
       
-      // Para demonstração, vamos simular um usuário com role padrão "user"
-      const mockUser: User = {
-        id: "1",
-        email,
-        role: "user", // Role padrão para novos usuários
-        name: name || email.split("@")[0],
-      };
-      
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      setAuthState({ user: mockUser, isLoading: false, error: null });
+      if (user) {
+        toast.success("Cadastro realizado com sucesso!");
+        setAuthState({ 
+          user, 
+          isLoading: false, 
+          error: null 
+        });
+      } else {
+        toast.success("Cadastro realizado! Por favor, verifique seu e-mail para confirmar sua conta.");
+        setAuthState({ 
+          user: null, 
+          isLoading: false, 
+          error: null 
+        });
+      }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Falha no registro. Por favor, tente novamente.";
+      toast.error(errorMessage);
       setAuthState((prev) => ({ 
         ...prev, 
         isLoading: false, 
-        error: "Falha no registro. Por favor, tente novamente." 
+        error: errorMessage 
       }));
     }
   };
@@ -109,16 +154,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
-      // Em produção, use: const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      // Quando o usuário for autenticado, obtenha a role de forma similar ao signIn
+      const { error } = await signInWithGoogleService();
       
-      alert("Função será implementada quando integrada com Supabase");
-      setAuthState((prev) => ({ ...prev, isLoading: false }));
+      if (error) {
+        toast.error(error);
+        setAuthState((prev) => ({ 
+          ...prev, 
+          isLoading: false, 
+          error 
+        }));
+      }
+      // Não definimos o usuário aqui, pois o Google OAuth redireciona para outra página
+      // O listener de autenticação configurado no useEffect irá atualizar o estado quando
+      // o usuário retornar após autenticação bem-sucedida
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Falha no login com Google. Por favor, tente novamente.";
+      toast.error(errorMessage);
       setAuthState((prev) => ({ 
         ...prev, 
         isLoading: false, 
-        error: "Falha no login com Google. Por favor, tente novamente." 
+        error: errorMessage 
       }));
     }
   };
@@ -127,15 +182,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
-      // Em produção, use: await supabase.auth.signOut();
+      const { error } = await signOutService();
       
-      localStorage.removeItem("user");
-      setAuthState({ user: null, isLoading: false, error: null });
+      if (error) {
+        toast.error(error);
+        setAuthState((prev) => ({ 
+          ...prev, 
+          isLoading: false, 
+          error 
+        }));
+        return;
+      }
+      
+      toast.success("Você saiu com sucesso.");
+      setAuthState({ 
+        user: null, 
+        isLoading: false, 
+        error: null 
+      });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Falha ao sair. Por favor, tente novamente.";
+      toast.error(errorMessage);
       setAuthState((prev) => ({ 
         ...prev, 
         isLoading: false, 
-        error: "Falha ao sair. Por favor, tente novamente." 
+        error: errorMessage 
       }));
     }
   };
