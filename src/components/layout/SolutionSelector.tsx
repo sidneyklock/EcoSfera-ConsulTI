@@ -82,7 +82,7 @@ export const SolutionSelector = () => {
   return (
     <div className="flex items-center">
       <Select
-        value={solutionId}
+        value={solutionId || ''}
         onValueChange={handleSolutionChange}
         disabled={loading}
       >
