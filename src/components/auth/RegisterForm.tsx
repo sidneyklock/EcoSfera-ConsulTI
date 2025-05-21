@@ -8,17 +8,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, User, Loader2 } from "lucide-react";
+import { PasswordValidator } from "./PasswordValidator";
 
 export const RegisterForm = () => {
   const { authState, signUp, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent submission if password is not valid
+    if (!isPasswordValid) {
+      return;
+    }
+    
     await signUp(email, password, name);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
   return (
@@ -74,16 +86,21 @@ export const RegisterForm = () => {
                 type="password"
                 placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 className="pl-10"
                 required
+                aria-describedby="password-validator"
               />
             </div>
+            <PasswordValidator 
+              password={password} 
+              onValidationChange={setIsPasswordValid}
+            />
           </div>
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={authState.isLoading}
+            disabled={authState.isLoading || !isPasswordValid}
           >
             {authState.isLoading ? (
               <>
