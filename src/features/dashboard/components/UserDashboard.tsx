@@ -1,6 +1,4 @@
-
-import { WelcomeHeader } from "./WelcomeHeader";
-import { StatsCard } from "./StatsCard";
+import { WelcomeHeader, StatsCard } from "@/components/shared";
 import { MessageSquare, Clock, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 

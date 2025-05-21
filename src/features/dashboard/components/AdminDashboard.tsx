@@ -1,6 +1,4 @@
-
-import { WelcomeHeader } from "./WelcomeHeader";
-import { StatsCard } from "./StatsCard";
+import { WelcomeHeader, StatsCard } from "@/components/shared";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
 import { 

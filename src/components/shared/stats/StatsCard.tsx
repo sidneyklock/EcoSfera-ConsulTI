@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, a11yClasses, animations } from "@/lib/utils";
+import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, animations } from "@/lib/utils";
 
 interface StatsTrend {
   value: number;
@@ -91,3 +91,4 @@ export const StatsCard = ({
     </Card>
   );
 };
+

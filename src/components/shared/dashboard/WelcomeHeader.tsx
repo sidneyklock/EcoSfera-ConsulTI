@@ -1,9 +1,14 @@
 
-import { useAuth } from "@/context/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
+import { textClasses, spacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
+/**
+ * Exibe um cabeçalho de boas-vindas personalizado para o dashboard
+ * com saudação baseada no período do dia
+ */
 export const WelcomeHeader = () => {
-  const { authState } = useAuth();
-  const { user } = authState;
+  const { user } = useAuthStore();
 
   // Determina o período do dia para saudação
   const getGreeting = () => {
@@ -17,8 +22,8 @@ export const WelcomeHeader = () => {
   const displayName = user?.name || user?.email?.split("@")[0] || "Usuário";
 
   return (
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold tracking-tight">
+    <div className={spacing.cardHeader}>
+      <h1 className={cn(textClasses.heading.h1)}>
         {getGreeting()}, {displayName}!
       </h1>
       <p className="text-muted-foreground mt-2">
