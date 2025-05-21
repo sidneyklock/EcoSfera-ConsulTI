@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { AuthStore, AuthState } from './types/auth.types';
-import { authOperations } from './operations/authOperations';
+import { authOperations } from './operations/auth';
 
 // Estado inicial
 const initialState: AuthState = {
