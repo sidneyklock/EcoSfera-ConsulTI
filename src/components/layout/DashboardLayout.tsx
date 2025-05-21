@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { Role } from "@/types";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { useSecureContext } from "@/hooks/useSecureContext";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, AlertTriangle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface DashboardLayoutProps {
@@ -25,33 +25,54 @@ export const DashboardLayout = ({
     solutionId,
     role,
     loading,
-    error, 
-    LoadingSpinner,
-    ErrorDisplay
+    error,
   } = useSecureContext();
   const { collapsed } = useSidebarCollapse(false);
-  const { signOut, authState } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("DashboardLayout: Initial render with authState:", authState, "secureContext user:", user);
-  }, [authState, user]);
+    console.log("DashboardLayout: Initial render with user:", user, "role:", role);
+  }, [user, role]);
 
   // If loading, display a loading indicator
   if (loading) {
     console.log("DashboardLayout: In loading state");
-    return <LoadingSpinner />;
+    return (
+      <div className="flex justify-center items-center h-screen p-4" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
+        <span className="sr-only">Carregando...</span>
+      </div>
+    );
   }
 
-  // If there's an error, display an error message
+  // If there's an error, display an error message with reload button
   if (error) {
     console.log("DashboardLayout: Error state:", error);
-    return <ErrorDisplay />;
+    return (
+      <div className="flex justify-center items-center h-screen p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Erro no carregamento</AlertTitle>
+          <AlertDescription className="flex flex-col">
+            <span>{error}</span>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 gap-2"
+              variant="outline"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   // If not authenticated, redirect to login
   if (!user) {
-    console.log("DashboardLayout: No user found, redirecting to login");
+    console.log("DashboardLayout: No user found, redirecting to auth");
     return <Navigate to="/login" />;
   }
 
@@ -66,7 +87,7 @@ export const DashboardLayout = ({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b h-16 px-4 flex items-center justify-between">
+      <header className="border-b h-16 px-4 flex items-center justify-between sticky top-0 bg-background z-10 shadow-sm">
         <div className="flex items-center">
           <span className="font-medium text-lg md:ml-2">Dashboard</span>
         </div>
