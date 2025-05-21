@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 
 import { EmailField } from "./EmailField";
 import { PasswordField } from "./PasswordField";
@@ -17,7 +16,7 @@ import { AuthDivider } from "./AuthDivider";
 import { FormActions } from "./FormActions";
 import { AuthHeader } from "./AuthHeader";
 import { AuthFooter } from "./AuthFooter";
-import { useAuthService } from "../hooks/useAuthService";
+import { useAuth } from "../hooks";
 import { toast } from "@/components/ui/sonner";
 
 // Schema para validação do formulário
@@ -33,7 +32,7 @@ type LoginFormInputs = z.infer<typeof loginFormSchema>;
  * Permite autenticação por email/senha e por Google
  */
 export function LoginForm() {
-  const { signIn, signInWithGoogle, error, isLoading } = useAuthService();
+  const { signIn, signInWithGoogle, error, isLoading } = useAuth();
   const [isDemoAuthLoading, setIsDemoAuthLoading] = useState(false);
   const navigate = useNavigate();
   

@@ -19,7 +19,7 @@ import { FormActions } from "./FormActions";
 import { PasswordValidator } from "./PasswordValidator";
 import { AuthHeader } from "./AuthHeader";
 import { AuthFooter } from "./AuthFooter";
-import { useAuthService } from "../hooks/useAuthService";
+import { useAuth } from "../hooks";
 import { toast } from "@/components/ui/sonner";
 
 // Schema para validação do formulário
@@ -36,7 +36,7 @@ type RegisterFormInputs = z.infer<typeof registerFormSchema>;
  * Permite criação de conta por email/senha e por Google
  */
 export function RegisterForm() {
-  const { signUp, signInWithGoogle, error, isLoading } = useAuthService();
+  const { signUp, signInWithGoogle, error, isLoading } = useAuth();
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const navigate = useNavigate();
   
