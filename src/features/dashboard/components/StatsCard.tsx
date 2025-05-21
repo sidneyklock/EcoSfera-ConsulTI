@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, a11yClasses } from "@/lib/utils";
+import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, a11yClasses, animations } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
