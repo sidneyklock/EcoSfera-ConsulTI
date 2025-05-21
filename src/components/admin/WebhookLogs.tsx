@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,18 +14,10 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
+import { Database } from "@/integrations/supabase/types";
 
-interface WebhookLog {
-  id: string;
-  execution_id: string;
-  user_id: string;
-  webhook_token_id: string;
-  request_data: any;
-  response_data: any;
-  ip_address: string | null;
-  status: string;
-  execution_timestamp: string;
-}
+// Usar o tipo da tabela webhook_logs do Supabase
+type WebhookLog = Database['public']['Tables']['webhook_logs']['Row'];
 
 interface TokenDetail {
   name: string;

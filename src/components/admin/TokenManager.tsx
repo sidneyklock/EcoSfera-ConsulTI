@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,16 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import { PlusCircle, Trash2, Check, X, Copy, Clock } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
 
-interface WebhookToken {
-  id: string;
-  name: string;
-  token: string;
-  description: string | null;
-  is_active: boolean;
-  created_at: string;
-  expires_at: string | null;
-}
+// Usar o tipo da tabela webhook_tokens do Supabase
+type WebhookToken = Database['public']['Tables']['webhook_tokens']['Row'];
 
 export const TokenManager = () => {
   const [tokens, setTokens] = useState<WebhookToken[]>([]);
@@ -104,10 +97,10 @@ export const TokenManager = () => {
       if (error) throw error;
       
       // Adicionar à lista local
-      setTokens([data, ...tokens]);
-      
-      // Registrar ação
-      if (data?.id) {
+      if (data) {
+        setTokens([data, ...tokens]);
+        
+        // Registrar ação
         await logAction(data.id);
       }
       
