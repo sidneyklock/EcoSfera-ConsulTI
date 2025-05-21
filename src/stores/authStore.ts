@@ -1,7 +1,8 @@
+
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Role } from '@/types';
-import { AuthStore, AuthState, AuthSignInResult, AuthSignUpResult, GoogleSignInResult } from '../types/auth.types';
+import { AuthStore, AuthState, AuthSignInResult, AuthSignUpResult, GoogleSignInResult } from '@/types/auth.types';
 import { logger } from '@/utils/logger';
 
 const mapUserFromAuth = (authUser: any, userData?: any) => {
