@@ -179,7 +179,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      assign_user_role: {
+        Args: {
+          in_user_email: string
+          in_role_name: string
+          in_solution_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

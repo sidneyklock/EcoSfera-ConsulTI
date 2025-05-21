@@ -11,6 +11,7 @@ interface SecureContextState {
   error: string | null;
   fetchUserContext: () => Promise<void>;
   setSolutionId: (solutionId: string) => void;
+  assignUserRole: (userEmail: string, roleName: Role, solutionId: string) => Promise<void>;
 }
 
 export const useSecureContextStore = create<SecureContextState>((set, get) => ({
@@ -129,5 +130,37 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
   
   setSolutionId: (solutionId) => {
     set({ solutionId });
+  },
+
+  assignUserRole: async (userEmail, roleName, solutionId) => {
+    set({ loading: true, error: null });
+    
+    try {
+      // Utilizar a função assign_user_role do PostgreSQL via supabase.rpc
+      const { error } = await supabase.rpc('assign_user_role', {
+        in_user_email: userEmail,
+        in_role_name: roleName,
+        in_solution_id: solutionId
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Recarregar o contexto do usuário se for o usuário atual
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email === userEmail) {
+        await get().fetchUserContext();
+      }
+      
+    } catch (error: any) {
+      console.error('Erro ao atribuir papel ao usuário:', error);
+      set({ 
+        error: `Falha ao atribuir papel ao usuário: ${error.message || 'Erro desconhecido'}`, 
+        loading: false 
+      });
+    } finally {
+      set({ loading: false });
+    }
   }
 }));
