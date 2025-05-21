@@ -2,7 +2,6 @@
 import React from "react";
 import { Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Control, FieldValues, Path } from "react-hook-form";
 
@@ -11,13 +10,15 @@ interface EmailFieldProps<T extends FieldValues> {
   name: Path<T>;
   label?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function EmailField<T extends FieldValues>({ 
   control, 
   name, 
   label = "Email", 
-  placeholder = "seu@email.com" 
+  placeholder = "seu@email.com",
+  disabled
 }: EmailFieldProps<T>) {
   return (
     <FormField
@@ -33,6 +34,7 @@ export function EmailField<T extends FieldValues>({
                 placeholder={placeholder}
                 className="pl-10"
                 type="email"
+                disabled={disabled}
                 {...field}
               />
             </FormControl>

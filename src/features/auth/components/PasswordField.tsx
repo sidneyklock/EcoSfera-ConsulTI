@@ -13,6 +13,7 @@ interface PasswordFieldProps<T extends FieldValues> {
   placeholder?: string;
   forgotPasswordLink?: boolean;
   onForgotPasswordClick?: () => void;
+  disabled?: boolean;
 }
 
 export function PasswordField<T extends FieldValues>({
@@ -21,7 +22,8 @@ export function PasswordField<T extends FieldValues>({
   label = "Senha",
   placeholder = "********",
   forgotPasswordLink = false,
-  onForgotPasswordClick
+  onForgotPasswordClick,
+  disabled
 }: PasswordFieldProps<T>) {
   return (
     <FormField
@@ -37,6 +39,7 @@ export function PasswordField<T extends FieldValues>({
                 className="p-0 h-auto text-xs"
                 type="button"
                 onClick={onForgotPasswordClick}
+                disabled={disabled}
               >
                 Esqueceu a senha?
               </Button>
@@ -49,6 +52,7 @@ export function PasswordField<T extends FieldValues>({
                 placeholder={placeholder}
                 className="pl-10"
                 type="password"
+                disabled={disabled}
                 {...field}
               />
             </FormControl>

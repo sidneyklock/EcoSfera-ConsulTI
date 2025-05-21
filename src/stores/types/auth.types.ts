@@ -34,7 +34,7 @@ export interface AuthRefreshResult {
 export interface AuthActions {
   signIn: (email: string, password: string) => Promise<User | null>;
   signUp: (email: string, password: string, name?: string) => Promise<User | null>;
-  signInWithGoogle: () => Promise<{ success: boolean }>;
+  signInWithGoogle: () => Promise<GoogleSignInResult>;
   signOut: () => Promise<void>;
   refreshContext: () => Promise<void>;
   clearError: () => void;

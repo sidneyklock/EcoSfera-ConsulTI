@@ -31,8 +31,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     authOperations.signUp(email, password, name, set, get),
 
   // Login com Google
-  signInWithGoogle: async () => 
-    authOperations.signInWithGoogle(set),
+  signInWithGoogle: async () => {
+    const result = await authOperations.signInWithGoogle(set);
+    return result;
+  },
 
   // Logout
   signOut: async () => 
