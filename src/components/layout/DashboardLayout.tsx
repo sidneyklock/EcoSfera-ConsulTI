@@ -76,12 +76,6 @@ const DashboardLayout = ({
     return <Navigate to="/login" />;
   }
 
-  // Check permissions if requiredRoles is specified
-  if (requiredRoles && role && !requiredRoles.includes(role)) {
-    console.log(`DashboardLayout: User role ${role} not in required roles [${requiredRoles.join(', ')}], redirecting to unauthorized`);
-    return <Navigate to="/unauthorized" />;
-  }
-
   console.log("DashboardLayout: Rendering dashboard with user", user, "role", role);
 
   return (

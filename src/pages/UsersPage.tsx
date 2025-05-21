@@ -68,7 +68,7 @@ const UsersPage = () => {
   );
 
   return (
-    <DashboardLayout requiredRoles={["admin"]}>
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Gerenciar Usuários</h1>
         <p className="text-muted-foreground mt-2">
@@ -144,7 +144,7 @@ const UsersPage = () => {
           </TableBody>
         </Table>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 
