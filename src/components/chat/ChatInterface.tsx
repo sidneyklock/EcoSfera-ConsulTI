@@ -48,9 +48,10 @@ export const ChatInterface = () => {
           const formattedMessages = data.map(
             (msg): ChatMessage => ({
               id: msg.id,
-              role: msg.role as "user" | "assistant",
+              role: msg.role as "user" | "assistant" | "system",
               content: msg.message,
               timestamp: new Date(msg.created_at || new Date()),
+              sender: msg.role === "user" ? user.name || user.email : "Assistant"
             })
           );
           setMessages(formattedMessages);
@@ -83,6 +84,7 @@ export const ChatInterface = () => {
       role: "user",
       content: message,
       timestamp: new Date(),
+      sender: user.name || user.email
     };
     
     setMessages((prev) => [...prev, userMessage]);
@@ -125,9 +127,10 @@ export const ChatInterface = () => {
       const formattedMessages = updatedData.map(
         (msg): ChatMessage => ({
           id: msg.id,
-          role: msg.role as "user" | "assistant",
+          role: msg.role as "user" | "assistant" | "system",
           content: msg.message,
           timestamp: new Date(msg.created_at || new Date()),
+          sender: msg.role === "user" ? user.name || user.email : "Assistant"
         })
       );
       

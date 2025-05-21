@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Bot, User } from "lucide-react";
 
 export interface SecureMessageBubbleProps {
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system"; // Add 'system' as valid role
   content: string;
   timestamp?: Date;
 }
