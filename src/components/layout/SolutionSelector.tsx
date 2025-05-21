@@ -54,7 +54,7 @@ export const SolutionSelector = () => {
         // Correção do mapeamento para acessar corretamente os dados
         const formattedSolutions = data
           .filter(item => item.solutions != null) // Garantir que solutions existe
-          .map((item: UserSolutionResponse) => ({
+          .map((item) => ({
             id: item.solutions?.id,
             name: item.solutions?.name
           }));
