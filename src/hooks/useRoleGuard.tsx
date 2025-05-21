@@ -30,6 +30,7 @@ export const useRoleGuard = (
 
   // Verifica se o usuário tem pelo menos uma das roles necessárias
   if (!role || !requiredRoles.includes(role)) {
+    console.log(`Acesso negado: usuário tem role ${role}, mas precisa de uma dessas: ${requiredRoles.join(", ")}`);
     return <Navigate to={redirectTo} />;
   }
 

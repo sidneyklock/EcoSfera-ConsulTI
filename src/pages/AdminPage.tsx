@@ -1,10 +1,21 @@
 
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { Role } from "@/types";
+import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
-  const redirectComponent = useRoleGuard(["admin"] as Role[]);
+  const redirectComponent = useRoleGuard("admin" as Role);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    // Exibe uma mensagem de boas-vindas para o administrador
+    toast({
+      title: "Área de Administração",
+      description: "Bem-vindo(a) à área administrativa. Você tem permissões de administrador.",
+    });
+  }, [toast]);
   
   // If the hook returns a redirect component, render it
   if (redirectComponent) {
