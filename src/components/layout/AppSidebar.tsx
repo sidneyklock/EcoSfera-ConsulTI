@@ -26,9 +26,9 @@ import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { 
-  iconClasses, 
-  sidebarElementClasses, 
-  buttonStateClasses 
+  iconClasses,
+  sidebarElementClasses,
+  buttonStateClasses
 } from "@/lib/tailwind-utils";
 import { useEffect, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";

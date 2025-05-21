@@ -42,7 +42,7 @@ export const SidebarFooter = ({ user, collapsed, onSignOut }: SidebarFooterProps
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className={textBaseClasses + " truncate"}>
+                <p className={cn(textBaseClasses, "truncate")}>
                   {user.name || 'Usuário'}
                 </p>
                 <p className={cn(textSecondaryClasses, "truncate")}>
