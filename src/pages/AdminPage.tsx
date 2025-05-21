@@ -10,6 +10,7 @@ import { AdminLogViewer } from "@/components/admin/AdminLogViewer";
 import { UserRoleAssignment } from "@/components/admin/UserRoleAssignment";
 import { TokenManager } from "@/components/admin/TokenManager";
 import { WebhookLogs } from "@/components/admin/WebhookLogs";
+import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
@@ -55,13 +56,14 @@ const AdminPage = () => {
       </p>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-6 mb-8">
+        <TabsList className="grid grid-cols-7 mb-8">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="users">Usuários e Roles</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
           <TabsTrigger value="tokens">Tokens n8n</TabsTrigger>
           <TabsTrigger value="webhook-logs">Logs de Webhook</TabsTrigger>
-          <TabsTrigger value="logs">Logs de Auditoria</TabsTrigger>
+          <TabsTrigger value="audit-logs">Logs de Auditoria</TabsTrigger>
+          <TabsTrigger value="logs">Logs de Sistema</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -93,6 +95,13 @@ const AdminPage = () => {
                 Gerencie tokens de autenticação e monitore webhooks do n8n.
               </p>
             </div>
+            
+            <div className="p-6 border rounded-lg bg-card shadow">
+              <h3 className="font-medium text-lg mb-2">Rastreabilidade de Dados</h3>
+              <p className="text-sm text-muted-foreground">
+                Visualize o histórico de alterações em tabelas críticas do sistema.
+              </p>
+            </div>
           </div>
         </TabsContent>
         
@@ -110,6 +119,10 @@ const AdminPage = () => {
         
         <TabsContent value="webhook-logs" className="space-y-4">
           <WebhookLogs />
+        </TabsContent>
+        
+        <TabsContent value="audit-logs" className="space-y-4">
+          <AuditLogViewer />
         </TabsContent>
         
         <TabsContent value="logs" className="space-y-4">
