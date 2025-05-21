@@ -18,21 +18,24 @@ export function useSecureContext() {
     role, 
     loading, 
     error, 
-    fetchUserContext 
+    fetchUserContext,
+    createUserRecord
   } = useSecureContextStore();
 
   useEffect(() => {
     fetchUserContext();
     
     // Inscrever-se para mudanças na autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchUserContext();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchUserContext();
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchUserContext]);
+  }, [fetchUserContext, createUserRecord]);
 
   return { 
     user, 

@@ -10,6 +10,7 @@ interface SecureContextState {
   loading: boolean;
   error: string | null;
   fetchUserContext: () => Promise<void>;
+  createUserRecord: (authUser: any) => Promise<void>;
   setSolutionId: (solutionId: string) => void;
   assignUserRole: (userEmail: string, roleName: Role, solutionId: string) => Promise<void>;
 }
@@ -20,6 +21,29 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
   role: null,
   loading: true,
   error: null,
+
+  createUserRecord: async (authUser) => {
+    try {
+      // Inserir o usuário na tabela public.users se não existir
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([
+          { 
+            id: authUser.id, 
+            email: authUser.email,
+            full_name: authUser.user_metadata?.name || authUser.email.split('@')[0]
+          }
+        ])
+        .single();
+
+      if (insertError && !insertError.message.includes('duplicate key')) {
+        console.error('Erro ao criar registro de usuário:', insertError);
+      }
+
+    } catch (error: any) {
+      console.error('Erro ao criar registro de usuário:', error);
+    }
+  },
 
   fetchUserContext: async () => {
     set({ loading: true, error: null });
@@ -38,6 +62,10 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         return;
       }
       
+      // Automaticamente criar um registro de usuário se não existir
+      const authUser = session.user;
+      await get().createUserRecord(authUser);
+      
       // Buscar dados do usuário e informações relacionadas com JOIN
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -51,7 +79,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
           )
         `)
         .eq('id', session.user.id)
-        .maybeSingle(); // Changed from .single() to .maybeSingle() to handle case where user might not be found
+        .maybeSingle();
       
       if (userError) {
         set({ error: `Erro ao carregar dados do usuário: ${userError.message}`, loading: false });
@@ -59,7 +87,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
       }
       
       if (!userData) {
-        set({ error: 'Usuário não encontrado no banco de dados', loading: false });
+        set({ error: 'Usuário não encontrado no banco de dados após tentativa de criação', loading: false });
         return;
       }
       
@@ -96,7 +124,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         .from('roles')
         .select('name')
         .eq('id', firstUserRole.role_id)
-        .maybeSingle(); // Changed from .single() to .maybeSingle() to handle case where role might not be found
+        .maybeSingle();
         
       if (roleError) {
         set({ error: `Erro ao carregar papel do usuário: ${roleError.message}`, loading: false });
