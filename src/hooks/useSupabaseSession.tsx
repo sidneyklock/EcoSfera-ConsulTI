@@ -4,7 +4,7 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { getErrorMessage } from "@/services/authService";
-import { logger, fetchLogger } from "@/utils";
+import { logger, fetchLogger, dispatchSupabaseQueryError, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
 
 /**
  * Hook para gerenciar a sessão do Supabase de forma eficiente
@@ -18,6 +18,10 @@ export const useSupabaseSession = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Disparar evento de início de carregamento
+    dispatchPageLoadStart('useSupabaseSession', window.location.pathname);
+    const startTime = performance.now();
+    
     // Função para mapear dados do usuário Supabase para o formato da aplicação
     const mapUserData = (supabaseUser: any): User => {
       return {
@@ -50,6 +54,12 @@ export const useSupabaseSession = () => {
         
         if (error) {
           fetchLogger.error("auth_session", "Erro ao verificar sessão", error);
+          dispatchSupabaseQueryError(
+            'auth.getSession',
+            error.message,
+            'auth.users',
+            error.code
+          );
           throw error;
         }
 
@@ -63,6 +73,14 @@ export const useSupabaseSession = () => {
           "Sessão verificada com sucesso", 
           { authenticated: !!data.session, userInfo: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null }
         );
+        
+        // Disparar evento de carregamento completo
+        dispatchPageLoadComplete(
+          'useSupabaseSession', 
+          performance.now() - startTime, 
+          window.location.pathname, 
+          mappedUser
+        );
       } catch (err) {
         console.error("Erro ao verificar sessão:", err);
         const errorMessage = getErrorMessage(err as any);
@@ -73,6 +91,12 @@ export const useSupabaseSession = () => {
           "Erro ao verificar sessão", 
           err, 
           { errorDetails: errorMessage }
+        );
+        
+        // Disparar evento de erro
+        dispatchPageLoadComplete(
+          'useSupabaseSession', 
+          performance.now() - startTime
         );
       } finally {
         setLoading(false);

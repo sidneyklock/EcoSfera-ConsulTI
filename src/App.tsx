@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { useEffect } from "react";
+import { AppEventTypes } from "@/utils/events";
 
 import Index from "@/features/core/pages/Index";
 import NotFound from "@/features/core/pages/NotFound";
@@ -24,11 +26,46 @@ import SustainabilityPage from "@/features/sustainability/pages/SustainabilityPa
 
 const queryClient = new QueryClient();
 
+/**
+ * Componente para configurar listeners de eventos customizados
+ */
+const EventListeners = () => {
+  useEffect(() => {
+    // Helper para registrar eventos no console em modo de desenvolvimento
+    const logEvent = (event: CustomEvent) => {
+      if (import.meta.env.DEV) {
+        // Já fazemos log no dispatchAppEvent, então isso é apenas para demonstração
+        // console.log(`%c[APP EVENT] ${event.type}`, 'color: purple; font-weight: bold', event.detail);
+      }
+      
+      // Aqui poderia ser adicionada a integração com ferramentas como LogRocket ou PostHog
+      // if (window.LogRocket) {
+      //   window.LogRocket.track(event.type, event.detail);
+      // }
+    };
+    
+    // Registrar ouvintes para todos os tipos de eventos
+    Object.values(AppEventTypes).forEach(eventType => {
+      window.addEventListener(eventType, logEvent as EventListener);
+    });
+    
+    // Cleanup ao desmontar
+    return () => {
+      Object.values(AppEventTypes).forEach(eventType => {
+        window.removeEventListener(eventType, logEvent as EventListener);
+      });
+    };
+  }, []);
+  
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <TooltipProvider>
         <AuthProvider>
+          <EventListeners />
           <Toaster />
           <Sonner />
           <Routes>

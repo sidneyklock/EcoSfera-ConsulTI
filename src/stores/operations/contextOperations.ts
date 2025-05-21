@@ -4,6 +4,7 @@ import { Role, User } from '@/types';
 import { createUserRecord } from './userOperations';
 import { logger } from '@/utils';
 import fetchLogger from '@/utils/fetchLogger';
+import { dispatchSupabaseQueryError, dispatchUserActionError, dispatchUserActionSubmit } from '@/utils/events';
 
 /**
  * Fetches the current user context from Supabase
@@ -20,9 +21,20 @@ export async function fetchUserContext(
   
   try {
     fetchLogger.start("fetch_user_context", "Buscando contexto do usuário");
+    dispatchUserActionSubmit("fetch_user_context", "contextOperations", { currentSolutionId });
     
     // Verificar se o usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      dispatchSupabaseQueryError(
+        "auth.getSession",
+        sessionError.message,
+        "auth.session",
+        sessionError.code
+      );
+      throw sessionError;
+    }
     
     if (!session) {
       fetchLogger.success("fetch_user_context", "Nenhuma sessão ativa encontrada", { authStatus: false });
@@ -57,6 +69,15 @@ export async function fetchUserContext(
         fetchLogger.error("fetch_user_context", "Erro ao buscar dados do usuário", userError, {
           userId: session.user.id
         });
+        
+        dispatchSupabaseQueryError(
+          "users.select",
+          userError.message,
+          "users",
+          userError.code,
+          { userId: session.user.id }
+        );
+        
         setErrorState(`Erro ao carregar dados do usuário: ${userError.message}`);
         return;
       }
@@ -91,6 +112,15 @@ export async function fetchUserContext(
           fetchLogger.error("fetch_user_context", "Erro ao criar registro de usuário", err, {
             userId: session.user.id
           });
+          
+          dispatchUserActionError(
+            "create_user_record",
+            "contextOperations",
+            err instanceof Error ? err.message : "Erro desconhecido",
+            { userId: session.user.id },
+            { id: session.user.id } as User
+          );
+          
           setErrorState(`Failed to create user record: ${err}`);
         }
         return;
@@ -156,6 +186,18 @@ export async function fetchUserContext(
           roleId: firstUserRole.role_id
         });
         
+        dispatchSupabaseQueryError(
+          "roles.select",
+          roleError.message,
+          "roles",
+          roleError.code,
+          { 
+            userId: userData.id, 
+            roleId: firstUserRole.role_id 
+          },
+          { id: userData.id } as User
+        );
+        
         setErrorState(`Erro ao carregar papel do usuário: ${roleError.message}`);
         return;
       }
@@ -181,11 +223,27 @@ export async function fetchUserContext(
     
     } catch (fetchError: any) {
       fetchLogger.error("fetch_user_context", "Erro na busca de dados de contexto do usuário", fetchError);
+      
+      dispatchUserActionError(
+        "fetch_user_context",
+        "contextOperations",
+        fetchError.message || "Erro desconhecido",
+        { userId: session?.user?.id }
+      );
+      
       setErrorState(`Error fetching user data: ${fetchError.message}`);
     }
     
   } catch (error: any) {
     fetchLogger.error("fetch_user_context", "Erro ao buscar contexto do usuário", error);
+    
+    dispatchUserActionError(
+      "fetch_user_context",
+      "contextOperations",
+      error.message || "Erro desconhecido",
+      {}
+    );
+    
     setErrorState(`Falha ao carregar dados do usuário: ${error.message || 'Erro desconhecido'}`);
   } finally {
     setLoadingState(false);

@@ -1,6 +1,7 @@
 
 import { logger } from './logger';
 import { User } from '@/types';
+import { dispatchSupabaseQueryError } from './events';
 
 /**
  * Função auxiliar para logs em operações de fetch
@@ -43,6 +44,19 @@ export const fetchLogger = {
       data: { ...additionalData, error },
       status: 'fail'
     }, error instanceof Error ? error : undefined);
+    
+    // Disparar evento de erro do Supabase
+    dispatchSupabaseQueryError(
+      operation,
+      message,
+      additionalData?.table,
+      additionalData?.errorCode,
+      { 
+        ...additionalData, 
+        errorDetails: error instanceof Error ? error.message : String(error) 
+      },
+      user
+    );
   },
 
   /**

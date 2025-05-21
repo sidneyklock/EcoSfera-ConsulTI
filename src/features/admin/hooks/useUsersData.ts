@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { logger } from "@/utils/logger";
 import { useUserContext } from "@/features/auth/hooks";
+import { dispatchUserActionSubmit, dispatchUserActionError, dispatchSupabaseQueryError } from "@/utils";
 
 interface UsersData {
   users: User[];
@@ -23,6 +24,8 @@ export function useUsersData() {
         status: 'success'
       });
 
+      dispatchUserActionSubmit("fetch_users", "useUsersData", { queryKey: "users" }, user);
+
       try {
         const { data: users, error: usersError } = await supabase
           .from('users')
@@ -36,6 +39,16 @@ export function useUsersData() {
             data: { error: usersError },
             status: 'fail'
           });
+          
+          dispatchSupabaseQueryError(
+            'users.select',
+            `Erro ao buscar usuários: ${usersError.message}`,
+            'users',
+            usersError.code,
+            { details: usersError },
+            user
+          );
+          
           throw new Error(`Error fetching users: ${usersError.message}`);
         }
         
@@ -63,6 +76,15 @@ export function useUsersData() {
           data: { error },
           status: 'fail'
         }, error instanceof Error ? error : undefined);
+        
+        dispatchUserActionError(
+          "fetch_users", 
+          "useUsersData",
+          error instanceof Error ? error.message : "Erro desconhecido",
+          { queryKey: "users" },
+          user
+        );
+        
         throw error;
       }
     }

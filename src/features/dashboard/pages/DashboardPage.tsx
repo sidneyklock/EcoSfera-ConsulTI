@@ -5,18 +5,27 @@ import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
-import { logger } from "@/utils/logger";
+import { logger, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
 
 const DashboardPage = () => {
   const { data: userData, isLoading: userLoading, error: userError } = useUserContext();
   const { user, role } = userData || {};
   
   useEffect(() => {
+    // Registrar início do carregamento da página
+    const startTime = performance.now();
+    dispatchPageLoadStart('DashboardPage');
+    
     logger.info({
       userId: user?.id,
       action: "dashboard_load",
       message: `Dashboard inicializado para usuário com papel: ${role || 'desconhecido'}`
     });
+    
+    return () => {
+      // Registrar conclusão do carregamento quando o componente está completamente montado
+      dispatchPageLoadComplete('DashboardPage', performance.now() - startTime, undefined, user);
+    };
   }, [user, role]);
   
   if (userLoading) {
