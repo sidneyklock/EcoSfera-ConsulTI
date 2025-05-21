@@ -1,3 +1,5 @@
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { PageLayout } from "@/layouts";
 
 // Dados simulados de usuários
 const mockUsers = [
@@ -66,14 +68,10 @@ const UsersPage = () => {
   );
 
   return (
-    <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Gerenciar Usuários</h1>
-        <p className="text-muted-foreground mt-2">
-          Visualize e gerencie todos os usuários do sistema
-        </p>
-      </div>
-
+    <PageLayout 
+      title="Gerenciar Usuários" 
+      description="Visualize e gerencie todos os usuários do sistema"
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -142,7 +140,7 @@ const UsersPage = () => {
           </TableBody>
         </Table>
       </div>
-    </>
+    </PageLayout>
   );
 };
 

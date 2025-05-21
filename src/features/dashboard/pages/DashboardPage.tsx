@@ -1,4 +1,3 @@
-
 import { memo, useEffect } from "react";
 import { AdminDashboard, UserDashboard } from "@/features/dashboard/components";
 import { useAuthStore } from "@/stores/authStore";
@@ -15,6 +14,8 @@ import { cn } from "@/lib/utils";
  * Uses memo to prevent unnecessary re-renders
  */
 const DashboardPage = memo(() => {
+  // O hook useAuthStore é mantido no componente de nível superior
+  // para centralizar a gestão de estado
   const { user, role, isLoading, error } = useAuthStore();
   
   useEffect(() => {
@@ -34,6 +35,7 @@ const DashboardPage = memo(() => {
     };
   }, [user, role]);
   
+  // Loading state
   if (isLoading) {
     logger.debug({
       action: "dashboard_loading",
@@ -61,6 +63,7 @@ const DashboardPage = memo(() => {
     );
   }
   
+  // Error state
   if (error) {
     logger.error({
       userId: user?.id,
@@ -82,6 +85,7 @@ const DashboardPage = memo(() => {
     );
   }
   
+  // Unauthorized state
   if (!user) {
     logger.warn({
       action: "dashboard_unauthorized",
@@ -96,6 +100,7 @@ const DashboardPage = memo(() => {
     message: `Renderizando dashboard para papel: ${role}`
   });
   
+  // Renderização do dashboard adequado baseado no papel do usuário
   return (
     <PageLayout 
       title="Dashboard" 

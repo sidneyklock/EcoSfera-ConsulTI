@@ -1,11 +1,11 @@
 
 import { useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { logger } from "@/utils/logger";
 import { useUserContext } from "@/features/auth/hooks";
 import { dispatchUserActionSubmit, dispatchSupabaseQueryError } from "@/utils";
 import { usePrefetchQuery } from "@/hooks/usePrefetchQuery";
+import { adminService } from "../services/adminService";
 
 interface UsersData {
   users: User[];
@@ -13,6 +13,7 @@ interface UsersData {
 
 /**
  * Hook for fetching and managing users data with prefetching capability
+ * Agora usa o adminService centralizado para acesso a dados
  */
 export function useUsersData() {
   const { data: userData } = useUserContext();
@@ -30,31 +31,9 @@ export function useUsersData() {
     dispatchUserActionSubmit("fetch_users", "useUsersData", { queryKey: "users" }, user);
 
     try {
-      const { data: users, error: usersError } = await supabase
-        .from('users')
-        .select('id, email, full_name');
+      // Usa adminService para buscar usuários
+      const users = await adminService.getUsers(user?.id);
       
-      if (usersError) {
-        logger.error({
-          userId: user?.id,
-          action: "fetch_error",
-          message: `Erro ao buscar usuários: ${usersError.message}`,
-          data: { error: usersError },
-          status: 'fail'
-        });
-        
-        dispatchSupabaseQueryError(
-          'users.select',
-          `Erro ao buscar usuários: ${usersError.message}`,
-          'users',
-          usersError.code,
-          { details: usersError },
-          user
-        );
-        
-        throw new Error(`Error fetching users: ${usersError.message}`);
-      }
-
       // Verificar se retornou dados vazios
       if (!users || users.length === 0) {
         logger.info({
@@ -75,14 +54,7 @@ export function useUsersData() {
         status: 'success'
       });
       
-      return {
-        users: users.map(user => ({
-          id: user.id,
-          email: user.email,
-          name: user.full_name || user.email.split('@')[0],
-          role: 'user' // Default role, would be fetched in a real application
-        }))
-      };
+      return { users };
     } catch (error) {
       logger.error({
         userId: user?.id,
@@ -91,6 +63,17 @@ export function useUsersData() {
         data: { error },
         status: 'fail'
       }, error instanceof Error ? error : undefined);
+      
+      if (error instanceof Error) {
+        dispatchSupabaseQueryError(
+          'users.select',
+          `Erro ao buscar usuários: ${error.message}`,
+          'users',
+          'unknown',
+          { details: error },
+          user
+        );
+      }
       
       throw error;
     }
