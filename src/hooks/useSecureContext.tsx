@@ -26,8 +26,28 @@ export function useSecureContext() {
     fetchUserContext();
     
     // Inscrever-se para mudanças na autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Verificar e garantir que o usuário existe na tabela users quando fizer login
+        if (session?.user) {
+          const authUser = session.user;
+          // Realizar upsert na tabela de users para garantir que o usuário existe
+          const { error: upsertError } = await supabase
+            .from('users')
+            .upsert({
+              id: authUser.id,
+              email: authUser.email,
+              full_name: authUser.user_metadata?.name || authUser.email.split('@')[0] || '',
+              created_at: new Date().toISOString()
+            }, {
+              onConflict: 'id'
+            });
+            
+          if (upsertError) {
+            console.error('Erro ao atualizar registro de usuário:', upsertError);
+          }
+        }
+        
         fetchUserContext();
       }
     });
