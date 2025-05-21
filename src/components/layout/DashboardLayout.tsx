@@ -1,9 +1,8 @@
 
-import { ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Role } from "@/types";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { useSecureContext } from "@/hooks/useSecureContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -75,16 +74,16 @@ const DashboardLayout = () => {
       {/* Header */}
       <header className="border-b h-16 px-4 flex items-center justify-between sticky top-0 bg-background z-10 shadow-sm">
         <div className="flex items-center">
-          <span className="font-medium text-lg md:ml-2">Dashboard</span>
+          <span className="font-medium text-lg md:ml-2">EcoSfera ConsulTI</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center mr-2">
             <User className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="text-sm font-medium hidden md:inline">{user?.name || user?.email}</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut}>
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-sm">
             <LogOut className="h-4 w-4 mr-1" />
-            <span className="hidden md:inline">Logout</span>
+            <span className="hidden md:inline">Sair</span>
           </Button>
         </div>
       </header>

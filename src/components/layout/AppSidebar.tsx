@@ -18,7 +18,8 @@ import {
   MessageSquare,
   Menu,
   X,
-  Shield
+  Shield,
+  Leaf
 } from "lucide-react";
 import { Role } from "@/types";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
@@ -69,9 +70,15 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
       roles: ["admin"],
     },
     {
-      title: "Chat IA",
+      title: "Consultoria",
       href: "/chat",
       icon: MessageSquare,
+      roles: ["user", "admin"],
+    },
+    {
+      title: "Sustentabilidade",
+      href: "/sustainability",
+      icon: Leaf,
       roles: ["user", "admin"],
     },
     {

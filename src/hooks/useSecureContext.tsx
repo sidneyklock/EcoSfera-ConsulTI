@@ -30,7 +30,7 @@ export function useSecureContext() {
       console.error("Error in initial fetchUserContext:", err);
     });
     
-    // Inscrever-se para mudanças na autenticação
+    // Subscribe to authentication changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("useSecureContext: Auth state changed", event, "session exists:", !!session);
       
@@ -74,14 +74,14 @@ export function useSecureContext() {
     role, 
     loading, 
     error,
-    // Componente acessível de loading para ser usado pelos consumidores
+    // Accessible loading component for consumers
     LoadingSpinner: () => loading ? (
       <div className="flex justify-center items-center h-screen p-4" role="status" aria-live="polite">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
         <span className="sr-only">Carregando...</span>
       </div>
     ) : null,
-    // Componente para exibição de erro
+    // Error display component
     ErrorDisplay: () => error ? (
       <Alert variant="destructive" className="m-4">
         <AlertTriangle className="h-4 w-4" />

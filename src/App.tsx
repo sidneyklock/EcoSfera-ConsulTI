@@ -20,6 +20,7 @@ import AdminPage from "./pages/AdminPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import SustainabilityPage from "./pages/SustainabilityPage";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/users" element={<UsersPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/sustainability" element={<SustainabilityPage />} />
             </Route>
             
             <Route path="*" element={<NotFound />} />

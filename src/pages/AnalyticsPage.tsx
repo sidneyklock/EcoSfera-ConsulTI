@@ -1,303 +1,184 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, BarChart, LineChart, PieChart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  BarChart as RechartBarChart,
-  Bar,
-  LineChart as RechartLineChart,
-  Line,
-  PieChart as RechartPieChart,
-  Pie,
-  AreaChart as RechartAreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 
-// Dados simulados
-const monthlyData = [
-  { name: "Jan", valor: 4000 },
-  { name: "Fev", valor: 3000 },
-  { name: "Mar", valor: 2000 },
-  { name: "Abr", valor: 2780 },
-  { name: "Mai", valor: 1890 },
-  { name: "Jun", valor: 2390 },
-  { name: "Jul", valor: 3490 },
-  { name: "Ago", valor: 2000 },
-  { name: "Set", valor: 2500 },
-  { name: "Out", valor: 3000 },
-  { name: "Nov", valor: 2400 },
-  { name: "Dez", valor: 2200 },
+const data = [
+  { name: "Jan", value: 5, users: 10 },
+  { name: "Feb", value: 8, users: 15 },
+  { name: "Mar", value: 12, users: 18 },
+  { name: "Apr", value: 19, users: 25 },
+  { name: "May", value: 15, users: 30 },
+  { name: "Jun", value: 24, users: 32 },
+  { name: "Jul", value: 35, users: 45 },
+  { name: "Aug", value: 30, users: 50 },
+  { name: "Sep", value: 42, users: 55 },
+  { name: "Oct", value: 38, users: 48 },
+  { name: "Nov", value: 45, users: 60 },
+  { name: "Dec", value: 55, users: 70 },
 ];
-
-const pieData = [
-  { name: "Vendas", value: 400 },
-  { name: "Marketing", value: 300 },
-  { name: "Desenvolvimento", value: 300 },
-  { name: "Suporte", value: 200 },
-];
-
-const userActivity = [
-  { name: "Seg", novos: 4, ativos: 24 },
-  { name: "Ter", novos: 3, ativos: 22 },
-  { name: "Qua", novos: 5, ativos: 26 },
-  { name: "Qui", novos: 10, ativos: 32 },
-  { name: "Sex", novos: 8, ativos: 30 },
-  { name: "Sab", novos: 3, ativos: 18 },
-  { name: "Dom", novos: 2, ativos: 16 },
-];
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const AnalyticsPage = () => {
-  // Use the role guard hook to protect this page
-  const redirectComponent = useRoleGuard(["admin"]);
-  
-  // If the hook returns a redirect component, render it
+  // Redirect if user doesn't have admin role
+  const redirectComponent = useRoleGuard("admin");
   if (redirectComponent) {
     return redirectComponent;
   }
-
+  
+  const [activeTab, setActiveTab] = useState("overview");
+  
+  useEffect(() => {
+    // Simulated analytics data fetch
+    console.log("Fetching analytics data...");
+  }, []);
+  
   return (
-    <>
-      <div className="mb-8">
+    <div className="space-y-6">
+      <div>
         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground mt-2">
-          Visualize e analise os dados do sistema
+          Visualize dados e métricas da plataforma.
         </p>
       </div>
-
-      <Tabs defaultValue="overview" className="mb-8">
+      
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview" className="flex items-center">
-            <AreaChart className="h-4 w-4 mr-2" />
-            Visão Geral
-          </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center">
-            <BarChart className="h-4 w-4 mr-2" />
-            Usuários
-          </TabsTrigger>
-          <TabsTrigger value="revenue" className="flex items-center">
-            <LineChart className="h-4 w-4 mr-2" />
-            Receita
-          </TabsTrigger>
-          <TabsTrigger value="projects" className="flex items-center">
-            <PieChart className="h-4 w-4 mr-2" />
-            Projetos
-          </TabsTrigger>
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="users">Usuários</TabsTrigger>
+          <TabsTrigger value="engagement">Engajamento</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="pt-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Usuários Ativos (2023)</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Usuários Totais
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartAreaChart
-                    data={monthlyData}
-                    margin={{
-                      top: 10,
-                      right: 30,
-                      left: 0,
-                      bottom: 0,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area
-                      type="monotone"
-                      dataKey="valor"
-                      stroke="#8884d8"
-                      fill="#8884d8"
-                    />
-                  </RechartAreaChart>
-                </ResponsiveContainer>
+                <div className="text-2xl font-bold">70</div>
+                <p className="text-xs text-muted-foreground">
+                  +20% em relação ao mês anterior
+                </p>
               </CardContent>
             </Card>
-
+            
             <Card>
-              <CardHeader>
-                <CardTitle>Distribuição de Recursos</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Novos Registros
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartPieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </RechartPieChart>
-                </ResponsiveContainer>
+                <div className="text-2xl font-bold">12</div>
+                <p className="text-xs text-muted-foreground">
+                  +15% em relação ao mês anterior
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Taxa de Engajamento
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">68%</div>
+                <p className="text-xs text-muted-foreground">
+                  +5% em relação ao mês anterior
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Consultorias Realizadas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">120</div>
+                <p className="text-xs text-muted-foreground">
+                  +25% em relação ao mês anterior
+                </p>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="users" className="pt-4">
-          <Card>
+          
+          <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Atividade de Usuários (Última Semana)</CardTitle>
+              <CardTitle>Crescimento Anual</CardTitle>
+              <CardDescription>
+                Evolução mensal de usuários e consultorias
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <RechartBarChart
-                  data={userActivity}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="novos" name="Novos Usuários" fill="#8884d8" />
-                  <Bar dataKey="ativos" name="Usuários Ativos" fill="#82ca9d" />
-                </RechartBarChart>
+                  <Line type="monotone" dataKey="value" stroke="#8884d8" name="Consultorias" />
+                  <Line type="monotone" dataKey="users" stroke="#82ca9d" name="Usuários" />
+                </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="revenue" className="pt-4">
-          <Card>
+        
+        <TabsContent value="users" className="space-y-4">
+          <Card className="h-96">
             <CardHeader>
-              <CardTitle>Receita Mensal (2023)</CardTitle>
+              <CardTitle>Distribuição de Usuários</CardTitle>
+              <CardDescription>
+                Análise de usuários por perfil
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <RechartLineChart
-                  data={monthlyData}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="valor"
-                    name="Receita (R$)"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                </RechartLineChart>
+                  <Bar dataKey="users" fill="#82ca9d" name="Usuários" />
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="projects" className="pt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Status dos Projetos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartPieChart>
-                    <Pie
-                      data={[
-                        { name: "Em andamento", value: 24 },
-                        { name: "Concluídos", value: 13 },
-                        { name: "Atrasados", value: 5 },
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      <Cell fill="#82ca9d" />
-                      <Cell fill="#8884d8" />
-                      <Cell fill="#ff8042" />
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </RechartPieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tipos de Projetos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartBarChart
-                    data={[
-                      { name: "Web", valor: 12 },
-                      { name: "Mobile", valor: 19 },
-                      { name: "API", valor: 7 },
-                      { name: "Desktop", valor: 4 },
-                    ]}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar
-                      dataKey="valor"
-                      name="Total"
-                      fill="#8884d8"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </RechartBarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
+        
+        <TabsContent value="engagement" className="space-y-4">
+          <Card className="h-96">
+            <CardHeader>
+              <CardTitle>Métricas de Engajamento</CardTitle>
+              <CardDescription>
+                Análise de consultorias realizadas
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" name="Consultorias" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 };
 
