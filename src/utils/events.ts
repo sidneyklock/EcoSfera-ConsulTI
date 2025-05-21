@@ -1,5 +1,6 @@
 
 import { User } from '@/types';
+import React from 'react';
 
 /**
  * Tipos de eventos customizados que a aplicação pode disparar
@@ -69,9 +70,9 @@ export type AppEventPayload = PageEventPayload | UserActionEventPayload | Supaba
 /**
  * Função auxiliar para disparar eventos do aplicativo com payload tipado
  */
-export function dispatchAppEvent(
+export function dispatchAppEvent<T extends AppEventPayload>(
   eventType: AppEventTypes, 
-  payload: Omit<AppEventPayload, 'timestamp'>,
+  payload: Omit<T, 'timestamp'>,
   user?: User | null
 ): void {
   // Adicionar timestamp e userId se aplicável
@@ -104,7 +105,7 @@ export function dispatchPageLoadStart(
   path: string = window.location.pathname,
   user?: User | null
 ): void {
-  dispatchAppEvent(AppEventTypes.PAGE_LOAD_START, {
+  dispatchAppEvent<PageEventPayload>(AppEventTypes.PAGE_LOAD_START, {
     component,
     path,
     referrer: document.referrer
@@ -117,7 +118,7 @@ export function dispatchPageLoadComplete(
   path: string = window.location.pathname,
   user?: User | null
 ): void {
-  dispatchAppEvent(AppEventTypes.PAGE_LOAD_COMPLETE, {
+  dispatchAppEvent<PageEventPayload>(AppEventTypes.PAGE_LOAD_COMPLETE, {
     component,
     path,
     duration: loadTimeMs
@@ -131,7 +132,7 @@ export function dispatchUserActionSubmit(
   data?: any,
   user?: User | null
 ): void {
-  dispatchAppEvent(AppEventTypes.USER_ACTION_SUBMIT, {
+  dispatchAppEvent<UserActionEventPayload>(AppEventTypes.USER_ACTION_SUBMIT, {
     action,
     component,
     data
@@ -145,7 +146,7 @@ export function dispatchUserActionError(
   data?: any,
   user?: User | null
 ): void {
-  dispatchAppEvent(AppEventTypes.USER_ACTION_ERROR, {
+  dispatchAppEvent<UserActionEventPayload>(AppEventTypes.USER_ACTION_ERROR, {
     action,
     component,
     errorMessage,
@@ -163,7 +164,7 @@ export function dispatchSupabaseQueryError(
   metadata?: any,
   user?: User | null
 ): void {
-  dispatchAppEvent(AppEventTypes.SUPABASE_QUERY_ERROR, {
+  dispatchAppEvent<SupabaseEventPayload>(AppEventTypes.SUPABASE_QUERY_ERROR, {
     operation,
     errorMessage,
     table,
