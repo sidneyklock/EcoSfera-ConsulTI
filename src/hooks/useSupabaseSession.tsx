@@ -68,11 +68,17 @@ export const useSupabaseSession = () => {
         const mappedUser = data.session?.user ? mapUserData(data.session.user) : null;
         setUser(mappedUser);
         
+        // Corrigido: Passando informações de autenticação como metadados, não como parte do objeto User
         fetchLogger.success(
           "auth_session", 
           "Sessão verificada com sucesso", 
           mappedUser, 
-          { authenticated: !!data.session, userInfo: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null }
+          { 
+            sessionInfo: { 
+              authenticated: !!data.session,
+              userInfo: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null 
+            } 
+          }
         );
         
         // Disparar evento de carregamento completo
