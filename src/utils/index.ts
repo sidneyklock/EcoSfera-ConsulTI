@@ -1,3 +1,3 @@
 
 export * from './logger';
-export * from './fetchLogger';
+export { default as fetchLogger, createFetchLogger, useFetchWithLogs } from './fetchLogger';

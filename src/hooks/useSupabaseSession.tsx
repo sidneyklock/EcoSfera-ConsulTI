@@ -58,16 +58,22 @@ export const useSupabaseSession = () => {
         const mappedUser = data.session?.user ? mapUserData(data.session.user) : null;
         setUser(mappedUser);
         
-        fetchLogger.success("auth_session", "Sessão verificada com sucesso", { 
-          authenticated: !!data.session,
-          user: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null
-        });
+        fetchLogger.success(
+          "auth_session", 
+          "Sessão verificada com sucesso", 
+          { authenticated: !!data.session, userInfo: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null }
+        );
       } catch (err) {
         console.error("Erro ao verificar sessão:", err);
         const errorMessage = getErrorMessage(err as any);
         setError(errorMessage);
         
-        fetchLogger.error("auth_session", "Erro ao verificar sessão", err, { errorMessage });
+        fetchLogger.error(
+          "auth_session", 
+          "Erro ao verificar sessão", 
+          err, 
+          { errorDetails: errorMessage }
+        );
       } finally {
         setLoading(false);
       }

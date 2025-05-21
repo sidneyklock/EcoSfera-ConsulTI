@@ -22,7 +22,7 @@ export const fetchLogger = {
   /**
    * Loga o sucesso de uma operação de busca
    */
-  success: (operation: string, message: string, user?: User | null, additionalData?: any) => {
+  success: (operation: string, message: string, additionalData?: any, user?: User | null) => {
     logger.info({
       userId: user?.id,
       action: `${operation}_success`,
@@ -35,7 +35,7 @@ export const fetchLogger = {
   /**
    * Loga um erro em uma operação de busca
    */
-  error: (operation: string, message: string, error: unknown, user?: User | null, additionalData?: any) => {
+  error: (operation: string, message: string, error: unknown, additionalData?: any, user?: User | null) => {
     logger.error({
       userId: user?.id,
       action: `${operation}_error`,
@@ -67,10 +67,10 @@ export const fetchLogger = {
     
     try {
       const result = await fetchFn();
-      fetchLogger.success(operation, successMessage(result), user, { result });
+      fetchLogger.success(operation, successMessage(result), { result }, user);
       return result;
     } catch (error) {
-      fetchLogger.error(operation, errorMessage, error, user);
+      fetchLogger.error(operation, errorMessage, error, {}, user);
       throw error;
     }
   }
@@ -85,10 +85,10 @@ export const createFetchLogger = (user?: User | null) => {
       fetchLogger.start(operation, message, user, additionalData),
       
     success: (operation: string, message: string, additionalData?: any) => 
-      fetchLogger.success(operation, message, user, additionalData),
+      fetchLogger.success(operation, message, additionalData, user),
       
     error: (operation: string, message: string, error: unknown, additionalData?: any) => 
-      fetchLogger.error(operation, message, error, user, additionalData),
+      fetchLogger.error(operation, message, error, additionalData, user),
       
     withLogs: <T>(
       operation: string,

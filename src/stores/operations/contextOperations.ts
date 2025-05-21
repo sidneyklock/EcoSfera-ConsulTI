@@ -2,7 +2,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Role, User } from '@/types';
 import { createUserRecord } from './userOperations';
-import { logger, fetchLogger } from '@/utils';
+import { logger } from '@/utils';
+import fetchLogger from '@/utils/fetchLogger';
 
 /**
  * Fetches the current user context from Supabase
@@ -24,13 +25,13 @@ export async function fetchUserContext(
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      fetchLogger.success("fetch_user_context", "Nenhuma sessão ativa encontrada", { authenticated: false });
+      fetchLogger.success("fetch_user_context", "Nenhuma sessão ativa encontrada", { authStatus: false });
       setUserState(null, null, null);
       return;
     }
     
     fetchLogger.success("fetch_user_context", "Sessão encontrada, usuário autenticado", { 
-      email: session.user.email 
+      userEmail: session.user.email 
     });
     
     // Automaticamente criar um registro de usuário se não existir
@@ -61,7 +62,7 @@ export async function fetchUserContext(
       }
       
       if (!userData) {
-        fetchLogger.info({
+        logger.info({
           userId: session.user.id,
           action: "fetch_user_context",
           message: "Nenhum registro de usuário encontrado, criando um",
@@ -84,7 +85,7 @@ export async function fetchUserContext(
           
           fetchLogger.success("fetch_user_context", "Registro de usuário criado com sucesso", {
             userId: defaultUser.id,
-            email: defaultUser.email
+            userEmail: defaultUser.email
           });
         } catch (err) {
           fetchLogger.error("fetch_user_context", "Erro ao criar registro de usuário", err, {
@@ -95,7 +96,7 @@ export async function fetchUserContext(
         return;
       }
       
-      fetchLogger.info({
+      logger.info({
         userId: userData.id,
         action: "fetch_user_context",
         message: "Registro de usuário encontrado",
@@ -109,7 +110,7 @@ export async function fetchUserContext(
       
       // Verificar se o usuário tem um papel e uma solução associada
       if (!firstUserRole) {
-        fetchLogger.info({
+        logger.info({
           userId: userData.id,
           action: "fetch_user_context",
           message: "Nenhum papel de usuário encontrado, definindo papel padrão",
@@ -127,7 +128,7 @@ export async function fetchUserContext(
         return;
       }
       
-      fetchLogger.info({
+      logger.info({
         userId: userData.id,
         action: "fetch_user_context",
         message: "Papel de usuário encontrado",
@@ -173,8 +174,8 @@ export async function fetchUserContext(
       
       fetchLogger.success("fetch_user_context", "Contexto de segurança carregado", {
         userId: user.id,
-        email: user.email,
-        role: userRole,
+        userEmail: user.email,
+        userRole: userRole,
         solutionId
       });
     
