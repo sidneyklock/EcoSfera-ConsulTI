@@ -94,9 +94,9 @@ export function RegisterForm() {
   const handleGoogleLogin = async () => {
     try {
       toast.loading("Preparando autenticação Google...", { id: "google-register" });
-      const { success } = await signInWithGoogle();
+      const result = await signInWithGoogle();
       
-      if (!success) {
+      if (!result.success) {
         toast.error("Falha ao iniciar registro com Google", { id: "google-register" });
       } else {
         toast.success("Redirecionando para Google...", { id: "google-register" });

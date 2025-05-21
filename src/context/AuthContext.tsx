@@ -7,6 +7,7 @@ import { logger } from "@/utils/logger";
 import { fetchLogger } from "@/utils/fetchLogger";
 import { dispatchAuthStateChange } from "@/utils/events";
 import { toast } from "@/components/ui/sonner";
+import { GoogleSignInResult } from "@/stores/types/auth.types";
 
 /**
  * Interface do contexto de autenticação
@@ -23,7 +24,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<User | null>;
   signUp: (email: string, password: string, name?: string) => Promise<User | null>;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<{ success: boolean }>;
+  signInWithGoogle: () => Promise<GoogleSignInResult>;
 };
 
 // Criação do contexto
@@ -129,6 +130,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  /**
+   * Função para login com Google
+   */
+  const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
+    try {
+      return await googleAuth();
+    } catch (error) {
+      logger.error({
+        action: "google_auth_error",
+        message: "Erro durante autenticação com Google",
+        data: { error }
+      });
+      return { success: false, error: "Erro ao autenticar com Google" };
+    }
+  };
+
   // Mantendo compatibilidade com a interface existente
   const authState = {
     user,
@@ -144,7 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signOut,
-    signInWithGoogle: googleAuth,
+    signInWithGoogle,
   };
 
   if (isLoading) {

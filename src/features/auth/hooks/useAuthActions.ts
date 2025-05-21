@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
 import { logger } from "@/utils/logger";
+import { GoogleSignInResult } from "@/stores/types/auth.types";
 
 interface AuthActionsResult {
   handleSignOut: () => Promise<void>;
@@ -11,7 +12,7 @@ interface AuthActionsResult {
   signIn?: (email: string, password: string) => Promise<any>;
   signUp?: (email: string, password: string, name?: string) => Promise<any>;
   signOut?: () => Promise<void>;
-  signInWithGoogle?: () => Promise<void>;
+  signInWithGoogle?: () => Promise<GoogleSignInResult>;
 }
 
 /**
