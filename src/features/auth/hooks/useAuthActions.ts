@@ -8,6 +8,10 @@ interface AuthActionsResult {
   handleSignOut: () => Promise<void>;
   isAuthenticated: boolean;
   userName: string | undefined;
+  signIn?: (email: string, password: string) => Promise<any>;
+  signUp?: (email: string, password: string, name?: string) => Promise<any>;
+  signOut?: () => Promise<void>;
+  signInWithGoogle?: () => Promise<void>;
 }
 
 /**
@@ -15,7 +19,7 @@ interface AuthActionsResult {
  * Centraliza a lógica de logout e informações de usuário
  */
 export function useAuthActions(): AuthActionsResult {
-  const { user, signOut } = useAuthStore();
+  const { user, signOut, signIn, signUp, signInWithGoogle } = useAuthStore();
   const navigate = useNavigate();
   
   // Nome para exibição do usuário
@@ -45,6 +49,10 @@ export function useAuthActions(): AuthActionsResult {
   return {
     handleSignOut,
     isAuthenticated: !!user,
-    userName
+    userName,
+    signIn,
+    signUp,
+    signOut,
+    signInWithGoogle
   };
 }
