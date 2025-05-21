@@ -4,6 +4,7 @@ import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, Cart
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useAnalyticsData } from "../hooks/useAnalyticsData";
+import { FallbackState } from "@/components/ui/fallback-state";
 import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,27 +21,27 @@ const AnalyticsPage = () => {
   const { data, isLoading, error } = useAnalyticsData();
   
   if (isLoading) {
-    return (
-      <div className="space-y-4 p-4">
-        <Skeleton className="h-12 w-3/4" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-        </div>
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
+    return <FallbackState type="loading" title="Carregando análises" />;
   }
   
   if (error) {
     return (
-      <Alert variant="destructive" className="m-4">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Erro ao carregar os dados de análise</AlertTitle>
-        <AlertDescription>{String(error)}</AlertDescription>
-      </Alert>
+      <FallbackState 
+        type="error" 
+        title="Erro ao carregar os dados de análise"
+        message={String(error)}
+      />
+    );
+  }
+  
+  // Check if data is empty
+  if (!data || !data.monthlyData || data.monthlyData.length === 0) {
+    return (
+      <FallbackState 
+        type="empty" 
+        title="Sem dados de análise"
+        message="Não há dados de análise disponíveis no momento."
+      />
     );
   }
   
