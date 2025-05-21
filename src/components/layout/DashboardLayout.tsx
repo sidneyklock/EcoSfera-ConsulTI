@@ -5,10 +5,10 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { useSecureContext } from "@/hooks/useSecureContext";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, AlertTriangle, RefreshCw } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { FallbackState } from "@/components/ui/fallback-state";
 
 const DashboardLayout = () => {
   const { 
@@ -39,10 +39,11 @@ const DashboardLayout = () => {
   if (loading) {
     console.log("DashboardLayout: In loading state");
     return (
-      <div className="flex justify-center items-center h-screen p-4" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
-        <span className="sr-only">Carregando...</span>
-      </div>
+      <FallbackState 
+        type="loading" 
+        title="Carregando dashboard" 
+        message="Preparando seu ambiente de trabalho..."
+      />
     );
   }
 
@@ -50,23 +51,11 @@ const DashboardLayout = () => {
   if (error) {
     console.log("DashboardLayout: Error state:", error);
     return (
-      <div className="flex justify-center items-center h-screen p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Erro no carregamento</AlertTitle>
-          <AlertDescription className="flex flex-col">
-            <span>{error}</span>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4 gap-2"
-              variant="outline"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Tentar novamente
-            </Button>
-          </AlertDescription>
-        </Alert>
-      </div>
+      <FallbackState 
+        type="error" 
+        title="Erro ao carregar o dashboard" 
+        message={`Não foi possível carregar o dashboard: ${error}. Tente recarregar a página.`}
+      />
     );
   }
 

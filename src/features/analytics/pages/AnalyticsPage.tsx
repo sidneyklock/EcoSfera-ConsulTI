@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
@@ -5,9 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useAnalyticsData } from "../hooks/useAnalyticsData";
 import { FallbackState } from "@/components/ui/fallback-state";
-import { AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PageLayout } from "@/layouts";
 import { useUserContext } from "@/features/auth/hooks";
 import { useLogger } from "@/utils/logger";
@@ -38,7 +36,11 @@ const AnalyticsPage = () => {
   
   if (isLoading) {
     log.debug("loading", "Carregando dados de analytics");
-    return <FallbackState type="loading" title="Carregando análises" />;
+    return <FallbackState 
+      type="loading" 
+      title="Carregando análises" 
+      message="Processando dados estatísticos..." 
+    />;
   }
   
   if (error) {
@@ -47,7 +49,7 @@ const AnalyticsPage = () => {
       <FallbackState 
         type="error" 
         title="Erro ao carregar os dados de análise"
-        message={String(error)}
+        message={`Não foi possível processar os dados: ${String(error)}. Tente novamente mais tarde.`}
       />
     );
   }
@@ -59,7 +61,7 @@ const AnalyticsPage = () => {
       <FallbackState 
         type="empty" 
         title="Sem dados de análise"
-        message="Não há dados de análise disponíveis no momento."
+        message="Não há dados de análise disponíveis no momento. Aguarde até que novos dados sejam gerados ou entre em contato com o suporte."
       />
     );
   }

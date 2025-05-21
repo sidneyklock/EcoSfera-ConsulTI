@@ -51,6 +51,18 @@ export function useUsersData() {
           
           throw new Error(`Error fetching users: ${usersError.message}`);
         }
+
+        // Verificar se retornou dados vazios
+        if (!users || users.length === 0) {
+          logger.info({
+            userId: user?.id,
+            action: "fetch_empty",
+            message: "Nenhum usuário encontrado",
+            status: 'success'
+          });
+          
+          return { users: [] };
+        }
         
         logger.info({
           userId: user?.id,

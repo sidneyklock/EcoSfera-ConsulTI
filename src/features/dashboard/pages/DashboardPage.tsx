@@ -33,7 +33,11 @@ const DashboardPage = () => {
       action: "dashboard_loading",
       message: "Dashboard em carregamento"
     });
-    return <FallbackState type="loading" />;
+    return <FallbackState 
+      type="loading" 
+      title="Carregando dashboard" 
+      message="Preparando seu painel personalizado..."
+    />;
   }
   
   if (userError) {
@@ -46,7 +50,7 @@ const DashboardPage = () => {
     return <FallbackState 
       type="error" 
       title="Erro ao carregar o dashboard" 
-      message={userError} 
+      message={`Não foi possível carregar seus dados: ${userError}. Tente novamente mais tarde.`} 
     />;
   }
   

@@ -1,9 +1,7 @@
 
 import { useEffect } from 'react';
 import { useSecureContextStore } from '@/stores/secureContextStore';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
+import { FallbackState } from '@/components/ui/fallback-state';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -76,26 +74,19 @@ export function useSecureContext() {
     error,
     // Accessible loading component for consumers
     LoadingSpinner: () => loading ? (
-      <div className="flex justify-center items-center h-screen p-4" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
-        <span className="sr-only">Carregando...</span>
-      </div>
+      <FallbackState 
+        type="loading" 
+        title="Carregando perfil" 
+        message="Obtendo dados do seu perfil..." 
+      />
     ) : null,
     // Error display component
     ErrorDisplay: () => error ? (
-      <Alert variant="destructive" className="m-4">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Erro no contexto de segurança</AlertTitle>
-        <AlertDescription className="flex flex-col">
-          <span>{error}</span>
-          <button 
-            onClick={() => fetchUserContext()} 
-            className="mt-2 text-sm underline hover:text-primary transition-colors"
-          >
-            Tentar novamente
-          </button>
-        </AlertDescription>
-      </Alert>
+      <FallbackState
+        type="error"
+        title="Erro ao carregar perfil"
+        message={`Não foi possível carregar seus dados: ${error}`}
+      />
     ) : null
   };
 }
