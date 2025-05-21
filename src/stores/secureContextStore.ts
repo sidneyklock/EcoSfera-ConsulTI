@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Role, User } from '@/types';
 
 interface SecureContextState {
@@ -22,6 +22,18 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
 
   fetchUserContext: async () => {
     set({ loading: true, error: null });
+    
+    // Se o Supabase não estiver configurado, definimos um estado padrão
+    if (!isSupabaseConfigured()) {
+      set({ 
+        user: null, 
+        solutionId: null, 
+        role: null, 
+        loading: false,
+        error: "Supabase não configurado. Configure as variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY."
+      });
+      return;
+    }
     
     try {
       // Verificar se o usuário está autenticado

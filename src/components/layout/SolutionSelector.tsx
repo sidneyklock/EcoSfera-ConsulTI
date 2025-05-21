@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
 import { 
@@ -9,7 +8,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { useSecureContextStore } from '@/stores/secureContextStore';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface Solution {
   id: string;
@@ -33,7 +32,7 @@ export const SolutionSelector = () => {
   // Buscar as soluções disponíveis para o usuário
   useEffect(() => {
     const fetchUserSolutions = async () => {
-      if (!user) {
+      if (!user || !isSupabaseConfigured()) {
         setSolutions([]);
         setLoading(false);
         return;
