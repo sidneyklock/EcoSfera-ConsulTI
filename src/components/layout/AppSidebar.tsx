@@ -27,7 +27,6 @@ import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 
 interface AppSidebarProps {
@@ -41,8 +40,22 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const { signOut } = useAuthStore();
 
   useEffect(() => {
-    console.log("AppSidebar: Rendering with userRole:", userRole);
-  }, [userRole]);
+    // Close sidebar on mobile when location changes
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+
+    // Set initial state based on screen size
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, [location.pathname, setCollapsed]);
 
   // Handle sign out
   const handleSignOut = async () => {
@@ -114,7 +127,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 right-4 z-50 md:hidden"
+        className="fixed top-4 right-4 z-50 md:hidden shadow-sm hover:bg-accent/80 transition-colors"
         onClick={toggleCollapsed}
         aria-label={collapsed ? "Abrir menu" : "Fechar menu"}
       >
@@ -132,17 +145,17 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
       >
         <Sidebar
           collapsible="icon"
-          className={`${sidebarElementClasses.container} border-r border-border bg-background`}
+          className={`${sidebarElementClasses.container} border-r border-border bg-background shadow-sm transition-all duration-300`}
           aria-label="Navegação principal"
         >
-          <SidebarHeaderWrapper className={`${sidebarElementClasses.header} px-4 py-3`}>
+          <SidebarHeaderWrapper className={`${sidebarElementClasses.header} px-4 py-4 border-b`}>
             <SidebarHeader 
               collapsed={collapsed} 
               solutionId={solutionId}
             />
           </SidebarHeaderWrapper>
           
-          <SidebarContent className={`${sidebarElementClasses.content} py-2 px-1`}>
+          <SidebarContent className={`${sidebarElementClasses.content} py-4 px-2`}>
             <SidebarGroup>
               <SidebarNavigation 
                 navItems={filteredItems} 
@@ -152,7 +165,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
             </SidebarGroup>
           </SidebarContent>
           
-          <SidebarFooterWrapper className={`${sidebarElementClasses.footer} mt-auto p-4`}>
+          <SidebarFooterWrapper className={`${sidebarElementClasses.footer} mt-auto p-4 border-t`}>
             <SidebarFooter 
               user={userRole ? { name: '', email: '', id: '', role: userRole } : null} 
               collapsed={collapsed} 

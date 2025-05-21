@@ -40,18 +40,21 @@ const DashboardPage = memo(() => {
     
     // Use skeleton loader instead of spinner for better UX
     return (
-      <div className="container space-y-6">
-        <LoadingSkeleton variant="text" className="h-8 w-1/3" />
-        <LoadingSkeleton variant="text" className="h-4 w-1/2" />
+      <div className="container mx-auto py-6 animate-fade-in">
+        <LoadingSkeleton variant="text" className="h-8 w-1/3 mb-4" />
+        <LoadingSkeleton variant="text" className="h-4 w-1/2 mb-8" />
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <LoadingSkeleton variant="card" />
           <LoadingSkeleton variant="card" />
           <LoadingSkeleton variant="card" />
           <LoadingSkeleton variant="card" />
         </div>
         
-        <LoadingSkeleton variant="table" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <LoadingSkeleton variant="card" className="h-64" />
+          <LoadingSkeleton variant="card" className="h-64" />
+        </div>
       </div>
     );
   }
@@ -96,7 +99,7 @@ const DashboardPage = memo(() => {
       title="Dashboard" 
       description="Bem-vindo ao painel de controle da EcoSfera ConsulTI"
     >
-      <div className="container py-6">
+      <div className="container mx-auto py-6 animate-fade-in">
         {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
       </div>
     </PageLayout>

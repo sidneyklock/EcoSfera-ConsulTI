@@ -14,10 +14,10 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <WelcomeHeader />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total de Usuários"
           value={stats.totalUsers}
@@ -48,48 +48,50 @@ export const AdminDashboard = () => {
         />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 mt-6">
-        <div className="rounded-lg border bg-card shadow p-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
           <h3 className="font-medium text-lg mb-4">Visão Geral do Sistema</h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-6">
             Bem-vindo ao painel administrativo. Como administrador, você tem acesso a todas as funcionalidades do sistema, incluindo gerenciamento de usuários, análise de dados e configurações gerais.
           </p>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span>Uso do Sistema</span>
+              <span className="font-medium">Uso do Sistema</span>
               <span className="text-sm font-medium">85%</span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2.5">
-              <div className="bg-primary h-2.5 rounded-full" style={{ width: "85%" }}></div>
+              <div className="bg-primary h-2.5 rounded-full transition-all" style={{ width: "85%" }}></div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card shadow p-6">
+        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
           <h3 className="font-medium text-lg mb-4">Ações Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Briefcase className="h-5 w-5 mb-1 mx-auto" />
+            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+              <Briefcase className="h-5 w-5 mb-2 mx-auto" />
               <span className="text-sm block">Novo Projeto</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Users className="h-5 w-5 mb-1 mx-auto" />
+            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+              <Users className="h-5 w-5 mb-2 mx-auto" />
               <span className="text-sm block">Gerenciar Usuários</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <BarChart2 className="h-5 w-5 mb-1 mx-auto" />
+            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+              <BarChart2 className="h-5 w-5 mb-2 mx-auto" />
               <span className="text-sm block">Ver Relatórios</span>
             </button>
-            <button className="p-3 border rounded-lg hover:bg-accent transition-colors">
-              <Activity className="h-5 w-5 mb-1 mx-auto" />
+            <button className="p-3 border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors">
+              <Activity className="h-5 w-5 mb-2 mx-auto" />
               <span className="text-sm block">Atividade</span>
             </button>
           </div>
         </div>
       </div>
       
-      <div className="mt-6">
-        <UserRoleAssignment />
+      <div className="mt-8">
+        <div className="rounded-lg border bg-card shadow-sm p-6 hover:shadow-md transition-all">
+          <UserRoleAssignment />
+        </div>
       </div>
     </div>
   );
