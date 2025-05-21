@@ -22,45 +22,7 @@ export function useAuth() {
     });
   }
   
-  // Extraindo os dados do contexto e convertendo para o formato esperado pelos componentes existentes
-  const {
-    authState: { user, isLoading, error, role, solutionId, session },
-    signIn,
-    signUp,
-    signOut,
-    signInWithGoogle
-  } = auth;
-  
-  // Mantendo o formato compatível com o código existente
-  return {
-    user,
-    role,
-    solutionId,
-    isLoading,
-    error,
-    signIn,
-    signUp, 
-    signOut,
-    signInWithGoogle,
-    refreshContext: async () => {
-      try {
-        logger.debug({
-          userId: user?.id,
-          action: "refresh_context",
-          message: "Manual context refresh requested"
-        });
-        return { success: true };
-      } catch (err) {
-        logger.error({
-          userId: user?.id,
-          action: "refresh_context_error",
-          message: "Error refreshing context",
-          data: { error: err }
-        });
-        return { success: false, error: err };
-      }
-    },
-  };
+  return auth;
 }
 
 export default useAuth;
