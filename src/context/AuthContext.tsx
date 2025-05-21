@@ -1,167 +1,69 @@
-import { createContext, useContext, useState, useEffect, useReducer } from "react";
-import { 
-  signInWithEmailAndPassword as signInWithEmailAndPasswordService,
-  signUpWithEmailAndPassword as signUpWithEmailAndPasswordService,
-  signOut as signOutService,
-  getCurrentSession as getCurrentSessionService,
-  signInWithGoogle as signInWithGoogleService,
-  setupAuthListener
-} from "@/services/authService";
-import { User } from "@/types";
-import { useNavigate } from "react-router-dom";
-import { useSecureContextStore } from '@/stores/secureContextStore';
 
+import { createContext, useContext, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
+import { User } from "@/types";
+import { useAuthentication, AuthenticationState } from "@/hooks/useAuthentication";
+
+/**
+ * Interface do contexto de autenticação
+ */
 type AuthContextType = {
-  authState: AuthState;
+  authState: AuthenticationState;
   signIn: (email: string, password: string) => Promise<User | null>;
   signUp: (email: string, password: string, name?: string) => Promise<User | null>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ success: boolean }>;
 };
 
-type AuthState = {
-  user: User | null;
-  isLoading: boolean;
-  error: string | null;
-};
-
-type AuthAction =
-  | { type: "LOGIN"; payload: User }
-  | { type: "LOGOUT" }
-  | { type: "LOADING" }
-  | { type: "ERROR"; payload: string }
-  | { type: "CLEAR_ERROR" };
-
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case "LOGIN":
-      return { ...state, user: action.payload, isLoading: false, error: null };
-    case "LOGOUT":
-      return { ...state, user: null, isLoading: false, error: null };
-    case "LOADING":
-      return { ...state, isLoading: true, error: null };
-    case "ERROR":
-      return { ...state, isLoading: false, error: action.payload };
-    case "CLEAR_ERROR":
-      return { ...state, error: null };
-    default:
-      return state;
-  }
-};
-
+// Criação do contexto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const initialState: AuthState = {
-    user: null,
-    isLoading: true,
-    error: null,
-  };
+/**
+ * Provider para o contexto de autenticação
+ * Usa o hook useAuthentication para gerenciar o estado
+ */
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const { 
+    authState, 
+    signIn: authenticateUser, 
+    signUp: registerUser, 
+    signOut: logoutUser, 
+    signInWithGoogle: googleAuth,
+    LoadingSpinner
+  } = useAuthentication();
 
-  const [authState, dispatch] = useReducer(authReducer, initialState);
   const navigate = useNavigate();
-  const { createUserRecord } = useSecureContextStore();
 
-  useEffect(() => {
-    const unsubscribe = setupAuthListener(async (user) => {
-      if (user) {
-        dispatch({ type: "LOGIN", payload: user });
-      } else {
-        dispatch({ type: "LOGOUT" });
-      }
-    });
-
-    const checkSession = async () => {
-      dispatch({ type: "LOADING" });
-      try {
-        const { user, error } = await getCurrentSessionService();
-        if (error) {
-          dispatch({ type: "ERROR", payload: error });
-        } else if (user) {
-          dispatch({ type: "LOGIN", payload: user });
-        }
-      } catch (error: any) {
-        dispatch({ type: "ERROR", payload: error.message });
-      } finally {
-        dispatch({ type: "LOADING" });
-      }
-    };
-
-    checkSession();
-
-    return () => {
-      unsubscribe.unsubscribe();
-    };
-  }, []);
-
+  /**
+   * Função de login com redirecionamento
+   */
   const signIn = async (email: string, password: string) => {
-    dispatch({ type: "LOADING" });
-    
-    try {
-      const { user, error } = await signInWithEmailAndPasswordService(email, password);
-      
-      if (error) {
-        dispatch({ type: "ERROR", payload: error });
-        return null;
-      }
-      
-      if (user) {
-        await createUserRecord(user);
-        dispatch({ type: "LOGIN", payload: user });
-      }
-      
-      return user;
-    } catch (error: any) {
-      dispatch({ type: "ERROR", payload: error.message });
-      return null;
+    const user = await authenticateUser(email, password);
+    if (user) {
+      // Após login bem-sucedido, redirecionar para o dashboard
+      setTimeout(() => navigate("/dashboard"), 0);
     }
+    return user;
   };
 
+  /**
+   * Função de registro com redirecionamento
+   */
   const signUp = async (email: string, password: string, name?: string) => {
-    dispatch({ type: "LOADING" });
-    try {
-      const { user, error } = await signUpWithEmailAndPasswordService(email, password, name);
-      if (error) {
-        dispatch({ type: "ERROR", payload: error });
-        return null;
-      }
-      if (user) {
-        dispatch({ type: "LOGIN", payload: user });
-        navigate("/verify-email");
-      }
-      return user;
-    } catch (error: any) {
-      dispatch({ type: "ERROR", payload: error.message });
-      return null;
+    const user = await registerUser(email, password, name);
+    if (user) {
+      // Após registro bem-sucedido, redirecionar para verificação de email
+      navigate("/verify-email", { state: { email } });
     }
+    return user;
   };
 
+  /**
+   * Função de logout com redirecionamento
+   */
   const signOut = async () => {
-    dispatch({ type: "LOADING" });
-    try {
-      await signOutService();
-      dispatch({ type: "LOGOUT" });
-      navigate("/login");
-    } catch (error: any) {
-      dispatch({ type: "ERROR", payload: error.message });
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    dispatch({ type: "LOADING" });
-    
-    try {
-      const { error } = await signInWithGoogleService();
-      
-      if (error) {
-        dispatch({ type: "ERROR", payload: error });
-      }
-      
-      return { success: !error };
-    } catch (error: any) {
-      dispatch({ type: "ERROR", payload: error.message });
-      return { success: false };
-    }
+    await logoutUser();
+    navigate("/login");
   };
 
   const value: AuthContextType = {
@@ -169,20 +71,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     signOut,
-    signInWithGoogle,
+    signInWithGoogle: googleAuth,
   };
+
+  if (authState.isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <AuthContext.Provider value={value}>
-      {authState.isLoading ? <div>Carregando...</div> : children}
+      {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+/**
+ * Hook para acessar o contexto de autenticação
+ * @returns {AuthContextType} Contexto de autenticação
+ * @throws {Error} Se usado fora de um AuthProvider
+ */
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}
