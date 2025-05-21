@@ -1,3 +1,6 @@
 
 // Import SecureMessageBubble from original location
-export { SecureMessageBubble } from "@/components/chat/SecureMessageBubble";
+import SecureMessageBubble from "@/components/chat/SecureMessageBubble";
+
+// Re-export the component
+export { SecureMessageBubble };
