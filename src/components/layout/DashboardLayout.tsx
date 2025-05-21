@@ -16,7 +16,7 @@ interface DashboardLayoutProps {
   requiredRoles?: Role[];
 }
 
-export const DashboardLayout = ({ 
+const DashboardLayout = ({ 
   children,
   requiredRoles = ["user", "admin"] 
 }: DashboardLayoutProps) => {
@@ -125,3 +125,5 @@ export const DashboardLayout = ({
     </div>
   );
 };
+
+export default DashboardLayout;

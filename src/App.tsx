@@ -19,7 +19,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import AdminPage from "./pages/AdminPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
-import { DashboardLayout } from "./components/layout/DashboardLayout";
+import DashboardLayout from "./components/layout/DashboardLayout";
 
 const queryClient = new QueryClient();
 
