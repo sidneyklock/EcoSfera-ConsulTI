@@ -1,11 +1,11 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/types";
-import { SendHorizonal, Bot, User } from "lucide-react";
+import { SendHorizonal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import SecureMessageBubble from "./SecureMessageBubble";
 
 export const ChatInterface = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -86,57 +86,32 @@ export const ChatInterface = () => {
     <div className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-12rem)] bg-card rounded-lg border shadow">
       <div className="p-4 border-b bg-muted/50">
         <h2 className="text-xl font-medium flex items-center gap-2">
-          <Bot className="h-5 w-5" /> Chat com IA
+          <span aria-hidden="true" className="h-5 w-5 inline-flex items-center justify-center">🤖</span> 
+          <span>Chat com IA</span>
         </h2>
         <p className="text-sm text-muted-foreground">
           Converse com nosso assistente inteligente
         </p>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
         {messages.map((msg) => (
-          <div
+          <SecureMessageBubble
             key={msg.id}
-            className={cn(
-              "flex gap-3 max-w-[80%] mb-4",
-              msg.role === "user" ? "ml-auto" : ""
-            )}
-          >
-            {msg.role === "assistant" && (
-              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                <Bot className="h-4 w-4 text-primary" />
-              </div>
-            )}
-            
-            <div
-              className={cn(
-                "rounded-lg p-3",
-                msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-              )}
-            >
-              <p className="text-sm">{msg.content}</p>
-              <p className="text-xs opacity-70 mt-1">
-                {msg.timestamp.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            
-            {msg.role === "user" && (
-              <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                <User className="h-4 w-4" />
-              </div>
-            )}
-          </div>
+            role={msg.role}
+            content={msg.content}
+            timestamp={msg.timestamp}
+          />
         ))}
         
         {isLoading && (
           <div className="flex gap-3">
             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <Bot className="h-4 w-4 text-primary" />
+              <span className="h-4 w-4 text-primary" aria-hidden="true">🤖</span>
             </div>
             <div className="rounded-md p-3 bg-muted w-16">
               <div className="flex space-x-1">
@@ -159,8 +134,14 @@ export const ChatInterface = () => {
             placeholder="Digite sua mensagem..."
             className="flex-1"
             disabled={isLoading}
+            aria-label="Mensagem"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()}>
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={isLoading || !inputValue.trim()}
+            aria-label="Enviar mensagem"
+          >
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </div>
