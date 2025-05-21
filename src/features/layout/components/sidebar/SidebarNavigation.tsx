@@ -1,15 +1,13 @@
 
 import { NavLink } from 'react-router-dom';
 import { useNavigation } from '@/features/layout/hooks/useNavigation';
-import { useSecureContextStore } from '@/stores/secureContextStore';
 
 export const SidebarNavigation = () => {
-  const { mainNavigation } = useNavigation();
-  const { role } = useSecureContextStore();
+  const { mainNavigation, isActive } = useNavigation();
 
   return (
     <nav className="space-y-1 px-2 py-4">
-      {mainNavigation.map((section) => (
+      {mainNavigation && mainNavigation.map((section) => (
         <div key={section.title || 'main'} className="mb-4">
           {section.title && (
             <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
@@ -18,14 +16,13 @@ export const SidebarNavigation = () => {
           )}
           <ul className="space-y-1">
             {section.items
-              .filter(item => !item.roles || item.roles.includes(role as any))
               .map((item) => (
                 <li key={item.title}>
                   <NavLink
                     to={item.href}
-                    className={({ isActive }) => 
+                    className={({ isActive: active }) => 
                       `flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                        isActive 
+                        active 
                           ? 'bg-primary text-primary-foreground' 
                           : 'text-foreground hover:bg-muted'
                       }`

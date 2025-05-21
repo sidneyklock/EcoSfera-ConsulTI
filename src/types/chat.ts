@@ -6,6 +6,7 @@ export interface ChatMessage {
   timestamp: Date;
   isRead?: boolean;
   type?: 'text' | 'image' | 'file';
+  role?: 'user' | 'system' | 'assistant';
   attachment?: {
     url: string;
     name: string;
