@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Role, User } from '@/types';
 
 interface SecureContextState {
@@ -23,18 +23,6 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
   fetchUserContext: async () => {
     set({ loading: true, error: null });
     
-    // Se o Supabase não estiver configurado, definimos um estado padrão
-    if (!isSupabaseConfigured()) {
-      set({ 
-        user: null, 
-        solutionId: null, 
-        role: null, 
-        loading: false,
-        error: "Supabase não configurado. Configure as variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY."
-      });
-      return;
-    }
-    
     try {
       // Verificar se o usuário está autenticado
       const { data: { session } } = await supabase.auth.getSession();
@@ -49,52 +37,91 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         return;
       }
       
-      // Buscar dados do usuário e sua role
+      // Buscar dados do usuário e informações relacionadas com JOIN
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('id, email, role, name, avatar_url')
+        .select(`
+          id, email, full_name,
+          user_roles (
+            role_id,
+            solutions (
+              id, name
+            )
+          )
+        `)
         .eq('id', session.user.id)
         .single();
       
       if (userError) {
-        set({ error: userError.message, loading: false });
+        set({ error: `Erro ao carregar dados do usuário: ${userError.message}`, loading: false });
         return;
       }
       
-      // Buscar a primeira solução disponível para o usuário (se ainda não tiver uma selecionada)
+      if (!userData) {
+        set({ error: 'Usuário não encontrado no banco de dados', loading: false });
+        return;
+      }
+      
+      // Extrair o papel (role) do usuário e ID da solução (se existirem)
+      const userRoles = userData.user_roles as any[] || [];
+      const firstUserRole = userRoles[0];
+      
+      // Verificar se o usuário tem um papel e uma solução associada
+      if (!firstUserRole) {
+        set({ 
+          user: {
+            id: userData.id,
+            email: userData.email,
+            role: 'user', // Papel padrão se não houver definido
+            name: userData.full_name || userData.email.split('@')[0]
+          },
+          role: 'user',
+          solutionId: null,
+          loading: false
+        });
+        return;
+      }
+      
+      // Extrair o ID da solução do primeiro papel do usuário (considerar preferência do usuário)
       const currentSolutionId = get().solutionId;
       let solutionId = currentSolutionId;
       
-      if (!currentSolutionId) {
-        const { data: solutionData } = await supabase
-          .from('user_solutions')
-          .select('solution_id')
-          .eq('user_id', userData.id)
-          .limit(1)
-          .single();
-        
-        solutionId = solutionData?.solution_id || null;
+      if (!currentSolutionId && firstUserRole?.solutions?.id) {
+        solutionId = firstUserRole.solutions.id;
       }
       
-      // Montar o objeto do usuário
+      // Buscar o papel específico do usuário
+      const { data: roleData, error: roleError } = await supabase
+        .from('roles')
+        .select('name')
+        .eq('id', firstUserRole.role_id)
+        .single();
+        
+      if (roleError) {
+        set({ error: `Erro ao carregar papel do usuário: ${roleError.message}`, loading: false });
+        return;
+      }
+      
+      // Montar o objeto do usuário com os dados obtidos
+      const userRole = (roleData?.name || 'user') as Role;
+      
       const user: User = {
         id: userData.id,
         email: userData.email,
-        role: userData.role,
-        name: userData.name,
-        avatar_url: userData.avatar_url
+        role: userRole,
+        name: userData.full_name || userData.email.split('@')[0]
       };
       
       set({
         user,
         solutionId,
-        role: userData.role,
+        role: userRole,
         loading: false
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar contexto do usuário:', error);
       set({ 
-        error: 'Falha ao carregar dados do usuário', 
+        error: `Falha ao carregar dados do usuário: ${error.message || 'Erro desconhecido'}`, 
         loading: false 
       });
     }
