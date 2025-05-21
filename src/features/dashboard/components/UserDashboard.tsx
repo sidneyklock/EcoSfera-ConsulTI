@@ -2,7 +2,9 @@
 import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { MessageSquare, Clock, Star, Calendar } from "lucide-react";
-import { cn, responsive, spacing, transitions } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { responsive, spacing, transitions } from "@/lib/utils";
+import { buttonStateClasses, cardStateClasses } from "@/lib/tailwind-utils";
 
 export const UserDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -94,7 +96,9 @@ export const UserDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center", 
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <MessageSquare className="h-5 w-5 mb-2" />
               <span className="text-sm">Iniciar Chat IA</span>
@@ -102,7 +106,9 @@ export const UserDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center", 
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Calendar className="h-5 w-5 mb-2" />
               <span className="text-sm">Agendar Reunião</span>
@@ -110,7 +116,9 @@ export const UserDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center", 
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Star className="h-5 w-5 mb-2" />
               <span className="text-sm">Novo Projeto</span>
@@ -118,7 +126,9 @@ export const UserDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center", 
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Clock className="h-5 w-5 mb-2" />
               <span className="text-sm">Ver Tarefas</span>

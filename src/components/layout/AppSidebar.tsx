@@ -25,10 +25,15 @@ import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { iconClasses, sidebarElementClasses, transitions } from "@/lib/tailwind-utils";
+import { 
+  iconClasses, 
+  sidebarElementClasses, 
+  buttonStateClasses 
+} from "@/lib/tailwind-utils";
 import { useEffect, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import { cn, animations } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { animations, transitions } from "@/lib/utils";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -139,7 +144,8 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
         className={cn(
           "fixed top-4 right-4 z-50 md:hidden shadow-sm",
           transitions.all,
-          "hover:bg-accent/80 active:scale-95",
+          buttonStateClasses.active,
+          buttonStateClasses.hover,
           animations.fadeIn
         )}
         onClick={toggleCollapsed}

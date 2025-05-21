@@ -3,7 +3,9 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
-import { cn, responsive, spacing, transitions } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { responsive, spacing, transitions } from "@/lib/utils";
+import { buttonStateClasses } from "@/lib/tailwind-utils";
 
 export const AdminDashboard = () => {
   // Dados simulados (seriam obtidos por API em produção)
@@ -87,7 +89,9 @@ export const AdminDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center",
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Briefcase className="h-5 w-5 mb-2" />
               <span className="text-sm">Novo Projeto</span>
@@ -95,7 +99,9 @@ export const AdminDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center",
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Users className="h-5 w-5 mb-2" />
               <span className="text-sm">Gerenciar Usuários</span>
@@ -103,7 +109,9 @@ export const AdminDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center",
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <BarChart2 className="h-5 w-5 mb-2" />
               <span className="text-sm">Ver Relatórios</span>
@@ -111,7 +119,9 @@ export const AdminDashboard = () => {
             <button className={cn(
               "p-3 border rounded-lg flex flex-col items-center justify-center",
               transitions.colors,
-              "hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              buttonStateClasses.hover,
+              buttonStateClasses.focus,
+              buttonStateClasses.active
             )}>
               <Activity className="h-5 w-5 mb-2" />
               <span className="text-sm">Atividade</span>

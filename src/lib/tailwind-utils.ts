@@ -31,7 +31,7 @@ export const transitionClasses = "transition-all duration-300";
 export const hoverStateClasses = "hover:bg-accent/80 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 export const activeStateClasses = "bg-accent text-accent-foreground";
 
-// Add transitions object to match the format in utils.ts
+// Transitions object with consistent naming across the application
 export const transitions = {
   all: "transition-all duration-300",
   colors: "transition-colors duration-200",
@@ -39,9 +39,11 @@ export const transitions = {
   opacity: "transition-opacity duration-200",
   hover: {
     scale: "hover:scale-105 transition-transform duration-200",
-    elevate: "hover:shadow-md transition-shadow duration-200",
+    elevate: "hover:shadow-md hover:-translate-y-0.5 transition-all duration-200",
     highlight: "hover:bg-accent/80 hover:text-accent-foreground transition-colors duration-200"
-  }
+  },
+  focus: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  active: "active:scale-[0.98] active:transition-transform active:duration-100"
 };
 
 // Card state classes - for consistent card styling
@@ -50,7 +52,7 @@ export const cardStateClasses = {
   interactive: "border bg-card shadow-sm hover:shadow-md transition-all duration-300",
   selected: "border bg-card shadow-md border-primary/50",
   disabled: "border bg-muted/50 shadow-sm opacity-70"
-}
+};
 
 // Responsive classes
 export const responsiveGridClasses = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6";

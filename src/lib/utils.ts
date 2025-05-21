@@ -37,7 +37,7 @@ export const transitions = {
   opacity: "transition-opacity duration-200",
   hover: {
     scale: "hover:scale-105 transition-transform duration-200",
-    elevate: "hover:shadow-md transition-shadow duration-200",
+    elevate: "hover:shadow-md hover:-translate-y-0.5 transition-all duration-200",
     highlight: "hover:bg-accent/80 hover:text-accent-foreground transition-colors duration-200"
   }
 }
@@ -49,9 +49,13 @@ export const responsive = {
     desktop: "md:hidden"
   },
   grid: {
-    base: "grid",
-    cols2: "grid-cols-1 md:grid-cols-2",
-    cols3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    cols4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+    base: "grid gap-6",
+    cols2: "grid grid-cols-1 md:grid-cols-2 gap-6",
+    cols3: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+    cols4: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+  },
+  stack: {
+    horizontal: "flex flex-row items-center gap-4",
+    vertical: "flex flex-col gap-4"
   }
 }

@@ -7,7 +7,8 @@ import { FallbackState } from "@/components/ui/fallback-state";
 import { PageLayout } from "@/layouts";
 import { logger, dispatchPageLoadStart, dispatchPageLoadComplete } from "@/utils";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { animations, transitions } from "@/lib/utils";
+import { animations, responsive, spacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 /**
  * Dashboard page component with standardized fallbacks
@@ -41,18 +42,18 @@ const DashboardPage = memo(() => {
     
     // Use skeleton loader instead of spinner for better UX
     return (
-      <div className={cn("container mx-auto p-6", animations.fadeIn)}>
+      <div className={cn(spacing.container, animations.fadeIn)}>
         <LoadingSkeleton variant="text" className="h-8 w-1/3 mb-6" />
         <LoadingSkeleton variant="text" className="h-4 w-1/2 mb-8" />
         
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <LoadingSkeleton variant="card" />
-          <LoadingSkeleton variant="card" />
-          <LoadingSkeleton variant="card" />
-          <LoadingSkeleton variant="card" />
+        <div className={responsive.grid.cols4}>
+          <LoadingSkeleton variant="stats" />
+          <LoadingSkeleton variant="stats" />
+          <LoadingSkeleton variant="stats" />
+          <LoadingSkeleton variant="stats" />
         </div>
         
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className={cn(responsive.grid.cols2, "mt-8")}>
           <LoadingSkeleton variant="card" className="h-64" />
           <LoadingSkeleton variant="card" className="h-64" />
         </div>
@@ -100,7 +101,7 @@ const DashboardPage = memo(() => {
       title="Dashboard" 
       description="Bem-vindo ao painel de controle da EcoSfera ConsulTI"
     >
-      <div className={cn("container mx-auto py-6", animations.fadeIn)}>
+      <div className={cn(spacing.container, animations.fadeIn, "py-6")}>
         {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
       </div>
     </PageLayout>
@@ -110,6 +111,3 @@ const DashboardPage = memo(() => {
 DashboardPage.displayName = 'DashboardPage';
 
 export default DashboardPage;
-
-// Precisamos importar o cn para usar no componente
-import { cn } from "@/lib/utils";

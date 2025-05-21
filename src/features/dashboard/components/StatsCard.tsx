@@ -2,7 +2,7 @@
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { transitions } from "@/lib/utils";
+import { transitions, iconContainerClasses } from "@/lib/tailwind-utils";
 
 interface StatsCardProps {
   title: string;
@@ -37,7 +37,7 @@ export const StatsCard = ({
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div 
-          className="h-9 w-9 rounded-md bg-primary/10 text-primary flex items-center justify-center"
+          className={cn(iconContainerClasses, "h-9 w-9")}
           aria-hidden="true"
         >
           {icon}
