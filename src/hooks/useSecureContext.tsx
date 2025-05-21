@@ -23,14 +23,19 @@ export function useSecureContext() {
   } = useSecureContextStore();
 
   useEffect(() => {
+    console.log("useSecureContext: Initializing secure context");
     fetchUserContext();
     
     // Inscrever-se para mudanças na autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("useSecureContext: Auth state changed", event);
+      
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         // Verificar e garantir que o usuário existe na tabela users quando fizer login
         if (session?.user) {
           const authUser = session.user;
+          console.log("useSecureContext: User signed in, ensuring user record exists", authUser.email);
+          
           // Realizar upsert na tabela de users para garantir que o usuário existe
           const { error: upsertError } = await supabase
             .from('users')
@@ -45,14 +50,20 @@ export function useSecureContext() {
             
           if (upsertError) {
             console.error('Erro ao atualizar registro de usuário:', upsertError);
+          } else {
+            console.log("useSecureContext: User record created/updated successfully");
           }
         }
         
+        fetchUserContext();
+      } else if (event === 'SIGNED_OUT') {
+        console.log("useSecureContext: User signed out");
         fetchUserContext();
       }
     });
 
     return () => {
+      console.log("useSecureContext: Cleanup - unsubscribing from auth changes");
       subscription.unsubscribe();
     };
   }, [fetchUserContext, createUserRecord]);
@@ -65,14 +76,14 @@ export function useSecureContext() {
     error,
     // Componente acessível de loading para ser usado pelos consumidores
     LoadingSpinner: () => loading ? (
-      <div className="flex justify-center items-center p-4" role="status" aria-live="polite">
+      <div className="flex justify-center items-center h-screen p-4" role="status" aria-live="polite">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-hidden="true"></div>
         <span className="sr-only">Carregando...</span>
       </div>
     ) : null,
     // Componente para exibição de erro
     ErrorDisplay: () => error ? (
-      <Alert variant="destructive" className="mb-4">
+      <Alert variant="destructive" className="m-4">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Erro no contexto de segurança</AlertTitle>
         <AlertDescription className="flex flex-col">

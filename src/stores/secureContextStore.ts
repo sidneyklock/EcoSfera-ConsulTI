@@ -24,6 +24,8 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
 
   createUserRecord: async (authUser) => {
     try {
+      console.log("createUserRecord: Creating/updating user record for", authUser.email);
+      
       // Inserir o usuário na tabela public.users se não existir
       const { error: insertError } = await supabase
         .from('users')
@@ -33,15 +35,18 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
             email: authUser.email,
             full_name: authUser.user_metadata?.name || authUser.email.split('@')[0]
           }
-        ])
-        .single();
+        ], { onConflict: 'id' });
 
-      if (insertError && !insertError.message.includes('duplicate key')) {
+      if (insertError) {
         console.error('Erro ao criar registro de usuário:', insertError);
+        throw insertError;
       }
+      
+      console.log("createUserRecord: User record created/updated successfully");
 
     } catch (error: any) {
       console.error('Erro ao criar registro de usuário:', error);
+      throw error;
     }
   },
 
@@ -49,10 +54,13 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
     set({ loading: true, error: null });
     
     try {
+      console.log("fetchUserContext: Fetching user context");
+      
       // Verificar se o usuário está autenticado
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
+        console.log("fetchUserContext: No active session found");
         set({ 
           user: null,
           solutionId: null,
@@ -61,6 +69,8 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         });
         return;
       }
+      
+      console.log("fetchUserContext: Session found, user is authenticated");
       
       // Automaticamente criar um registro de usuário se não existir
       const authUser = session.user;
@@ -81,11 +91,13 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         .maybeSingle();
       
       if (userError) {
+        console.error("fetchUserContext: Error fetching user data", userError);
         set({ error: `Erro ao carregar dados do usuário: ${userError.message}`, loading: false });
         return;
       }
       
       if (!userData) {
+        console.log("fetchUserContext: No user record found, creating one");
         // Criar o usuário se não existir
         await get().createUserRecord(authUser);
         
@@ -104,12 +116,15 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         return;
       }
       
+      console.log("fetchUserContext: User record found", userData);
+      
       // Extrair o papel (role) do usuário e ID da solução (se existirem)
       const userRoles = userData.user_roles as any[] || [];
       const firstUserRole = userRoles[0];
       
       // Verificar se o usuário tem um papel e uma solução associada
       if (!firstUserRole) {
+        console.log("fetchUserContext: No user role found, setting default role");
         set({ 
           user: {
             id: userData.id,
@@ -123,6 +138,8 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         });
         return;
       }
+      
+      console.log("fetchUserContext: User role found", firstUserRole);
       
       // Extrair o ID da solução do primeiro papel do usuário (considerar preferência do usuário)
       const currentSolutionId = get().solutionId;
@@ -140,6 +157,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         .maybeSingle();
         
       if (roleError) {
+        console.error("fetchUserContext: Error fetching role data", roleError);
         set({ error: `Erro ao carregar papel do usuário: ${roleError.message}`, loading: false });
         return;
       }
@@ -180,6 +198,8 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
     set({ loading: true, error: null });
     
     try {
+      console.log(`assignUserRole: Assigning role ${roleName} to user ${userEmail} for solution ${solutionId}`);
+      
       // Utilizar a função assign_user_role do PostgreSQL via supabase.rpc
       const { error } = await supabase.rpc('assign_user_role', {
         in_user_email: userEmail,

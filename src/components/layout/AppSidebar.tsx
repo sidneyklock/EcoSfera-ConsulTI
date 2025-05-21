@@ -37,6 +37,8 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
+  console.log("AppSidebar: Rendering sidebar for user role:", userRole);
+
   // Navigation items with role-based access control
   const navItems: NavItem[] = [
     {
