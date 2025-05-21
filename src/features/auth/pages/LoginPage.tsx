@@ -1,17 +1,16 @@
 
 import { useEffect } from "react";
 import { LoginForm } from "../components";
-import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { FallbackState } from "@/components/ui/fallback-state";
+import { useAuthService } from "../hooks/useAuthService";
 
 /**
  * Página de login com redirecionamento automático
  * Se o usuário já estiver autenticado, redireciona para o dashboard
  */
 const LoginPage = () => {
-  const { authState } = useAuth();
-  const { user, isLoading, error } = authState;
+  const { user, isLoading, error } = useAuthService();
   
   useEffect(() => {
     // Adiciona metadados para SEO
