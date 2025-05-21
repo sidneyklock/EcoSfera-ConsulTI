@@ -1,17 +1,14 @@
 
 import { ReactNode } from "react";
 import { AppSidebar } from "./AppSidebar";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Role } from "@/types";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
-import { useSecureContextStore } from "@/stores/secureContextStore";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { useSecureContext } from "@/hooks/useSecureContext";
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
   requiredRoles?: Role[];
 }
 
@@ -25,11 +22,12 @@ export const DashboardLayout = ({
     role,
     loading,
     error, 
-    fetchUserContext
-  } = useSecureContextStore();
+    LoadingSpinner,
+    ErrorDisplay
+  } = useSecureContext();
   const { collapsed } = useSidebarCollapse(false);
 
-  // If loading, display a loading indicator with skeleton UI
+  // If loading, display a loading indicator
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -56,24 +54,7 @@ export const DashboardLayout = ({
 
   // If there's an error, display an error message
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Erro ao carregar o contexto</AlertTitle>
-          <AlertDescription>
-            {error}
-            <button 
-              onClick={() => fetchUserContext()} 
-              className="mt-2 text-sm underline hover:text-primary transition-colors"
-              aria-label="Tentar novamente"
-            >
-              Tentar novamente
-            </button>
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+    return <ErrorDisplay />;
   }
 
   // If not authenticated, redirect to login
@@ -93,7 +74,7 @@ export const DashboardLayout = ({
         userRole={role}
       />
       <div className={cn(
-        "flex-1 transition-all duration-300",
+        "flex-1 flex flex-col transition-all duration-300",
         collapsed ? "ml-0 md:ml-20" : "ml-0 md:ml-64"
       )}>
         <main 
@@ -101,7 +82,7 @@ export const DashboardLayout = ({
           aria-live="polite"
           aria-relevant="additions removals"
         >
-          {children}
+          {children || <Outlet />}
         </main>
       </div>
     </div>
