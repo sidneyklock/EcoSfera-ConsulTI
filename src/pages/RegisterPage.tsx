@@ -1,10 +1,10 @@
 
 import { RegisterForm } from "../features/auth/components/RegisterForm";
-import { useAuthService } from "../features/auth/hooks/useAuthService";
+import { useAuth } from "../features/auth/hooks";
 import { Navigate } from "react-router-dom";
 
 const RegisterPage = () => {
-  const { user } = useAuthService();
+  const { user } = useAuth();
   
   // Se já estiver autenticado, redireciona para o dashboard
   if (user) {

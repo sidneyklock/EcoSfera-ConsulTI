@@ -1,6 +1,6 @@
 
 import { Navigate } from "react-router-dom";
-import { useSecureContext } from "@/hooks/useSecureContext";
+import { useAuth } from "@/features/auth/hooks";
 import { Role } from "@/types";
 
 /**
@@ -13,10 +13,10 @@ export const useRoleGuard = (
   requiredRole: Role | Role[], 
   redirectTo = "/unauthorized"
 ) => {
-  const { user, loading, role } = useSecureContext();
+  const { user, role, isLoading } = useAuth();
 
   // Se estiver carregando, não faz nada ainda
-  if (loading) {
+  if (isLoading) {
     return null;
   }
 

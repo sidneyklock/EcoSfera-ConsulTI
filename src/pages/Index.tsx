@@ -1,9 +1,9 @@
 
 import { Navigate } from "react-router-dom";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuth } from "@/features/auth/hooks";
 
 const Index = () => {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   
   // Redirecionar para o dashboard se estiver autenticado
   // ou para a página de login se não estiver
