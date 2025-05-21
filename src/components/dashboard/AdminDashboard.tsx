@@ -5,6 +5,7 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { UserRoleAssignment } from "../admin/UserRoleAssignment";
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -106,6 +107,10 @@ export const AdminDashboard = () => {
             </button>
           </div>
         </div>
+      </div>
+      
+      <div className="mt-8">
+        <UserRoleAssignment />
       </div>
     </div>
   );
