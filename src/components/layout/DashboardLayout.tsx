@@ -9,7 +9,7 @@ import { useSecureContext } from "@/hooks/useSecureContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 interface DashboardLayoutProps {
   children?: ReactNode;
@@ -30,10 +30,7 @@ export const DashboardLayout = ({
     ErrorDisplay
   } = useSecureContext();
   const { collapsed } = useSidebarCollapse(false);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const { signOut } = useAuth();
 
   // If loading, display a loading indicator
   if (loading) {
@@ -80,7 +77,7 @@ export const DashboardLayout = ({
   }
 
   // Check permissions if requiredRoles is specified
-  if (requiredRoles && !requiredRoles.includes(user.role)) {
+  if (requiredRoles && role && !requiredRoles.includes(role)) {
     return <Navigate to="/unauthorized" />;
   }
 
@@ -96,7 +93,7 @@ export const DashboardLayout = ({
             <User className="h-4 w-4 mr-1 text-muted-foreground" />
             <span className="text-sm font-medium hidden md:inline">{user?.name || user?.email}</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button variant="ghost" size="sm" onClick={signOut}>
             <LogOut className="h-4 w-4 mr-1" />
             <span className="hidden md:inline">Logout</span>
           </Button>

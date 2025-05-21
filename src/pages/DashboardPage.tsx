@@ -4,11 +4,19 @@ import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { useSecureContext } from "@/hooks/useSecureContext";
 
 const DashboardPage = () => {
-  const { user } = useSecureContext();
+  const { user, role, loading, ErrorDisplay, LoadingSpinner } = useSecureContext();
+  
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+  
+  if (!user) {
+    return <div>Usuário não autenticado.</div>;
+  }
 
   return (
     <>
-      {user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />}
+      {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
     </>
   );
 };

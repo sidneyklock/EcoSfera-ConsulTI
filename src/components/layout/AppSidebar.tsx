@@ -26,7 +26,6 @@ import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
 import { iconClasses, sidebarElementClasses } from "@/lib/tailwind-utils";
-import { useSecureContextStore } from "@/stores/secureContextStore";
 
 interface AppSidebarProps {
   solutionId: string | null;
@@ -35,7 +34,6 @@ interface AppSidebarProps {
 
 export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
   const { signOut } = useAuth();
-  const { user } = useSecureContextStore();
   const location = useLocation();
   const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
 
@@ -133,7 +131,7 @@ export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
           
           <SidebarFooterWrapper className={sidebarElementClasses.footer}>
             <SidebarFooter 
-              user={user} 
+              user={userRole ? { name: '', email: '', id: '', role: userRole } : null} 
               collapsed={collapsed} 
               onSignOut={signOut}
             />
