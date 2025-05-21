@@ -1,72 +1,94 @@
 
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
-import { Role } from '@/types';
-
-interface UserSolution {
-  solution_id: string;
-  role: Role;
-}
+import { Role, User } from '@/types';
 
 interface SecureContextState {
   user: User | null;
   solutionId: string | null;
   role: Role | null;
   loading: boolean;
-  error: Error | null;
+  error: string | null;
   fetchUserContext: () => Promise<void>;
+  setSolutionId: (solutionId: string) => void;
 }
 
-export const useSecureContextStore = create<SecureContextState>((set) => ({
+export const useSecureContextStore = create<SecureContextState>((set, get) => ({
   user: null,
   solutionId: null,
   role: null,
   loading: true,
   error: null,
+
   fetchUserContext: async () => {
     set({ loading: true, error: null });
     
     try {
-      // Obter o usuário atual do Supabase
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      // Verificar se o usuário está autenticado
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (userError) throw userError;
-      
-      if (!user) {
+      if (!session) {
         set({ 
-          user: null, 
-          solutionId: null, 
-          role: null, 
-          loading: false 
+          user: null,
+          solutionId: null,
+          role: null,
+          loading: false
         });
         return;
       }
       
-      // Buscar dados do usuário na tabela user_solutions
-      const { data: userSolution, error: solutionError } = await supabase
-        .from('user_solutions')
-        .select('solution_id, role')
-        .eq('user_id', user.id)
+      // Buscar dados do usuário e sua role
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id, email, role, name, avatar_url')
+        .eq('id', session.user.id)
         .single();
       
-      if (solutionError && solutionError.code !== 'PGRST116') { // Não é um erro "not found"
-        throw solutionError;
+      if (userError) {
+        set({ error: userError.message, loading: false });
+        return;
       }
+      
+      // Buscar a primeira solução disponível para o usuário (se ainda não tiver uma selecionada)
+      const currentSolutionId = get().solutionId;
+      let solutionId = currentSolutionId;
+      
+      if (!currentSolutionId) {
+        const { data: solutionData } = await supabase
+          .from('user_solutions')
+          .select('solution_id')
+          .eq('user_id', userData.id)
+          .limit(1)
+          .single();
+        
+        solutionId = solutionData?.solution_id || null;
+      }
+      
+      // Montar o objeto do usuário
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        role: userData.role,
+        name: userData.name,
+        avatar_url: userData.avatar_url
+      };
       
       set({
         user,
-        solutionId: userSolution?.solution_id || null,
-        role: userSolution?.role || null,
-        loading: false,
+        solutionId,
+        role: userData.role,
+        loading: false
       });
-      
     } catch (error) {
-      console.error('Error fetching secure context:', error);
+      console.error('Erro ao buscar contexto do usuário:', error);
       set({ 
-        error: error instanceof Error ? error : new Error('Erro desconhecido ao carregar contexto'), 
+        error: 'Falha ao carregar dados do usuário', 
         loading: false 
       });
     }
+  },
+  
+  setSolutionId: (solutionId) => {
+    set({ solutionId });
   }
 }));

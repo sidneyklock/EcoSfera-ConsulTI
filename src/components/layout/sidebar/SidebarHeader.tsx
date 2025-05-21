@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { flexCenterClasses } from "@/lib/tailwind-utils";
+import { SolutionSelector } from "../SolutionSelector";
 
 interface SidebarHeaderProps {
   collapsed: boolean;
@@ -15,7 +16,10 @@ export const SidebarHeader = ({ collapsed }: SidebarHeaderProps) => {
           S
         </div>
         {!collapsed && (
-          <div className="font-semibold text-xl">SaaS Platform</div>
+          <div className="flex flex-col">
+            <div className="font-semibold text-xl">SaaS Platform</div>
+            <SolutionSelector />
+          </div>
         )}
       </div>
     </div>
