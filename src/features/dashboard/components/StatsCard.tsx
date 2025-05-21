@@ -3,19 +3,35 @@ import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, cardClasses, iconClasses, transitions, layoutClasses, textClasses, a11yClasses, animations } from "@/lib/utils";
 
+interface StatsTrend {
+  value: number;
+  isPositive: boolean;
+}
+
+/**
+ * Props para o componente StatsCard
+ * @property title - Título do card
+ * @property value - Valor principal a ser exibido
+ * @property description - Descrição opcional
+ * @property icon - Ícone a ser exibido
+ * @property trend - Informação de tendência do valor
+ * @property className - Classes adicionais para estilização
+ * @property isLoading - Estado de carregamento
+ */
 interface StatsCardProps {
   title: string;
   value: string | number;
   description?: string;
   icon: ReactNode;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
+  trend?: StatsTrend;
   className?: string;
   isLoading?: boolean;
 }
 
+/**
+ * Card para exibição de estatísticas
+ * Componente puramente de apresentação, sem lógica de negócio
+ */
 export const StatsCard = ({
   title,
   value,

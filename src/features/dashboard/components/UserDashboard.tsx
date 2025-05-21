@@ -3,16 +3,25 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { MessageSquare, Clock, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { responsive, spacing, cardClasses, transitions, layoutClasses, textClasses, buttonStateClasses, iconClasses, a11yClasses } from "@/lib/utils";
+import { 
+  responsive, 
+  spacing, 
+  cardClasses, 
+  transitions, 
+  layoutClasses, 
+  textClasses, 
+  buttonStateClasses, 
+  iconClasses, 
+  a11yClasses 
+} from "@/lib/utils";
+import { useStatsData } from "../hooks/useStatsData";
 
+/**
+ * Dashboard para usuários regulares
+ * Exibe estatísticas e ações relevantes para o usuário
+ */
 export const UserDashboard = () => {
-  // Dados simulados (seriam obtidos por API em produção)
-  const stats = {
-    messages: 24,
-    projectsCompleted: 3,
-    tasksPending: 8,
-    nextMeeting: "Hoje, 15:00",
-  };
+  const { userStats, isLoading } = useStatsData();
 
   return (
     <div className={spacing.section}>
@@ -21,29 +30,33 @@ export const UserDashboard = () => {
       <div className={responsive.grid.cols4}>
         <StatsCard
           title="Mensagens"
-          value={stats.messages}
+          value={userStats.messages}
           description="Novas mensagens"
           icon={<MessageSquare className="h-6 w-6" />}
           trend={{ value: 5, isPositive: true }}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Projetos Concluídos"
-          value={stats.projectsCompleted}
+          value={userStats.projectsCompleted}
           description="Neste mês"
           icon={<Star className="h-6 w-6" />}
           trend={{ value: 1, isPositive: true }}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Tarefas Pendentes"
-          value={stats.tasksPending}
+          value={userStats.tasksPending}
           description="A serem concluídas"
           icon={<Clock className="h-6 w-6" />}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Próxima Reunião"
-          value={stats.nextMeeting}
+          value={userStats.nextMeeting}
           description="Calendário"
           icon={<Calendar className="h-6 w-6" />}
+          isLoading={isLoading}
         />
       </div>
 

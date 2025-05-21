@@ -3,16 +3,23 @@ import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
 import { UserRoleAssignment } from "@/features/admin/components/UserRoleAssignment";
-import { cn, responsive, spacing, transitions, cardClasses, buttonStateClasses, textClasses } from "@/lib/utils";
+import { 
+  cn, 
+  responsive, 
+  spacing, 
+  transitions, 
+  cardClasses, 
+  buttonStateClasses, 
+  textClasses 
+} from "@/lib/utils";
+import { useStatsData } from "../hooks/useStatsData";
 
+/**
+ * Dashboard para administradores
+ * Exibe estatísticas gerais do sistema e ações administrativas
+ */
 export const AdminDashboard = () => {
-  // Dados simulados (seriam obtidos por API em produção)
-  const stats = {
-    totalUsers: 1293,
-    activeUsers: 857,
-    totalProjects: 42,
-    activeProjects: 24,
-  };
+  const { adminStats, isLoading } = useStatsData();
 
   return (
     <div className={spacing.section}>
@@ -21,31 +28,35 @@ export const AdminDashboard = () => {
       <div className={responsive.grid.cols4}>
         <StatsCard
           title="Total de Usuários"
-          value={stats.totalUsers}
+          value={adminStats.totalUsers}
           description="Todos os usuários registrados"
           icon={<Users className="h-6 w-6" />}
           trend={{ value: 12.5, isPositive: true }}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Usuários Ativos"
-          value={stats.activeUsers}
+          value={adminStats.activeUsers}
           description="Usuários ativos nos últimos 30 dias"
           icon={<Activity className="h-6 w-6" />}
           trend={{ value: 8.2, isPositive: true }}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Total de Projetos"
-          value={stats.totalProjects}
+          value={adminStats.totalProjects}
           description="Todos os projetos criados"
           icon={<Briefcase className="h-6 w-6" />}
           trend={{ value: 3.1, isPositive: true }}
+          isLoading={isLoading}
         />
         <StatsCard
           title="Projetos Ativos"
-          value={stats.activeProjects}
+          value={adminStats.activeProjects}
           description="Projetos ativos no momento"
           icon={<BarChart2 className="h-6 w-6" />}
           trend={{ value: 1.2, isPositive: false }}
+          isLoading={isLoading}
         />
       </div>
 

@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Sidebar,
   SidebarProvider,
@@ -9,22 +9,13 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  Home,
-  Users,
-  BarChart,
-  Settings,
-  MessageSquare,
-  Menu,
-  X,
-  Shield,
-  Leaf
-} from "lucide-react";
-import { Role } from "@/types";
+import { Menu, X } from "lucide-react";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
-import { SidebarNavigation, NavItem } from "./sidebar/SidebarNavigation";
+import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
-import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
+import { useSidebarConfig } from "@/features/layout/hooks/useSidebarConfig";
+import { useNavigation } from "@/features/layout/hooks/useNavigation";
+import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
 import { 
   iconClasses,
   sidebarElementClasses,
@@ -33,109 +24,22 @@ import {
   animations,
   a11yClasses
 } from "@/lib/utils";
-import { useEffect, useCallback } from "react";
-import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
+import type { Role } from "@/types";
 
 interface AppSidebarProps {
   solutionId: string | null;
   userRole: Role | null;
 }
 
+/**
+ * Componente principal de navegação lateral da aplicação
+ * Utiliza hooks especializados para gerenciar sua configuração
+ */
 export const AppSidebar = ({ solutionId, userRole }: AppSidebarProps) => {
-  const location = useLocation();
-  const { collapsed, setCollapsed, toggleCollapsed } = useSidebarCollapse(false);
-  const { signOut } = useAuthStore();
-
-  // Detectar tamanho da tela e ajustar sidebar para melhor experiência mobile
-  const handleScreenResize = useCallback(() => {
-    if (window.innerWidth < 768) {
-      setCollapsed(true);
-    } else if (window.innerWidth >= 1280) {
-      setCollapsed(false);
-    }
-  }, [setCollapsed]);
-
-  useEffect(() => {
-    // Configurar estado inicial baseado no tamanho da tela
-    handleScreenResize();
-    
-    // Adicionar evento para detectar mudanças de tamanho de tela
-    window.addEventListener('resize', handleScreenResize);
-    
-    // Fechar sidebar em dispositivos móveis quando a rota mudar
-    if (window.innerWidth < 768) {
-      setCollapsed(true);
-    }
-
-    return () => {
-      window.removeEventListener('resize', handleScreenResize);
-    };
-  }, [location.pathname, setCollapsed, handleScreenResize]);
-
-  // Handle sign out
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
-
-  // Navigation items with role-based access control
-  const navItems: NavItem[] = [
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: Home,
-      roles: ["user", "admin"],
-    },
-    {
-      title: "Admin",
-      href: "/admin",
-      icon: Shield,
-      roles: ["admin"],
-    },
-    {
-      title: "Usuários",
-      href: "/users",
-      icon: Users,
-      roles: ["admin"],
-    },
-    {
-      title: "Analytics",
-      href: "/analytics",
-      icon: BarChart,
-      roles: ["admin"],
-    },
-    {
-      title: "Consultoria",
-      href: "/chat",
-      icon: MessageSquare,
-      roles: ["user", "admin"],
-    },
-    {
-      title: "Sustentabilidade",
-      href: "/sustainability",
-      icon: Leaf,
-      roles: ["user", "admin"],
-    },
-    {
-      title: "Configurações",
-      href: "/settings",
-      icon: Settings,
-      roles: ["user", "admin"],
-    },
-  ];
-
-  // Filter items based on the current user's role
-  const filteredItems = navItems.filter(
-    (item) => userRole && item.roles.includes(userRole)
-  );
-
-  // Check if the current item is active
-  const isActive = (href: string) => location.pathname === href;
+  const { collapsed, setCollapsed, toggleCollapsed } = useSidebarConfig();
+  const { filteredItems, isActive } = useNavigation(userRole);
+  const { handleSignOut } = useAuthActions();
 
   return (
     <>

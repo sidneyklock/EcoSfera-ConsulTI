@@ -1,16 +1,20 @@
-import { useEffect, memo, useMemo } from "react";
+
+import { useEffect, memo } from "react";
 import { AppSidebar } from "./AppSidebar";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useSidebarCollapse } from "@/hooks/useSidebarCollapse";
+import { useSidebarConfig } from "@/features/layout/hooks/useSidebarConfig";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { Button } from "@/components/ui/button";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { FallbackState } from "@/components/ui/fallback-state";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { Role } from "@/types";
 import { logger } from "@/utils/logger";
+import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
 
+/**
+ * Cabeçalho do dashboard com informações do usuário
+ */
 const DashboardHeader = memo(({ userName, onSignOut }: { userName?: string, onSignOut: () => void }) => (
   <header className="border-b h-16 px-4 flex items-center justify-between sticky top-0 bg-background z-10 shadow-sm">
     <div className="flex items-center">
@@ -31,6 +35,9 @@ const DashboardHeader = memo(({ userName, onSignOut }: { userName?: string, onSi
 
 DashboardHeader.displayName = 'DashboardHeader';
 
+/**
+ * Conteúdo principal do dashboard
+ */
 const DashboardContent = memo(({ collapsed, children }: { collapsed: boolean, children: React.ReactNode }) => (
   <div className={cn(
     "flex-1 flex flex-col transition-all duration-300",
@@ -48,18 +55,14 @@ const DashboardContent = memo(({ collapsed, children }: { collapsed: boolean, ch
 
 DashboardContent.displayName = 'DashboardContent';
 
+/**
+ * Layout principal do dashboard
+ * Gerencia o estado da autenticação e renderiza o conteúdo apropriado
+ */
 const DashboardLayout = () => {
-  const { user, role, solutionId, isLoading, error, signOut } = useAuthService();
-  const { collapsed } = useSidebarCollapse(false);
-  const navigate = useNavigate();
-
-  // Validate role early and memoize to prevent unnecessary re-renders
-  const userRole = useMemo(() => {
-    const validRoles: Role[] = ["anon", "user", "admin", "system", "member", "owner"];
-    return (role && typeof role === 'string' && validRoles.includes(role as Role)) 
-      ? (role as Role) 
-      : null;
-  }, [role]);
+  const { user, role, solutionId, isLoading, error } = useAuthService();
+  const { collapsed } = useSidebarConfig();
+  const { handleSignOut, userName } = useAuthActions();
 
   useEffect(() => {
     logger.debug({
@@ -67,7 +70,7 @@ const DashboardLayout = () => {
       message: "DashboardLayout: Initial render",
       data: { 
         hasUser: !!user, 
-        userRole, 
+        userRole: role, 
         hasSolutionId: !!solutionId 
       }
     });
@@ -83,30 +86,9 @@ const DashboardLayout = () => {
         data: { renderTimeMs: renderTime }
       });
     };
-  }, [user, userRole, solutionId]);
+  }, [user, role, solutionId]);
 
-  // Memoize the handle sign out function to prevent unnecessary re-renders
-  const handleSignOut = useMemo(() => async () => {
-    try {
-      logger.info({
-        userId: user?.id,
-        action: "user_signout",
-        message: "User initiated sign out"
-      });
-      
-      await signOut();
-      navigate("/login");
-    } catch (error) {
-      logger.error({
-        userId: user?.id,
-        action: "signout_error",
-        message: "Error signing out",
-        data: { error }
-      });
-    }
-  }, [signOut, navigate, user?.id]);
-
-  // If loading, display a skeleton loader instead of spinner
+  // Se estiver carregando, exibe um skeleton loader
   if (isLoading) {
     logger.debug({
       action: "dashboard_loading",
@@ -128,7 +110,7 @@ const DashboardLayout = () => {
     );
   }
 
-  // If there's an error, display an error message with reload button
+  // Se houver um erro, exibe uma mensagem de erro com botão para recarregar
   if (error) {
     logger.error({
       userId: user?.id,
@@ -147,7 +129,7 @@ const DashboardLayout = () => {
     );
   }
 
-  // If not authenticated, redirect to login
+  // Se não estiver autenticado, redireciona para login
   if (!user) {
     logger.debug({
       action: "dashboard_redirect",
@@ -161,20 +143,20 @@ const DashboardLayout = () => {
     userId: user.id,
     action: "dashboard_render",
     message: "Rendering dashboard",
-    data: { userRole }
+    data: { userRole: role }
   });
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <DashboardHeader 
-        userName={user?.name || user?.email} 
+        userName={userName} 
         onSignOut={handleSignOut} 
       />
       
       <div className="flex flex-1">
         <AppSidebar 
           solutionId={solutionId} 
-          userRole={userRole}
+          userRole={role}
         />
         <DashboardContent collapsed={collapsed}>
           <Outlet />
