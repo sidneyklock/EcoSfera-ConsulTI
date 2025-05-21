@@ -71,6 +71,7 @@ export const useSupabaseSession = () => {
         fetchLogger.success(
           "auth_session", 
           "Sessão verificada com sucesso", 
+          mappedUser, 
           { authenticated: !!data.session, userInfo: mappedUser ? { id: mappedUser.id, email: mappedUser.email } : null }
         );
         

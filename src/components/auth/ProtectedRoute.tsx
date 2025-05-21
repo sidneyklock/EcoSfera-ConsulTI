@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSecureContext } from '@/hooks/useSecureContext';
 import { Role } from '@/types';
+import { FallbackState } from '@/components/ui/fallback-state';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -23,11 +24,20 @@ export const ProtectedRoute = ({
   requiredSolution 
 }: ProtectedRouteProps) => {
   // Obter o contexto seguro do usuário
-  const { user, solutionId, role, loading, LoadingSpinner } = useSecureContext();
+  const { user, solutionId, role, loading, error } = useSecureContext();
   
   // Enquanto carrega, mostrar o spinner
   if (loading) {
-    return <LoadingSpinner />;
+    return <FallbackState type="loading" title="Carregando" message="Verificando suas credenciais..." />;
+  }
+  
+  // Se houver erro, mostrar mensagem de erro
+  if (error) {
+    return <FallbackState 
+      type="error" 
+      title="Erro de autenticação" 
+      message={error} 
+    />;
   }
   
   // Se não estiver autenticado, redirecionar para login
