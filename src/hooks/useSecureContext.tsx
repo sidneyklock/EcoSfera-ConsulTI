@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useSecureContextStore } from '@/stores/secureContextStore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Hook que fornece o contexto seguro do usuário atual
@@ -46,6 +47,3 @@ export function useSecureContext() {
     ) : null
   };
 }
-
-// Importação necessária para o componente
-import { supabase } from '@/lib/supabase';
