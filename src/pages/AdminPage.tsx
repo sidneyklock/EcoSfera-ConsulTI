@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WebhookKeyManager } from "@/components/admin/WebhookKeyManager";
 import { AdminLogViewer } from "@/components/admin/AdminLogViewer";
 import { UserRoleAssignment } from "@/components/admin/UserRoleAssignment";
+import { TokenManager } from "@/components/admin/TokenManager";
+import { WebhookLogs } from "@/components/admin/WebhookLogs";
 
 const AdminPage = () => {
   // Use the role guard hook to protect this page
@@ -53,10 +55,12 @@ const AdminPage = () => {
       </p>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-6 mb-8">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="users">Usuários e Roles</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+          <TabsTrigger value="tokens">Tokens n8n</TabsTrigger>
+          <TabsTrigger value="webhook-logs">Logs de Webhook</TabsTrigger>
           <TabsTrigger value="logs">Logs de Auditoria</TabsTrigger>
         </TabsList>
         
@@ -82,6 +86,13 @@ const AdminPage = () => {
                 Monitore atividades do sistema e revise logs de auditoria.
               </p>
             </div>
+            
+            <div className="p-6 border rounded-lg bg-card shadow">
+              <h3 className="font-medium text-lg mb-2">Integrações n8n</h3>
+              <p className="text-sm text-muted-foreground">
+                Gerencie tokens de autenticação e monitore webhooks do n8n.
+              </p>
+            </div>
           </div>
         </TabsContent>
         
@@ -91,6 +102,14 @@ const AdminPage = () => {
         
         <TabsContent value="webhooks" className="space-y-4">
           <WebhookKeyManager />
+        </TabsContent>
+        
+        <TabsContent value="tokens" className="space-y-4">
+          <TokenManager />
+        </TabsContent>
+        
+        <TabsContent value="webhook-logs" className="space-y-4">
+          <WebhookLogs />
         </TabsContent>
         
         <TabsContent value="logs" className="space-y-4">
