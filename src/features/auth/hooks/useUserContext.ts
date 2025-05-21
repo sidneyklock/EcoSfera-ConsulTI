@@ -13,7 +13,9 @@ interface UserContextData {
  * Hook to provide user context data with optimized re-renders
  */
 export function useUserContext() {
-  const { user, role, solutionId, isLoading, error, refreshContext } = useAuth();
+  const auth = useAuth();
+  const { user, role, solutionId, isLoading, error } = auth.authState;
+  const refreshContext = auth.signOut; // Using signOut as the refreshContext function
   
   // Validate role type safety early to avoid re-renders
   // Only re-validate when role changes

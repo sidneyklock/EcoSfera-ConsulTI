@@ -50,7 +50,9 @@ const DashboardContent = memo(({ collapsed, children }: { collapsed: boolean, ch
 DashboardContent.displayName = 'DashboardContent';
 
 const DashboardLayout = () => {
-  const { user, role, solutionId, isLoading, error, signOut } = useAuth();
+  const auth = useAuth();
+  const { user, role, solutionId, isLoading, error } = auth.authState;
+  const signOut = auth.signOut;
   const { collapsed } = useSidebarCollapse(false);
   const navigate = useNavigate();
 
