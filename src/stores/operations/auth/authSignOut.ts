@@ -40,7 +40,6 @@ export const signOut = async (set: Function, get: Function) => {
       message: "Logout realizado com sucesso"
     });
     
-    return { success: true };
   } catch (error: any) {
     const errorMessage = error.message || "Erro ao realizar logout";
     logger.error({
@@ -52,7 +51,7 @@ export const signOut = async (set: Function, get: Function) => {
     
     set({ error: errorMessage });
     toast.error(errorMessage);
-    return { success: false };
+    
   } finally {
     const duration = performance.now() - methodStart;
     
