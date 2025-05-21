@@ -1,13 +1,12 @@
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/context/AuthContext";
 
 const Index = () => {
-  const { user } = useAuth();
+  const { authState } = useAuth();
   
-  // Redirecionar para o dashboard se estiver autenticado
-  // ou para a página de login se não estiver
-  if (user) {
+  // Redirect to dashboard if authenticated or to login if not
+  if (authState.user) {
     return <Navigate to="/dashboard" />;
   } else {
     return <Navigate to="/login" />;
