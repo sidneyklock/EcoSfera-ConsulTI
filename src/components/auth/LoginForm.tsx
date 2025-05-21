@@ -21,8 +21,8 @@ export const LoginForm = () => {
   };
 
   const handleDevLogin = async () => {
-    // Usuário e senha temporários para desenvolvimento
-    await signIn("dev@example.com", "senha123");
+    // Usuário e senha temporários para desenvolvimento - usando um email existente
+    await signIn("sidney.klock@gmail.com", "senha123");
   };
 
   return (

@@ -70,8 +70,8 @@ export function LoginForm() {
     try {
       setIsDemoAuthLoading(true);
       toast.loading("Efetuando login de desenvolvimento...", { id: "dev-login" });
-      // Usuário e senha temporários para desenvolvimento
-      await signIn("dev@example.com", "senha123");
+      // Use o email que já existe no seu sistema Supabase
+      await signIn("sidney.klock@gmail.com", "senha123");
       toast.success("Login de desenvolvimento concluído", { id: "dev-login" });
     } catch (err) {
       toast.error("Falha no login de desenvolvimento", { id: "dev-login" });
