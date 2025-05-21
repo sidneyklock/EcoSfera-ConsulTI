@@ -1,31 +1,10 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { WelcomeHeader } from "./WelcomeHeader";
 import { StatsCard } from "./StatsCard";
 import { Users, BarChart2, Activity, Briefcase } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 import { UserRoleAssignment } from "../admin/UserRoleAssignment";
 
 export const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const { authState } = useAuth();
-  const { user } = authState;
-
-  useEffect(() => {
-    // Redirecionar se o usuário não estiver autenticado
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    // Redirecionar se o usuário não for administrador
-    if (user.role !== "admin") {
-      navigate("/unauthorized");
-      return;
-    }
-  }, [user, navigate]);
-
   // Dados simulados (seriam obtidos por API em produção)
   const stats = {
     totalUsers: 1293,

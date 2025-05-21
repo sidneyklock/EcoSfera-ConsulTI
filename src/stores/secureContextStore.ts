@@ -27,7 +27,7 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
       // Inserir o usuário na tabela public.users se não existir
       const { error: insertError } = await supabase
         .from('users')
-        .insert([
+        .upsert([
           { 
             id: authUser.id, 
             email: authUser.email,
@@ -64,7 +64,6 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
       
       // Automaticamente criar um registro de usuário se não existir
       const authUser = session.user;
-      await get().createUserRecord(authUser);
       
       // Buscar dados do usuário e informações relacionadas com JOIN
       const { data: userData, error: userError } = await supabase
@@ -87,7 +86,21 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
       }
       
       if (!userData) {
-        set({ error: 'Usuário não encontrado no banco de dados após tentativa de criação', loading: false });
+        // Criar o usuário se não existir
+        await get().createUserRecord(authUser);
+        
+        // Define um papel padrão para o usuário
+        set({ 
+          user: {
+            id: authUser.id,
+            email: authUser.email,
+            role: 'user',
+            name: authUser.user_metadata?.name || authUser.email.split('@')[0] || ''
+          },
+          role: 'user',
+          solutionId: null,
+          loading: false
+        });
         return;
       }
       
@@ -147,6 +160,9 @@ export const useSecureContextStore = create<SecureContextState>((set, get) => ({
         role: userRole,
         loading: false
       });
+      
+      console.log('SecureContext loaded:', { user, role: userRole, solutionId });
+      
     } catch (error: any) {
       console.error('Erro ao buscar contexto do usuário:', error);
       set({ 
